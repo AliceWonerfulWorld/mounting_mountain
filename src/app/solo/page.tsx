@@ -39,21 +39,32 @@ export default function SoloPage() {
   const currentRound = game.players[0].rounds[game.roundIndex];
   const [text, setText] = useState("");
 
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
   const isFinished = game.status === "finished";
 
-  function fakeAnalyze(input: string) {
-    // いまはダミー：文章の長さでそれっぽく変化させる
-    const mountScore = Math.min(1, Math.max(0, input.length / 60));
-    const altitude = Math.round(mountScore * 8848);
-    const labels = altitude > 6000 ? ["数値", "比較"] : altitude > 3000 ? ["比較"] : ["弱め"];
-    const rewrite = "（ダミー）優しい言い方にするとこう！";
-    return { mountScore, altitude, labels, rewrite };
-  }
 
-  function submitRound() {
-    if (!text.trim() || isFinished) return;
+async function submitRound() {
+  if (!text.trim() || isFinished || loading) return;
 
-    const result = fakeAnalyze(text.trim());
+  setLoading(true);
+  setError(null);
+
+  try {
+    const res = await fetch("/api/analyze", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: text.trim() }),
+    });
+
+    if (!res.ok) {
+      const msg = await res.text().catch(() => "");
+      throw new Error(`API Error: ${res.status} ${msg}`);
+    }
+
+    const result = await res.json(); // MountResult想定
+
     setGame((prev) => {
       const next = structuredClone(prev);
 
@@ -76,7 +87,12 @@ export default function SoloPage() {
     });
 
     setText("");
+  } catch (e) {
+    setError(e instanceof Error ? e.message : "Unknown error");
+  } finally {
+    setLoading(false);
   }
+}
 
   function resetGame() {
     const rounds = createRounds(promptTexts, ROUND_COUNT);
@@ -111,6 +127,7 @@ export default function SoloPage() {
           <div className="font-semibold">
             ラウンド {Math.min(game.roundIndex + 1, ROUND_COUNT)} / {ROUND_COUNT}
           </div>
+          {error && <div className="text-sm text-red-600">エラー: {error}</div>}
           <div className="text-sm">
             合計標高: <span className="font-semibold">{game.players[0].totalScore}</span> m
           </div>
@@ -133,11 +150,12 @@ export default function SoloPage() {
             <div className="flex gap-2">
               <button
                 className="px-4 py-2 rounded bg-black text-white disabled:opacity-50"
-                disabled={!text.trim()}
+                disabled={!text.trim() || loading}
                 onClick={submitRound}
               >
-                判定して次へ
+                {loading ? "判定中..." : "判定して次へ"}
               </button>
+
               <button className="px-4 py-2 rounded border" onClick={resetGame}>
                 リセット
               </button>
