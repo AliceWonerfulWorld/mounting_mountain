@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import type { GameState, Round } from "@/types/game";
 import { PROMPTS } from "@/lib/prompts";
+import { MountainView } from "@/components/MountainView";
 
 function createRounds(promptTexts: string[], roundCount: number): Round[] {
   return promptTexts.slice(0, roundCount).map((p, i) => ({
@@ -45,54 +46,54 @@ export default function SoloPage() {
   const isFinished = game.status === "finished";
 
 
-async function submitRound() {
-  if (!text.trim() || isFinished || loading) return;
+  async function submitRound() {
+    if (!text.trim() || isFinished || loading) return;
 
-  setLoading(true);
-  setError(null);
+    setLoading(true);
+    setError(null);
 
-  try {
-    const res = await fetch("/api/analyze", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text: text.trim() }),
-    });
+    try {
+      const res = await fetch("/api/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: text.trim() }),
+      });
 
-    if (!res.ok) {
-      const msg = await res.text().catch(() => "");
-      throw new Error(`API Error: ${res.status} ${msg}`);
-    }
-
-    const result = await res.json(); // MountResult想定
-
-    setGame((prev) => {
-      const next = structuredClone(prev);
-
-      const player = next.players[0];
-      const round = player.rounds[next.roundIndex];
-
-      round.inputText = text.trim();
-      round.result = result;
-
-      player.totalScore += result.altitude;
-
-      // 次ラウンドへ
-      if (next.roundIndex + 1 >= player.rounds.length) {
-        next.status = "finished";
-      } else {
-        next.roundIndex += 1;
+      if (!res.ok) {
+        const msg = await res.text().catch(() => "");
+        throw new Error(`API Error: ${res.status} ${msg}`);
       }
 
-      return next;
-    });
+      const result = await res.json(); // MountResult想定
 
-    setText("");
-  } catch (e) {
-    setError(e instanceof Error ? e.message : "Unknown error");
-  } finally {
-    setLoading(false);
+      setGame((prev) => {
+        const next = structuredClone(prev);
+
+        const player = next.players[0];
+        const round = player.rounds[next.roundIndex];
+
+        round.inputText = text.trim();
+        round.result = result;
+
+        player.totalScore += result.altitude;
+
+        // 次ラウンドへ
+        if (next.roundIndex + 1 >= player.rounds.length) {
+          next.status = "finished";
+        } else {
+          next.roundIndex += 1;
+        }
+
+        return next;
+      });
+
+      setText("");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Unknown error");
+    } finally {
+      setLoading(false);
+    }
   }
-}
 
   function resetGame() {
     const rounds = createRounds(promptTexts, ROUND_COUNT);
@@ -187,13 +188,16 @@ async function submitRound() {
 
               <div className="pt-2 text-sm text-gray-600">結果</div>
               {r.result ? (
-                <div className="space-y-1">
-                  <div>標高: {r.result.altitude} m</div>
-                  <div>スコア: {r.result.mountScore.toFixed(2)}</div>
-                  <div>ラベル: {r.result.labels.join(", ")}</div>
-                  <div className="pt-1">
-                    <div className="font-semibold">言い換え</div>
-                    <div>{r.result.rewrite}</div>
+                <div className="flex items-start gap-4">
+                  <MountainView altitude={r.result.altitude} size={120} />
+                  <div className="space-y-1 flex-1">
+                    <div className="text-lg font-bold">{r.result.altitude} m</div>
+                    <div>スコア: {r.result.mountScore.toFixed(2)}</div>
+                    <div>ラベル: {r.result.labels.join(", ")}</div>
+                    <div className="pt-1">
+                      <div className="font-semibold text-xs text-gray-500">言い換え</div>
+                      <div className="text-sm">{r.result.rewrite}</div>
+                    </div>
                   </div>
                 </div>
               ) : (
