@@ -1,4 +1,5 @@
 import type { MountResult } from "./mount";
+export type { MountResult };
 
 
 /**
@@ -6,10 +7,10 @@ import type { MountResult } from "./mount";
  * prompt（お題）に対して、プレイヤーが入力して、結果がつく
  */
 export type Round = {
-  id: string; // ラウンド識別子（"r1"みたいなのでOK）
-  prompt: string; // お題
-  inputText?: string; // プレイヤー入力（未入力ならundefined）
-  result?: MountResult; // AI結果（未解析ならundefined）
+    id: string; // ラウンド識別子（"r1"みたいなのでOK）
+    prompt: string; // お題
+    inputText?: string; // プレイヤー入力（未入力ならundefined）
+    result?: MountResult; // AI結果（未解析ならundefined）
 };
 
 /**
@@ -17,10 +18,10 @@ export type Round = {
  * MVP(ソロ)では players は1人だけでOK
  */
 export type Player = {
-  id: string; // "p1" / "p2"
-  name: string; // 表示名
-  totalScore: number; // 合計スコア（例：標高合計など）
-  rounds: Round[]; // 各ラウンドの入力・結果
+    id: string; // "p1" / "p2"
+    name: string; // 表示名
+    totalScore: number; // 合計スコア（例：標高合計など）
+    rounds: Round[]; // 各ラウンドの入力・結果
 };
 
 /**
@@ -30,9 +31,9 @@ export type Player = {
 export type GameMode = "solo" | "versus_local" | "versus_online";
 
 export type GameState = {
-  mode: GameMode;
-  roundIndex: number; // 現在のラウンド（0-based）
-  prompts: string[]; // お題リスト（元データ）
-  players: Player[]; // MVPは1人だけ入れる
-  status: "idle" | "playing" | "finished";
+    mode: GameMode;
+    roundIndex: number; // 現在のラウンド（0-based）
+    prompts: string[]; // お題リスト（元データ）
+    players: Player[]; // MVPは1人だけ入れる
+    status: "idle" | "playing" | "finished";
 };
