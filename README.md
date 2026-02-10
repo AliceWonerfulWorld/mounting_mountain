@@ -1,36 +1,75 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🏔 マウンティングマウンテン
 
-## Getting Started
+「マウント」を“標高”で可視化するAIゲーム。
 
-First, run the development server:
+入力された文章のマウンティング度をAIが判定し、
+エベレスト（8848m）を目指す対戦型コミュニケーションゲームです。
+
+---
+
+## 🎮 アプリ概要
+
+日常会話の中に潜む「マウンティング発言」を、
+AIがスコアリングし、標高（m）として表示します。
+
+- マウントが強いほど標高が上がる
+- 角を取った言い換えも生成
+- ラベルでマウントの種類を分類
+
+例：
+- 数値マウント
+- 比較マウント
+- 努力マウント
+- 皮肉マウント
+
+---
+
+## 🧠 コンセプト
+
+> 「なんとなく感じるマウント」を、数値で説明できるようにする。
+
+技術で感情を可視化することで、
+コミュニケーションの面白さと危うさを同時に体験できる設計です。
+
+---
+
+## 🕹 現在の機能（MVP）
+
+### ✅ ソロモード
+- 3ラウンド制
+- お題に対して文章を入力
+- AIがマウンティング度を判定
+- 標高表示（0〜8848m）
+- 合計標高を算出
+- 履歴表示
+
+### ✅ フォールバック判定
+APIキーが無い環境でも動作する安全設計。
+
+---
+
+## 🏔 今後の拡張予定
+
+- ローカル対戦モード
+- 山の可視化UI（標高に応じて成長）
+- マウント山脈モード（会話ログ解析）
+- オンライン対戦
+- ランキング機能
+
+---
+
+## 🛠 技術スタック
+
+- Next.js (App Router)
+- TypeScript
+- Tailwind CSS
+- OpenAI API（オプション）
+- Fallbackルールベース判定
+
+---
+
+## 🚀 セットアップ
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
