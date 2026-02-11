@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import type { GameState, Round } from "@/types/game";
 import { PROMPTS } from "@/lib/prompts";
 import { MountainView } from "@/components/MountainView";
+import { pickN } from "@/lib/random";
 
 function createRounds(promptTexts: string[], roundCount: number): Round[] {
   return promptTexts.slice(0, roundCount).map((p, i) => ({
@@ -16,11 +17,10 @@ export default function SoloPage() {
   // ラウンド数（まずは3で固定がデモ安定）
   const ROUND_COUNT = 3;
 
-  // PROMPTS から text だけ抜き出し（GameStateはstring[]で運用）
-  const promptTexts = useMemo(() => PROMPTS.map((p) => p.text), []);
-
   const [game, setGame] = useState<GameState>(() => {
-    const rounds = createRounds(promptTexts, ROUND_COUNT);
+    // 初期化時にランダムに選ぶ
+    const selectedPrompts = pickN(PROMPTS, ROUND_COUNT).map((p) => p.text);
+    const rounds = createRounds(selectedPrompts, ROUND_COUNT);
     return {
       mode: "solo",
       status: "playing",
@@ -102,7 +102,9 @@ export default function SoloPage() {
   }
 
   function resetGame() {
-    const rounds = createRounds(promptTexts, ROUND_COUNT);
+    // リセット時もランダムに再抽選
+    const selectedPrompts = pickN(PROMPTS, ROUND_COUNT).map((p) => p.text);
+    const rounds = createRounds(selectedPrompts, ROUND_COUNT);
     setGame({
       mode: "solo",
       status: "playing",
