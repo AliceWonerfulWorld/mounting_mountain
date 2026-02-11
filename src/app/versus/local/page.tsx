@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState, useEffect } from "react";
 import type { GameState, Round } from "@/types/game";
 import { PROMPTS } from "@/lib/prompts";
@@ -194,6 +195,12 @@ export default function VersusLocalPage() {
                     <button onClick={resetGame} className="w-full py-3 bg-black text-white rounded-lg font-bold">
                         再戦する (Rematch)
                     </button>
+                    <Link
+                        href="/"
+                        className="block w-full py-3 text-center rounded-lg border hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors"
+                    >
+                        タイトルに戻る
+                    </Link>
                 </section>
             )}
 
