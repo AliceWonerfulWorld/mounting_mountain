@@ -15,6 +15,12 @@ export default function Home() {
         >
           ソロモードで遊ぶ
         </Link>
+        <Link
+          href="/versus/local"
+          className="px-6 py-3 rounded-lg border border-black dark:border-white text-black dark:text-white font-semibold hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-center"
+        >
+          対戦モード (Beta)
+        </Link>
       </div>
     </main>
   );
