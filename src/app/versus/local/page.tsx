@@ -48,6 +48,7 @@ export default function VersusLocalPage() {
     const [text, setText] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [isHistoryOpen, setIsHistoryOpen] = useState(false);
 
     if (!game) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
 
@@ -146,6 +147,7 @@ export default function VersusLocalPage() {
         });
         setText("");
     }
+
 
     return (
         <main className="min-h-screen p-4 max-w-xl mx-auto space-y-6">
@@ -260,6 +262,59 @@ export default function VersusLocalPage() {
                     </button>
                 </section>
             )}
+
+            {/* 履歴 (History) */}
+            <section className="space-y-4 pt-4 border-t">
+                <button
+                    onClick={() => setIsHistoryOpen(!isHistoryOpen)}
+                    className="w-full flex items-center justify-between text-sm text-gray-500 hover:text-gray-800 transition-colors px-2"
+                >
+                    <span>📜 対戦履歴</span>
+                    <span>{isHistoryOpen ? "閉じる ▲" : "開く ▼"}</span>
+                </button>
+
+                {isHistoryOpen && (
+                    <div className="space-y-3 animate-in slide-in-from-top-2 fade-in duration-300">
+                        {Array.from({ length: Math.max(game.players[0].rounds.length, game.players[1].rounds.length) }).map((_, i) => {
+                            const r1 = game.players[0].rounds[i];
+                            const r2 = game.players[1].rounds[i];
+                            if (!r1 && !r2) return null;
+
+                            return (
+                                <div key={i} className="space-y-2">
+                                    <div className="text-xs font-bold text-center text-gray-400">Round {i + 1}</div>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        {/* P1 History */}
+                                        <div className={clsx("p-2 rounded text-xs border", r1?.result ? "bg-red-50 border-red-100 dark:bg-red-900/20 dark:border-red-900" : "bg-gray-50 border-gray-100 opacity-50")}>
+                                            <div className="font-bold text-red-600 mb-1">Player 1</div>
+                                            {r1?.result ? (
+                                                <>
+                                                    <div className="font-bold text-lg">{r1.result.altitude}m</div>
+                                                    <div className="text-gray-600 dark:text-gray-400 line-clamp-2">{r1.inputText}</div>
+                                                </>
+                                            ) : (
+                                                <div className="text-gray-400">-</div>
+                                            )}
+                                        </div>
+                                        {/* P2 History */}
+                                        <div className={clsx("p-2 rounded text-xs border", r2?.result ? "bg-blue-50 border-blue-100 dark:bg-blue-900/20 dark:border-blue-900" : "bg-gray-50 border-gray-100 opacity-50")}>
+                                            <div className="font-bold text-blue-600 mb-1">Player 2</div>
+                                            {r2?.result ? (
+                                                <>
+                                                    <div className="font-bold text-lg">{r2.result.altitude}m</div>
+                                                    <div className="text-gray-600 dark:text-gray-400 line-clamp-2">{r2.inputText}</div>
+                                                </>
+                                            ) : (
+                                                <div className="text-gray-400">-</div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                )}
+            </section>
         </main>
     );
 }
