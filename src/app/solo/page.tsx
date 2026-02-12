@@ -1,27 +1,25 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import Link from "next/link";
+import { useMemo, useState, useEffect } from "react";
 import type { GameState, Round } from "@/types/game";
 import { PROMPTS } from "@/lib/prompts";
 import { MountainView } from "@/components/MountainView";
 import { pickN } from "@/lib/random";
+import { createRounds } from "@/lib/game";
 
-function createRounds(promptTexts: string[], roundCount: number): Round[] {
-  return promptTexts.slice(0, roundCount).map((p, i) => ({
-    id: `r${i + 1}`,
-    prompt: p,
-  }));
-}
 
 export default function SoloPage() {
   // ラウンド数（まずは3で固定がデモ安定）
   const ROUND_COUNT = 3;
 
-  const [game, setGame] = useState<GameState>(() => {
+  const [game, setGame] = useState<GameState | null>(null);
+
+  useEffect(() => {
     // 初期化時にランダムに選ぶ
     const selectedPrompts = pickN(PROMPTS, ROUND_COUNT).map((p) => p.text);
     const rounds = createRounds(selectedPrompts, ROUND_COUNT);
-    return {
+    setGame({
       mode: "solo",
       status: "playing",
       roundIndex: 0,
@@ -34,16 +32,19 @@ export default function SoloPage() {
           rounds,
         },
       ],
-    };
-  });
+    });
+  }, []);
 
-  const currentRound = game.players[0].rounds[game.roundIndex];
   const [text, setText] = useState("");
   const [lastResult, setLastResult] = useState<Round | null>(null);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  if (!game) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+
+  const currentRound = game.players[0].rounds[game.roundIndex];
 
   const isFinished = game.status === "finished";
 
@@ -69,6 +70,7 @@ export default function SoloPage() {
       const result = await res.json(); // MountResult想定
 
       setGame((prev) => {
+        if (!prev) return null;
         const next = structuredClone(prev);
 
         const player = next.players[0];
@@ -198,6 +200,12 @@ export default function SoloPage() {
             >
               もう一度挑戦する
             </button>
+            <Link
+              href="/"
+              className="block w-full py-3 text-center rounded-lg border hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors"
+            >
+              タイトルに戻る
+            </Link>
           </div>
         )}
       </section>
