@@ -6,13 +6,8 @@ import type { GameState, Round } from "@/types/game";
 import { PROMPTS } from "@/lib/prompts";
 import { MountainView } from "@/components/MountainView";
 import { pickN } from "@/lib/random";
+import { createRounds } from "@/lib/game";
 
-function createRounds(promptTexts: string[], roundCount: number): Round[] {
-  return promptTexts.slice(0, roundCount).map((p, i) => ({
-    id: `r${i + 1}`,
-    prompt: p,
-  }));
-}
 
 export default function SoloPage() {
   // ラウンド数（まずは3で固定がデモ安定）

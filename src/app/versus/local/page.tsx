@@ -6,19 +6,14 @@ import type { GameState, Round } from "@/types/game";
 import { PROMPTS } from "@/lib/prompts";
 import { MountainView } from "@/components/MountainView";
 import { pickN } from "@/lib/random";
+import { createRounds } from "@/lib/game";
 import clsx from "clsx";
 
-function createRounds(promptTexts: string[], roundCount: number): Round[] {
-    return promptTexts.slice(0, roundCount).map((p, i) => ({
-        id: `r${i + 1}`,
-        prompt: p,
-    }));
-}
 
 type VersusState = GameState & {
     currentPlayerIndex: 0 | 1; // 0: Player 1, 1: Player 2
     phase: "input" | "result" | "finished";
-    lastResult?: Round; // 直近の判定結果表示用
+    lastResult: Round | undefined; // 直近の判定結果表示用
 };
 
 export default function VersusLocalPage() {
@@ -42,6 +37,7 @@ export default function VersusLocalPage() {
                 { id: "p1", name: "Player 1", totalScore: 0, rounds: roundsP1 },
                 { id: "p2", name: "Player 2", totalScore: 0, rounds: roundsP2 },
             ],
+            lastResult: undefined,
         });
     }, []);
 
@@ -145,6 +141,7 @@ export default function VersusLocalPage() {
                 { id: "p1", name: "Player 1", totalScore: 0, rounds: roundsP1 },
                 { id: "p2", name: "Player 2", totalScore: 0, rounds: roundsP2 },
             ],
+            lastResult: undefined,
         });
         setText("");
     }
