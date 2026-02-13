@@ -8,6 +8,7 @@ import { MountainView } from "@/components/MountainView";
 import { pickN } from "@/lib/random";
 import { createRounds } from "@/lib/game";
 import clsx from "clsx";
+import { updateStats } from "@/lib/achievementStore";
 
 
 type VersusState = GameState & {
@@ -84,12 +85,10 @@ export default function VersusLocalPage() {
                 player.totalScore += result.altitude;
 
                 // --- 称号判定 (ラウンド毎) ---
-                import("@/lib/achievementStore").then(({ updateStats }) => {
-                    updateStats({
-                        highestAltitude: result.altitude,
-                        snowCount: result.altitude >= 6000 ? 1 : 0,
-                        everestCount: result.altitude >= 8000 ? 1 : 0,
-                    });
+                updateStats({
+                    highestAltitude: result.altitude,
+                    snowCount: result.altitude >= 6000 ? 1 : 0,
+                    everestCount: result.altitude >= 8000 ? 1 : 0,
                 });
 
                 // 結果表示フェーズへ
@@ -129,12 +128,10 @@ export default function VersusLocalPage() {
                     const margin = Math.abs(p1Score - p2Score);
                     const p1Win = p1Score > p2Score;
 
-                    import("@/lib/achievementStore").then(({ updateStats }) => {
-                        updateStats({
-                            versusPlays: 1,
-                            versusWinsP1: p1Win ? 1 : 0,
-                            maxWinMargin: (p1Win || p2Score > p1Score) ? margin : 0, // 引き分けはmargin 0扱い（あるいは対象外）
-                        });
+                    updateStats({
+                        versusPlays: 1,
+                        versusWinsP1: p1Win ? 1 : 0,
+                        maxWinMargin: (p1Win || p2Score > p1Score) ? margin : 0, // 引き分けはmargin 0扱い（あるいは対象外）
                     });
                 } else {
                     next.roundIndex += 1;

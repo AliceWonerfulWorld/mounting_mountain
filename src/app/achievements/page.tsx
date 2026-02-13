@@ -16,7 +16,19 @@ export default function AchievementsPage() {
     }, []);
 
     if (!mounted) {
-        return <div className="min-h-screen bg-zinc-50 dark:bg-black" />;
+        return (
+            <main className="min-h-screen p-6 max-w-2xl mx-auto space-y-8 bg-zinc-50 dark:bg-black">
+                <div className="space-y-2 text-center animate-pulse">
+                    <div className="h-8 w-48 bg-gray-200 dark:bg-zinc-800 rounded mx-auto" />
+                    <div className="h-4 w-64 bg-gray-200 dark:bg-zinc-800 rounded mx-auto" />
+                </div>
+                <div className="space-y-4">
+                    {[...Array(5)].map((_, i) => (
+                        <div key={i} className="h-24 w-full bg-gray-200 dark:bg-zinc-800 rounded-xl animate-pulse" />
+                    ))}
+                </div>
+            </main>
+        );
     }
 
     return (
