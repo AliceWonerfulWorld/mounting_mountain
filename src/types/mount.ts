@@ -19,4 +19,9 @@ export type MountResult = {
   // 滑落情報
   didFall?: boolean; // 滑落したかどうか
   fallReason?: string; // 滑落理由
+
+  // 天候情報
+  weatherApplied?: boolean; // 天候ボーナスが適用されたか
+  weatherMultiplier?: number; // 天候倍率
+  weatherBoostLabel?: string; // ブーストされたラベル
 };

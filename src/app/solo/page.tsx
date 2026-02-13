@@ -11,6 +11,7 @@ import { updateStats } from "@/lib/achievementStore";
 import { computeBonus } from "@/lib/solo/bonus";
 import { ROUTES, getRoute, type RouteId } from "@/lib/solo/routes";
 import { computeFinalAltitude } from "@/lib/solo/score";
+import { pickWeather, getWeather } from "@/lib/solo/weather";
 
 
 export default function SoloPage() {
@@ -23,11 +24,14 @@ export default function SoloPage() {
     // 初期化時にランダムに選ぶ
     const selectedPrompts = pickN(PROMPTS, ROUND_COUNT).map((p) => p.text);
     const rounds = createRounds(selectedPrompts, ROUND_COUNT);
+    const weather = pickWeather();
+
     setGame({
       mode: "solo",
       status: "playing",
       roundIndex: 0,
       prompts: rounds.map((r) => r.prompt),
+      weather: weather.id,
       players: [
         {
           id: "p1",
@@ -91,15 +95,17 @@ export default function SoloPage() {
         const baseAltitude = result.altitude;
         const bonusAltitude = bonus.bonusAltitude;
 
-        // 最終標高計算（滑落判定を含む）
+        // 最終標高計算（滑落判定・天候を含む）
         const scoreResult = computeFinalAltitude({
           baseAltitude,
           routeId: round.routeId || "NORMAL",
           routeMultiplier,
           bonusAltitude,
+          weatherId: prev.weather,
+          labels: result.labels,
         });
 
-        const { finalAltitude, didFall, fallReason } = scoreResult;
+        const { finalAltitude, didFall, fallReason, weatherApplied, weatherMultiplier, weatherBoostLabel } = scoreResult;
 
         // 結果オブジェクトを拡張更新
         round.result = {
@@ -112,6 +118,9 @@ export default function SoloPage() {
           routeMultiplier,
           didFall,
           fallReason,
+          weatherApplied,
+          weatherMultiplier,
+          weatherBoostLabel,
           altitude: finalAltitude, // 互換性のため、表示等は final を使う
         };
 
@@ -157,11 +166,14 @@ export default function SoloPage() {
     // リセット時もランダムに再抽選
     const selectedPrompts = pickN(PROMPTS, ROUND_COUNT).map((p) => p.text);
     const rounds = createRounds(selectedPrompts, ROUND_COUNT);
+    const weather = pickWeather();
+
     setGame({
       mode: "solo",
       status: "playing",
       roundIndex: 0,
       prompts: rounds.map((r) => r.prompt),
+      weather: weather.id,
       players: [
         {
           id: "p1",
@@ -173,7 +185,7 @@ export default function SoloPage() {
     });
     setText("");
     setLastResult(null);
-    setIsHistoryOpen(false);
+    setError(null);
   }
 
   return (
@@ -183,6 +195,16 @@ export default function SoloPage() {
         <p className="text-sm text-gray-600">
           お題に沿ってマウント発言を入力！標高が高いほどスコアが伸びる。
         </p>
+        {game.weather && (
+          <div className="inline-block px-3 py-1 bg-blue-50 dark:bg-blue-900 rounded-lg border border-blue-200 dark:border-blue-700">
+            <span className="text-sm font-bold">
+              天候: {getWeather(game.weather).emoji} {getWeather(game.weather).label}
+            </span>
+            <span className="text-xs text-gray-600 dark:text-gray-400 ml-2">
+              ({getWeather(game.weather).description})
+            </span>
+          </div>
+        )}
       </header>
 
       {/* Block A: プレイカード / ゲーム終了表示 */}
@@ -335,6 +357,12 @@ export default function SoloPage() {
               {lastResult.result.didFall && (
                 <div className="text-sm font-bold text-red-600 bg-red-50 p-3 rounded border-2 border-red-300">
                   ⚠️ {lastResult.result.fallReason || "滑落！"} 標高が2000mに固定されました
+                </div>
+              )}
+
+              {lastResult.result.weatherApplied && (
+                <div className="text-sm font-bold text-blue-600 bg-blue-50 p-2 rounded border border-blue-200">
+                  🌤 天候ボーナス発動！「{lastResult.result.weatherBoostLabel}」で+20%
                 </div>
               )}
 
