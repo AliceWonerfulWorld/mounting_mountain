@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import type { MountResult } from "@/types/game";
+import { clamp01 } from "@/lib/utils";
 
 const API_KEY = process.env.GEMINI_API_KEY;
 const MAX_RETRIES = 5;
@@ -12,10 +13,6 @@ type GeminiOut = {
     labels: string[];
     rewrite: string;
 };
-
-function clamp01(x: number) {
-    return Math.max(0, Math.min(1, x));
-}
 
 // ユーティリティ: 指定ミリ秒待機
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));

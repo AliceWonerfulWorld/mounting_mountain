@@ -1,8 +1,5 @@
 import type { MountResult } from "@/types/game";
-
-function clamp01(x: number) {
-    return Math.max(0, Math.min(1, x));
-}
+import { clamp01 } from "@/lib/utils";
 
 /**
  * 🔹 fallback判定（APIキー無しでも動く）
