@@ -17,19 +17,20 @@ import { buildSoloSummary } from "@/lib/solo/summary";
 
 
 export default function SoloPage() {
-  // ラウンド数（まずは3で固定がデモ安定）
   const ROUND_COUNT = 3;
 
   const [game, setGame] = useState<GameState | null>(null);
 
-  useEffect(() => {
-    // 初期化時にランダムに選ぶ
+  /**
+   * ソロゲームの状態を初期化するヘルパー関数
+   */
+  function initializeSoloGameState(): GameState {
     const selectedPrompts = pickN(PROMPTS, ROUND_COUNT).map((p) => p.text);
     const rounds = createRounds(selectedPrompts, ROUND_COUNT);
     const weather = pickWeather();
     const mission = pickMission();
 
-    setGame({
+    return {
       mode: "solo",
       status: "playing",
       roundIndex: 0,
@@ -44,7 +45,11 @@ export default function SoloPage() {
           rounds,
         },
       ],
-    });
+    };
+  }
+
+  useEffect(() => {
+    setGame(initializeSoloGameState());
   }, []);
 
   const [text, setText] = useState("");
@@ -167,28 +172,7 @@ export default function SoloPage() {
   }
 
   function resetGame() {
-    // リセット時もランダムに再抽選
-    const selectedPrompts = pickN(PROMPTS, ROUND_COUNT).map((p) => p.text);
-    const rounds = createRounds(selectedPrompts, ROUND_COUNT);
-    const weather = pickWeather();
-    const mission = pickMission();
-
-    setGame({
-      mode: "solo",
-      status: "playing",
-      roundIndex: 0,
-      prompts: rounds.map((r) => r.prompt),
-      weather: weather.id,
-      mission,
-      players: [
-        {
-          id: "p1",
-          name: "Player 1",
-          totalScore: 0,
-          rounds,
-        },
-      ],
-    });
+    setGame(initializeSoloGameState());
     setText("");
     setLastResult(null);
     setError(null);
@@ -326,12 +310,12 @@ export default function SoloPage() {
 
               {/* ミッション結果 */}
               <div className={`p-4 rounded-lg border-2 ${summary.mission.cleared
-                  ? 'bg-green-50 border-green-300 dark:bg-green-900 dark:border-green-700'
-                  : 'bg-gray-50 border-gray-300 dark:bg-gray-800 dark:border-gray-600'
+                ? 'bg-green-50 border-green-300 dark:bg-green-900 dark:border-green-700'
+                : 'bg-gray-50 border-gray-300 dark:bg-gray-800 dark:border-gray-600'
                 }`}>
                 <div className={`text-xl font-bold ${summary.mission.cleared
-                    ? 'text-green-700 dark:text-green-300'
-                    : 'text-gray-700 dark:text-gray-300'
+                  ? 'text-green-700 dark:text-green-300'
+                  : 'text-gray-700 dark:text-gray-300'
                   }`}>
                   {summary.mission.cleared ? '🎉 MISSION CLEAR!' : '😔 MISSION FAILED...'}
                 </div>
