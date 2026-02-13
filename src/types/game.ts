@@ -1,6 +1,7 @@
 import type { MountResult } from "./mount";
 import type { RouteId } from "@/lib/solo/routes";
 import type { WeatherId } from "@/lib/solo/weather";
+import type { Mission } from "@/lib/solo/missions";
 export type { MountResult };
 
 
@@ -40,4 +41,5 @@ export type GameState = {
     players: Player[]; // MVPは1人だけ入れる
     status: "idle" | "playing" | "finished";
     weather?: WeatherId; // 天候（ソロモード用）
+    mission?: Mission; // ミッション（ソロモード用）
 };

@@ -12,6 +12,7 @@ import { computeBonus } from "@/lib/solo/bonus";
 import { ROUTES, getRoute, type RouteId } from "@/lib/solo/routes";
 import { computeFinalAltitude } from "@/lib/solo/score";
 import { pickWeather, getWeather } from "@/lib/solo/weather";
+import { pickMission, evaluateMission } from "@/lib/solo/missions";
 
 
 export default function SoloPage() {
@@ -25,6 +26,7 @@ export default function SoloPage() {
     const selectedPrompts = pickN(PROMPTS, ROUND_COUNT).map((p) => p.text);
     const rounds = createRounds(selectedPrompts, ROUND_COUNT);
     const weather = pickWeather();
+    const mission = pickMission();
 
     setGame({
       mode: "solo",
@@ -32,6 +34,7 @@ export default function SoloPage() {
       roundIndex: 0,
       prompts: rounds.map((r) => r.prompt),
       weather: weather.id,
+      mission,
       players: [
         {
           id: "p1",
@@ -167,6 +170,7 @@ export default function SoloPage() {
     const selectedPrompts = pickN(PROMPTS, ROUND_COUNT).map((p) => p.text);
     const rounds = createRounds(selectedPrompts, ROUND_COUNT);
     const weather = pickWeather();
+    const mission = pickMission();
 
     setGame({
       mode: "solo",
@@ -174,6 +178,7 @@ export default function SoloPage() {
       roundIndex: 0,
       prompts: rounds.map((r) => r.prompt),
       weather: weather.id,
+      mission,
       players: [
         {
           id: "p1",
@@ -221,6 +226,20 @@ export default function SoloPage() {
         </div>
 
         {error && <div className="text-sm text-red-600 bg-red-50 p-2 rounded">エラー: {error}</div>}
+
+        {game.mission && (
+          <div className="bg-purple-50 dark:bg-purple-900 p-3 rounded-lg border border-purple-200 dark:border-purple-700">
+            <div className="text-sm font-bold text-purple-900 dark:text-purple-100">
+              🎯 ミッション: {game.mission.title}
+            </div>
+            <div className="text-xs text-purple-700 dark:text-purple-300 mt-1">
+              {game.mission.description}
+            </div>
+            <div className="text-xs text-purple-600 dark:text-purple-400 mt-2 font-mono">
+              {evaluateMission(game).progressText}
+            </div>
+          </div>
+        )}
 
         {!isFinished ? (
           <>
@@ -297,6 +316,30 @@ export default function SoloPage() {
               <div className="text-sm text-gray-500">最終合計標高</div>
               <div className="text-5xl font-black">{game.players[0].totalScore} m</div>
             </div>
+
+            {game.mission && (() => {
+              const missionResult = evaluateMission(game);
+              return (
+                <div className={`p-4 rounded-lg border-2 ${missionResult.cleared
+                    ? 'bg-green-50 border-green-300 dark:bg-green-900 dark:border-green-700'
+                    : 'bg-gray-50 border-gray-300 dark:bg-gray-800 dark:border-gray-600'
+                  }`}>
+                  <div className={`text-2xl font-bold ${missionResult.cleared
+                      ? 'text-green-700 dark:text-green-300'
+                      : 'text-gray-700 dark:text-gray-300'
+                    }`}>
+                    {missionResult.cleared ? '🎉 MISSION CLEAR!' : '😔 MISSION FAILED...'}
+                  </div>
+                  <div className="text-sm mt-2 font-bold">
+                    {game.mission.title}: {game.mission.description}
+                  </div>
+                  <div className="text-sm mt-1 font-mono">
+                    {missionResult.progressText}
+                  </div>
+                </div>
+              );
+            })()}
+
             <button
               className="w-full py-3 rounded-lg bg-black text-white font-bold hover:opacity-90 dark:bg-white dark:text-black"
               onClick={resetGame}
