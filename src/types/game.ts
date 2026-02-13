@@ -1,4 +1,5 @@
 import type { MountResult } from "./mount";
+import type { RouteId } from "@/lib/solo/routes";
 export type { MountResult };
 
 
@@ -9,6 +10,7 @@ export type { MountResult };
 export type Round = {
     id: string; // ラウンド識別子（"r1"みたいなのでOK）
     prompt: string; // お題
+    routeId?: RouteId; // 選択したルート（未指定はNORMAL扱い）
     inputText?: string; // プレイヤー入力（未入力ならundefined）
     result?: MountResult; // AI結果（未解析ならundefined）
 };

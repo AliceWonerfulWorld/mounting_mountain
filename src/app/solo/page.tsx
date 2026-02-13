@@ -9,6 +9,7 @@ import { pickN } from "@/lib/random";
 import { createRounds } from "@/lib/game";
 import { updateStats } from "@/lib/achievementStore";
 import { computeBonus } from "@/lib/solo/bonus";
+import { ROUTES, getRoute, type RouteId } from "@/lib/solo/routes";
 
 
 export default function SoloPage() {
@@ -80,11 +81,17 @@ export default function SoloPage() {
 
         round.inputText = text.trim();
 
+        // ルート取得
+        const route = getRoute(round.routeId);
+        const routeMultiplier = route.multiplier;
+
         // ボーナス計算
         const bonus = computeBonus(result.labels);
         const baseAltitude = result.altitude;
         const bonusAltitude = bonus.bonusAltitude;
-        const finalAltitude = baseAltitude + bonusAltitude;
+
+        // 最終標高 = (基礎標高 × ルート倍率) + ボーナス
+        const finalAltitude = Math.round(baseAltitude * routeMultiplier) + bonusAltitude;
 
         // 結果オブジェクトを拡張更新
         round.result = {
@@ -93,6 +100,8 @@ export default function SoloPage() {
           bonusAltitude,
           finalAltitude,
           bonusReasons: bonus.reasons,
+          routeId: round.routeId,
+          routeMultiplier,
           altitude: finalAltitude, // 互換性のため、表示等は final を使う
         };
 
@@ -190,6 +199,37 @@ export default function SoloPage() {
               </div>
             </div>
 
+            {/* ルート選択 */}
+            <div className="space-y-2">
+              <div className="text-xs font-bold text-gray-500 uppercase tracking-wider">Route</div>
+              <div className="flex gap-2">
+                {ROUTES.map((route) => {
+                  const isSelected = (currentRound.routeId || "NORMAL") === route.id;
+                  return (
+                    <button
+                      key={route.id}
+                      onClick={() => {
+                        setGame((prev) => {
+                          if (!prev) return null;
+                          const next = structuredClone(prev);
+                          next.players[0].rounds[next.roundIndex].routeId = route.id;
+                          return next;
+                        });
+                      }}
+                      className={`flex-1 py-2 px-3 rounded-lg border-2 transition-all text-sm font-bold ${isSelected
+                        ? "border-black dark:border-white bg-black dark:bg-white text-white dark:text-black"
+                        : "border-gray-200 dark:border-zinc-700 hover:border-gray-400 dark:hover:border-zinc-500"
+                        }`}
+                    >
+                      <div className="text-lg">{route.emoji}</div>
+                      <div className="text-xs">{route.label}</div>
+                      <div className="text-[10px] opacity-70">×{route.multiplier}</div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
             <div className="space-y-1">
               <div className="text-xs font-bold text-gray-500 uppercase tracking-wider">You</div>
               <textarea
@@ -272,6 +312,16 @@ export default function SoloPage() {
                 </div>
               )}
 
+              {lastResult.result.routeId && (
+                <div className="text-xs">
+                  <span className="font-bold text-gray-500">ルート:</span>{" "}
+                  <span className="font-mono">{getRoute(lastResult.result.routeId).emoji} {getRoute(lastResult.result.routeId).label}</span>
+                  {lastResult.result.routeMultiplier && lastResult.result.routeMultiplier !== 1.0 && (
+                    <span className="ml-1 text-gray-500">(×{lastResult.result.routeMultiplier})</span>
+                  )}
+                </div>
+              )}
+
               <div className="flex flex-wrap gap-2 justify-center md:justify-start">
                 {lastResult.result.labels.map((label) => (
                   <span key={label} className="px-2 py-1 rounded-md bg-stone-200 dark:bg-stone-800 text-xs font-bold text-stone-700 dark:text-stone-300">
@@ -304,7 +354,14 @@ export default function SoloPage() {
             {game.players[0].rounds.filter(r => r.result).map((r) => (
               <div key={r.id} className="rounded-lg border p-4 bg-gray-50 dark:bg-zinc-900 text-sm">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="font-bold">{r.prompt}</span>
+                  <div className="flex items-center gap-2">
+                    {r.routeId && (
+                      <span className="text-xs" title={getRoute(r.routeId).label}>
+                        {getRoute(r.routeId).emoji}
+                      </span>
+                    )}
+                    <span className="font-bold">{r.prompt}</span>
+                  </div>
                   <div className="text-right">
                     <span className="font-mono font-bold">{r.result?.altitude} m</span>
                     {r.result?.bonusAltitude && r.result.bonusAltitude > 0 && (

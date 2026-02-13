@@ -1,3 +1,5 @@
+import type { RouteId } from "@/lib/solo/routes";
+
 export type MountResult = {
   mountScore: number; // 0.00〜1.00
   altitude: number; // 0〜8848（メートル）
@@ -9,4 +11,8 @@ export type MountResult = {
   bonusAltitude?: number; // ボーナス加算分
   finalAltitude?: number; // 最終標高（base + bonus）
   bonusReasons?: string[]; // ボーナス理由
+
+  // ルート情報
+  routeId?: RouteId; // 選択したルート
+  routeMultiplier?: number; // ルート倍率
 };
