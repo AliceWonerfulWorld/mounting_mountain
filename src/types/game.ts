@@ -1,4 +1,7 @@
 import type { MountResult } from "./mount";
+import type { RouteId } from "@/lib/solo/routes";
+import type { WeatherId } from "@/lib/solo/weather";
+import type { Mission } from "@/lib/solo/missions";
 export type { MountResult };
 
 
@@ -9,6 +12,7 @@ export type { MountResult };
 export type Round = {
     id: string; // ラウンド識別子（"r1"みたいなのでOK）
     prompt: string; // お題
+    routeId?: RouteId; // 選択したルート（未指定はNORMAL扱い）
     inputText?: string; // プレイヤー入力（未入力ならundefined）
     result?: MountResult; // AI結果（未解析ならundefined）
 };
@@ -36,4 +40,6 @@ export type GameState = {
     prompts: string[]; // お題リスト（元データ）
     players: Player[]; // MVPは1人だけ入れる
     status: "idle" | "playing" | "finished";
+    weather?: WeatherId; // 天候（ソロモード用）
+    mission?: Mission; // ミッション（ソロモード用）
 };
