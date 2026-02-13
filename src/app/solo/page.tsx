@@ -8,6 +8,7 @@ import { MountainView } from "@/components/MountainView";
 import { pickN } from "@/lib/random";
 import { createRounds } from "@/lib/game";
 import { updateStats } from "@/lib/achievementStore";
+import { computeBonus } from "@/lib/solo/bonus";
 
 
 export default function SoloPage() {
@@ -78,16 +79,31 @@ export default function SoloPage() {
         const round = player.rounds[next.roundIndex];
 
         round.inputText = text.trim();
-        round.result = result;
 
-        player.totalScore += result.altitude;
+        // ボーナス計算
+        const bonus = computeBonus(result.labels);
+        const baseAltitude = result.altitude;
+        const bonusAltitude = bonus.bonusAltitude;
+        const finalAltitude = baseAltitude + bonusAltitude;
+
+        // 結果オブジェクトを拡張更新
+        round.result = {
+          ...result,
+          baseAltitude,
+          bonusAltitude,
+          finalAltitude,
+          bonusReasons: bonus.reasons,
+          altitude: finalAltitude, // 互換性のため、表示等は final を使う
+        };
+
+        player.totalScore += finalAltitude;
 
         // --- 称号判定 (ラウンド毎) ---
         // 非同期で実行（UIをブロックしない）
         updateStats({
-          highestAltitude: result.altitude,
-          snowCount: result.altitude >= 6000 ? 1 : 0,
-          everestCount: result.altitude >= 8000 ? 1 : 0,
+          highestAltitude: finalAltitude,
+          snowCount: finalAltitude >= 6000 ? 1 : 0,
+          everestCount: finalAltitude >= 8000 ? 1 : 0,
         });
 
         // 次ラウンドへ
@@ -240,8 +256,21 @@ export default function SoloPage() {
             <div className="flex-1 space-y-3 w-full text-center md:text-left">
               <div>
                 <div className="text-4xl font-black leading-none">{lastResult.result.altitude} m</div>
-                <div className="text-sm text-gray-500">Mount Score: {lastResult.result.mountScore.toFixed(2)}</div>
+                <div className="text-sm text-gray-500">
+                  Mount Score: {lastResult.result.mountScore.toFixed(2)}
+                  {lastResult.result.bonusAltitude && lastResult.result.bonusAltitude > 0 && (
+                    <span className="ml-2 text-yellow-600 font-bold">
+                      (+{lastResult.result.bonusAltitude}m Bonus!)
+                    </span>
+                  )}
+                </div>
               </div>
+
+              {lastResult.result.bonusReasons && lastResult.result.bonusReasons.length > 0 && (
+                <div className="text-xs text-yellow-700 bg-yellow-50 p-2 rounded border border-yellow-200">
+                  {lastResult.result.bonusReasons.map(r => <div key={r}>✨ {r}</div>)}
+                </div>
+              )}
 
               <div className="flex flex-wrap gap-2 justify-center md:justify-start">
                 {lastResult.result.labels.map((label) => (
@@ -276,7 +305,14 @@ export default function SoloPage() {
               <div key={r.id} className="rounded-lg border p-4 bg-gray-50 dark:bg-zinc-900 text-sm">
                 <div className="flex items-center justify-between mb-2">
                   <span className="font-bold">{r.prompt}</span>
-                  <span className="font-mono font-bold">{r.result?.altitude} m</span>
+                  <div className="text-right">
+                    <span className="font-mono font-bold">{r.result?.altitude} m</span>
+                    {r.result?.bonusAltitude && r.result.bonusAltitude > 0 && (
+                      <div className="text-[10px] text-yellow-600 font-bold">
+                        (inc. +{r.result.bonusAltitude})
+                      </div>
+                    )}
+                  </div>
                 </div>
                 <div className="text-gray-600 dark:text-gray-400 pl-2 border-l-2 border-gray-300">
                   {r.inputText}
