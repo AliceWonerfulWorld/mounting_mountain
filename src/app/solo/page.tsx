@@ -7,6 +7,7 @@ import { PROMPTS } from "@/lib/prompts";
 import { MountainView } from "@/components/MountainView";
 import { pickN } from "@/lib/random";
 import { createRounds } from "@/lib/game";
+import { updateStats } from "@/lib/achievementStore";
 
 
 export default function SoloPage() {
@@ -81,9 +82,23 @@ export default function SoloPage() {
 
         player.totalScore += result.altitude;
 
+        // --- 称号判定 (ラウンド毎) ---
+        // 非同期で実行（UIをブロックしない）
+        updateStats({
+          highestAltitude: result.altitude,
+          snowCount: result.altitude >= 6000 ? 1 : 0,
+          everestCount: result.altitude >= 8000 ? 1 : 0,
+        });
+
         // 次ラウンドへ
         if (next.roundIndex + 1 >= player.rounds.length) {
           next.status = "finished";
+
+          // --- 称号判定 (ゲーム終了時) ---
+          updateStats({
+            soloPlays: 1,
+            highestTotalAltitude: player.totalScore,
+          });
         } else {
           next.roundIndex += 1;
         }
