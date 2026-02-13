@@ -81,9 +81,27 @@ export default function SoloPage() {
 
         player.totalScore += result.altitude;
 
+        // --- 称号判定 (ラウンド毎) ---
+        // 非同期で実行（UIをブロックしない）
+        import("@/lib/achievementStore").then(({ updateStats }) => {
+          updateStats({
+            highestAltitude: result.altitude,
+            snowCount: result.altitude >= 6000 ? 1 : 0,
+            everestCount: result.altitude >= 8000 ? 1 : 0,
+          });
+        });
+
         // 次ラウンドへ
         if (next.roundIndex + 1 >= player.rounds.length) {
           next.status = "finished";
+
+          // --- 称号判定 (ゲーム終了時) ---
+          import("@/lib/achievementStore").then(({ updateStats }) => {
+            updateStats({
+              soloPlays: 1,
+              highestTotalAltitude: player.totalScore,
+            });
+          });
         } else {
           next.roundIndex += 1;
         }

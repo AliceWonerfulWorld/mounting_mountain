@@ -83,6 +83,15 @@ export default function VersusLocalPage() {
                 round.result = result;
                 player.totalScore += result.altitude;
 
+                // --- 称号判定 (ラウンド毎) ---
+                import("@/lib/achievementStore").then(({ updateStats }) => {
+                    updateStats({
+                        highestAltitude: result.altitude,
+                        snowCount: result.altitude >= 6000 ? 1 : 0,
+                        everestCount: result.altitude >= 8000 ? 1 : 0,
+                    });
+                });
+
                 // 結果表示フェーズへ
                 next.lastResult = structuredClone(round);
                 next.phase = "result";
@@ -113,6 +122,20 @@ export default function VersusLocalPage() {
                 if (next.roundIndex + 1 >= ROUND_COUNT) {
                     next.status = "finished";
                     next.phase = "finished";
+
+                    // --- 称号判定 (ゲーム終了時) ---
+                    const p1Score = next.players[0].totalScore;
+                    const p2Score = next.players[1].totalScore;
+                    const margin = Math.abs(p1Score - p2Score);
+                    const p1Win = p1Score > p2Score;
+
+                    import("@/lib/achievementStore").then(({ updateStats }) => {
+                        updateStats({
+                            versusPlays: 1,
+                            versusWinsP1: p1Win ? 1 : 0,
+                            maxWinMargin: (p1Win || p2Score > p1Score) ? margin : 0, // 引き分けはmargin 0扱い（あるいは対象外）
+                        });
+                    });
                 } else {
                     next.roundIndex += 1;
                     next.currentPlayerIndex = 0; // P1に戻る
