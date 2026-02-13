@@ -15,4 +15,8 @@ export type MountResult = {
   // ルート情報
   routeId?: RouteId; // 選択したルート
   routeMultiplier?: number; // ルート倍率
+
+  // 滑落情報
+  didFall?: boolean; // 滑落したかどうか
+  fallReason?: string; // 滑落理由
 };

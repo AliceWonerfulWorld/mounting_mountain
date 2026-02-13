@@ -10,6 +10,7 @@ import { createRounds } from "@/lib/game";
 import { updateStats } from "@/lib/achievementStore";
 import { computeBonus } from "@/lib/solo/bonus";
 import { ROUTES, getRoute, type RouteId } from "@/lib/solo/routes";
+import { computeFinalAltitude } from "@/lib/solo/score";
 
 
 export default function SoloPage() {
@@ -90,8 +91,15 @@ export default function SoloPage() {
         const baseAltitude = result.altitude;
         const bonusAltitude = bonus.bonusAltitude;
 
-        // 最終標高 = (基礎標高 × ルート倍率) + ボーナス
-        const finalAltitude = Math.round(baseAltitude * routeMultiplier) + bonusAltitude;
+        // 最終標高計算（滑落判定を含む）
+        const scoreResult = computeFinalAltitude({
+          baseAltitude,
+          routeId: round.routeId || "NORMAL",
+          routeMultiplier,
+          bonusAltitude,
+        });
+
+        const { finalAltitude, didFall, fallReason } = scoreResult;
 
         // 結果オブジェクトを拡張更新
         round.result = {
@@ -102,6 +110,8 @@ export default function SoloPage() {
           bonusReasons: bonus.reasons,
           routeId: round.routeId,
           routeMultiplier,
+          didFall,
+          fallReason,
           altitude: finalAltitude, // 互換性のため、表示等は final を使う
         };
 
@@ -319,6 +329,12 @@ export default function SoloPage() {
                   {lastResult.result.routeMultiplier && lastResult.result.routeMultiplier !== 1.0 && (
                     <span className="ml-1 text-gray-500">(×{lastResult.result.routeMultiplier})</span>
                   )}
+                </div>
+              )}
+
+              {lastResult.result.didFall && (
+                <div className="text-sm font-bold text-red-600 bg-red-50 p-3 rounded border-2 border-red-300">
+                  ⚠️ {lastResult.result.fallReason || "滑落！"} 標高が2000mに固定されました
                 </div>
               )}
 
