@@ -1,5 +1,6 @@
 import type { RouteId } from "./routes";
 import type { WeatherId } from "./weather";
+import type { LabelId } from "@/lib/labels";
 import { getWeather } from "./weather";
 
 /**
@@ -11,7 +12,7 @@ export type ScoreInput = {
     routeMultiplier: number;
     bonusAltitude?: number;
     weatherId?: WeatherId;
-    labels?: string[];
+    labels?: LabelId[]; // 固定enumに変更
     rng?: () => number; // テスト用（省略時はMath.random）
 };
 

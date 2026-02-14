@@ -1,10 +1,25 @@
 import type { RouteId } from "@/lib/solo/routes";
+import type { LabelId } from "@/lib/labels";
+
+/**
+ * 内訳分析（各ラベルの寄与度）
+ */
+export type Breakdown = Partial<Record<LabelId, number>> & {
+  penalty?: number; // -0.0 〜 -1.0（任意）
+};
 
 export type MountResult = {
   mountScore: number; // 0.00〜1.00
   altitude: number; // 0〜8848（メートル）
-  labels: string[]; // 例: ["比較", "数値"]
-  rewrite: string; // 優しい言い換え
+  labels: LabelId[]; // 固定enum（例: ["NUMERIC", "COMPARISON"]）
+
+  // 新規フィールド
+  breakdown: Breakdown; // 内訳分析
+  tip: string; // 攻略ヒント（1行）
+  commentary: string; // 実況コメント（1行）
+
+  // 非推奨（互換性のため残す）
+  rewrite?: string; // 優しい言い換え
 
   // ボーナス拡張
   baseAltitude?: number; // 素の標高
