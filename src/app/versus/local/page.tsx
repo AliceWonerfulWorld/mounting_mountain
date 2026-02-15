@@ -15,6 +15,7 @@ type VersusState = GameState & {
     currentPlayerIndex: 0 | 1; // 0: Player 1, 1: Player 2
     phase: "input" | "result" | "finished";
     lastResult: Round | undefined; // 直近の判定結果表示用
+    roundWinner?: 0 | 1 | null; // 0: P1, 1: P2, null: 引き分け
 };
 
 export default function VersusLocalPage() {
@@ -40,6 +41,7 @@ export default function VersusLocalPage() {
                 { id: "p2", name: "Player 2", totalScore: 0, rounds: roundsP2 },
             ],
             lastResult: undefined,
+            roundWinner: undefined,
         });
     }, []);
 
@@ -95,6 +97,20 @@ export default function VersusLocalPage() {
                     everestCount: result.altitude >= 8000 ? 1 : 0,
                 });
 
+                // P2のターン終了時にラウンド勝者を判定
+                if (next.currentPlayerIndex === 1) {
+                    const p1Alt = next.players[0].rounds[next.roundIndex].result?.altitude || 0;
+                    const p2Alt = next.players[1].rounds[next.roundIndex].result?.altitude || 0;
+
+                    if (p1Alt > p2Alt) {
+                        next.roundWinner = 0;
+                    } else if (p2Alt > p1Alt) {
+                        next.roundWinner = 1;
+                    } else {
+                        next.roundWinner = null; // 引き分け
+                    }
+                }
+
                 // 結果表示フェーズへ
                 next.lastResult = structuredClone(round);
                 next.phase = "result";
@@ -121,7 +137,15 @@ export default function VersusLocalPage() {
                 next.phase = "input";
                 next.lastResult = undefined;
             } else {
-                // P2終了 -> 次のラウンドへ OR 終了
+                // P2終了 -> ラウンド終了 -> 勝者にボーナス加算
+                if (next.roundWinner === 0) {
+                    next.players[0].totalScore += 1000;
+                } else if (next.roundWinner === 1) {
+                    next.players[1].totalScore += 1000;
+                }
+                // 引き分け (roundWinner === null) の場合はボーナスなし
+
+                // 次のラウンドへ OR 終了
                 if (next.roundIndex + 1 >= ROUND_COUNT) {
                     next.status = "finished";
                     next.phase = "finished";
@@ -142,6 +166,7 @@ export default function VersusLocalPage() {
                     next.currentPlayerIndex = 0; // P1に戻る
                     next.phase = "input";
                     next.lastResult = undefined;
+                    next.roundWinner = undefined;
                 }
             }
             return next;
@@ -167,6 +192,7 @@ export default function VersusLocalPage() {
                 { id: "p2", name: "Player 2", totalScore: 0, rounds: roundsP2 },
             ],
             lastResult: undefined,
+            roundWinner: undefined,
         });
         setText("");
     }
@@ -277,6 +303,44 @@ export default function VersusLocalPage() {
                             ))}
                         </div>
                     </div>
+
+                    {/* ラウンド勝者表示（P2のターン時のみ） */}
+                    {game.currentPlayerIndex === 1 && game.roundWinner !== undefined && (
+                        <div className="bg-gradient-to-r from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 p-4 rounded-xl border-2 border-purple-300 dark:border-purple-700">
+                            {game.roundWinner === null ? (
+                                <div className="text-center text-lg font-bold">🤝 引き分け！</div>
+                            ) : (
+                                <>
+                                    <div className="text-center text-lg font-bold mb-2">
+                                        🏆 Round Winner: Player {game.roundWinner + 1}
+                                    </div>
+                                    <div className="text-center text-2xl font-black text-purple-600 dark:text-purple-300">
+                                        +1000m Bonus!
+                                    </div>
+                                </>
+                            )}
+                        </div>
+                    )}
+
+                    {/* AI Commentary（実況） */}
+                    {game.lastResult.result.commentary && (
+                        <div className="bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 p-4 rounded-lg border-2 border-yellow-200 dark:border-yellow-800">
+                            <div className="text-xs text-yellow-700 dark:text-yellow-400 font-bold mb-1 uppercase tracking-wider">🎤 実況</div>
+                            <div className="text-lg font-semibold text-yellow-900 dark:text-yellow-100">
+                                {game.lastResult.result.commentary}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* AI Tip（攻略ヒント） */}
+                    {game.lastResult.result.tip && (
+                        <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg border border-blue-200 dark:border-blue-800">
+                            <div className="text-xs text-blue-700 dark:text-blue-400 font-bold mb-1 uppercase tracking-wider">💡 ヒント</div>
+                            <div className="text-sm text-blue-800 dark:text-blue-200">
+                                {game.lastResult.result.tip}
+                            </div>
+                        </div>
+                    )}
 
                     <div className="bg-white dark:bg-black p-3 rounded text-left text-sm border">
                         <div className="text-xs text-gray-400 font-bold mb-1">言い換え</div>
