@@ -39,4 +39,7 @@ export type MountResult = {
   weatherApplied?: boolean; // 天候ボーナスが適用されたか
   weatherMultiplier?: number; // 天候倍率
   weatherBoostLabel?: string; // ブーストされたラベル
+
+  // 保険情報（Issue #34）
+  insuranceUsed?: boolean; // 保険が使われたか
 };

@@ -42,4 +42,5 @@ export type GameState = {
     status: "idle" | "playing" | "finished";
     weather?: WeatherId; // 天候（ソロモード用）
     mission?: Mission; // ミッション（ソロモード用）
+    insurance: number; // 保険の所持数（0-1、ソロモード用）
 };

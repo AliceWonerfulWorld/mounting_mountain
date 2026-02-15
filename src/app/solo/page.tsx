@@ -39,6 +39,7 @@ export default function SoloPage() {
       prompts: rounds.map((r) => r.prompt),
       weather: weather.id,
       mission,
+      insurance: 0, // 保険の初期値
       players: [
         {
           id: "p1",
@@ -117,9 +118,10 @@ export default function SoloPage() {
           bonusAltitude,
           weatherId: prev.weather,
           labels: result.labels,
+          insurance: prev.insurance, // 保険を渡す
         });
 
-        const { finalAltitude, didFall, fallReason, weatherApplied, weatherMultiplier, weatherBoostLabel } = scoreResult;
+        const { finalAltitude, didFall, fallReason, weatherApplied, weatherMultiplier, weatherBoostLabel, insuranceUsed } = scoreResult;
 
         // 結果オブジェクトを拡張更新
         round.result = {
@@ -137,6 +139,17 @@ export default function SoloPage() {
           weatherBoostLabel,
           altitude: finalAltitude, // 互換性のため、表示等は final を使う
         };
+
+        // 保険消費処理
+        if (insuranceUsed) {
+          next.insurance = Math.max(0, prev.insurance - 1);
+        }
+
+        // SAFE選択時に保険を貸める
+        const MAX_INSURANCE = 1;
+        if (round.routeId === "SAFE") {
+          next.insurance = Math.min(MAX_INSURANCE, next.insurance + 1);
+        }
 
         player.totalScore += finalAltitude;
 
@@ -200,6 +213,12 @@ export default function SoloPage() {
             </span>
           </div>
         )}
+        {/* 保険表示 */}
+        <div className="inline-block ml-2 px-3 py-1 bg-green-50 dark:bg-green-900 rounded-lg border border-green-200 dark:border-green-700">
+          <span className="text-sm font-bold">
+            🛟 保険: {game.insurance}/1
+          </span>
+        </div>
       </header>
 
       {/* Block A: プレイカード / ゲーム終了表示 */}
@@ -340,6 +359,24 @@ export default function SoloPage() {
                   )}
                 </div>
               </div>
+
+              {/* 保険発動通知 */}
+              {lastResult.result.insuranceUsed && (
+                <div className="bg-green-100 dark:bg-green-900 border border-green-300 dark:border-green-700 rounded-lg p-3 text-center">
+                  <span className="text-green-800 dark:text-green-200 font-bold">
+                    🛟 保険発動！滑落を回避しました
+                  </span>
+                </div>
+              )}
+
+              {/* 滑落表示 */}
+              {lastResult.result.didFall && (
+                <div className="bg-red-100 dark:bg-red-900 border border-red-300 dark:border-red-700 rounded-lg p-3 text-center">
+                  <span className="text-red-800 dark:text-red-200 font-bold">
+                    {lastResult.result.fallReason || "滑落しました"}
+                  </span>
+                </div>
+              )}
 
               {lastResult.result.bonusReasons && lastResult.result.bonusReasons.length > 0 && (
                 <div className="text-xs text-yellow-700 bg-yellow-50 p-2 rounded border border-yellow-200">
