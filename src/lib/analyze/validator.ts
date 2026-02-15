@@ -3,14 +3,17 @@ import type { LabelId } from "@/lib/labels";
 import type { Breakdown } from "@/types/mount";
 import { isLabelId } from "@/lib/labels";
 import { clamp01 } from "@/lib/utils";
+import { mountScoreToAltitude, type RouteType } from "./altitude";
 
 /**
  * AI出力をバリデーションして安全なMountResultに変換
+ * @param raw AI出力の生データ
+ * @param route ルートタイプ（altitude計算に使用）
  */
-export function validateAiOutput(raw: any): MountResult {
+export function validateAiOutput(raw: any, route: RouteType = "NORMAL"): MountResult {
     // mountScore のバリデーション
     const mountScore = clamp01(Number(raw.mountScore ?? 0));
-    const altitude = Math.round(mountScore * 8848);
+    const altitude = mountScoreToAltitude(mountScore, route);
 
     // labels のバリデーション
     let labels: LabelId[] = [];

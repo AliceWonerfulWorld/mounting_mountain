@@ -67,7 +67,10 @@ export default function VersusLocalPage() {
             const res = await fetch("/api/analyze", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ text: text.trim() }),
+                body: JSON.stringify({
+                    text: text.trim(),
+                    route: "NORMAL" // 対戦モードは常にNORMAL
+                }),
             });
 
             if (!res.ok) throw new Error("API Error");

@@ -78,7 +78,10 @@ export default function SoloPage() {
       const res = await fetch("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: text.trim() }),
+        body: JSON.stringify({
+          text: text.trim(),
+          route: currentRound.routeId || "NORMAL"
+        }),
       });
 
       if (!res.ok) {

@@ -5,15 +5,16 @@ import { clamp01 } from "@/lib/utils";
 /**
  * 🔹 fallback判定（APIキー無しでも動く）
  */
-export function fallbackAnalyze(text: string): MountResult & { source: string } {
+export function fallbackAnalyze(text: string): Partial<MountResult> & { source: string } {
     const mountScore = clamp01(text.length / 60);
-    const altitude = Math.round(mountScore * 8848);
+    // altitude は validator で計算するため削除
 
     // ラベルを固定enumで返す
     let labels: LabelId[];
-    if (altitude > 6000) {
+    const score = mountScore;
+    if (score > 0.68) {
         labels = ["NUMERIC", "COMPARISON"];
-    } else if (altitude > 3000) {
+    } else if (score > 0.34) {
         labels = ["COMPARISON"];
     } else {
         labels = ["EFFORT"];
@@ -27,7 +28,7 @@ export function fallbackAnalyze(text: string): MountResult & { source: string } 
 
     return {
         mountScore,
-        altitude,
+        // altitude は削除
         labels,
         breakdown,
         tip: "文字数を増やすと標高が上がります！",

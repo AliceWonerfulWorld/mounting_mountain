@@ -83,7 +83,7 @@ async function generateWithBackoff(model: any, prompt: string, retries = 0): Pro
     }
 }
 
-export async function analyzeWithGemini(text: string): Promise<MountResult & { source: string }> {
+export async function analyzeWithGemini(text: string): Promise<Partial<MountResult> & { source: string }> {
     if (!API_KEY) {
         throw new Error("GEMINI_API_KEY is not defined");
     }
@@ -142,11 +142,10 @@ ${JSON.stringify(text)}
         const parsed = safeJsonParse<Partial<GeminiOut>>(textRes);
 
         const mountScore = clamp01(Number(parsed.mountScore ?? 0));
-        const altitude = Math.round(mountScore * 8848);
 
         return {
             mountScore,
-            altitude,
+            // altitude は validator で計算するため削除
             labels: Array.isArray(parsed.labels) ? parsed.labels : [],
             breakdown: typeof parsed.breakdown === "object" && parsed.breakdown !== null ? parsed.breakdown : {},
             tip: typeof parsed.tip === "string" ? parsed.tip.slice(0, 80) : "",

@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { analyzeWithGemini } from "@/lib/analyze/gemini";
 import { fallbackAnalyze } from "@/lib/analyze/fallback";
 import { validateAiOutput } from "@/lib/analyze/validator";
+import type { RouteType } from "@/lib/analyze/altitude";
 
 // 同一プロセス内での同時実行数を簡易的に制限するためのカウンタ
 // 注意: Vercelなどのサーバレス環境ではLambdaインスタンスごとにメモリが独立しているため、
@@ -13,7 +14,10 @@ const MAX_CONCURRENT = 1;
 
 export async function POST(req: Request) {
   try {
-    const { text } = (await req.json()) as { text: string };
+    const { text, route = "NORMAL" } = (await req.json()) as {
+      text: string;
+      route?: RouteType;
+    };
 
     if (!text || !text.trim()) {
       return NextResponse.json({ error: "text is required" }, { status: 400 });
@@ -33,8 +37,8 @@ export async function POST(req: Request) {
       inFlight++;
       try {
         const rawResult = await analyzeWithGemini(text);
-        // バリデーションを通す
-        const validated = validateAiOutput(rawResult);
+        // バリデーションを通す（routeを渡す）
+        const validated = validateAiOutput(rawResult, route);
         return NextResponse.json({ ...validated, source: "gemini" });
       } catch (e) {
         console.error("Gemini analysis failed (retries exhausted), switching to fallback:", e);
@@ -48,8 +52,8 @@ export async function POST(req: Request) {
 
     // キーが無い、またはGemini失敗時はfallback
     const fallbackResult = fallbackAnalyze(text);
-    // fallbackもバリデーションを通す（念のため）
-    const validated = validateAiOutput(fallbackResult);
+    // fallbackもバリデーションを通す（routeを渡す）
+    const validated = validateAiOutput(fallbackResult, route);
     return NextResponse.json({ ...validated, source: "fallback" });
   } catch (error) {
     console.error("[/api/analyze] error:", error);
