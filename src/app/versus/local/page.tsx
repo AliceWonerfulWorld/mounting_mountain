@@ -34,6 +34,7 @@ export default function VersusLocalPage() {
             prompts: selectedPrompts,
             currentPlayerIndex: 0,
             phase: "input",
+            insurance: 0, // 保険（対戦モードでは未使用だが型に必要）
             players: [
                 { id: "p1", name: "Player 1", totalScore: 0, rounds: roundsP1 },
                 { id: "p2", name: "Player 2", totalScore: 0, rounds: roundsP2 },
@@ -67,7 +68,10 @@ export default function VersusLocalPage() {
             const res = await fetch("/api/analyze", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ text: text.trim() }),
+                body: JSON.stringify({
+                    text: text.trim(),
+                    route: "NORMAL" // 対戦モードは常にNORMAL
+                }),
             });
 
             if (!res.ok) throw new Error("API Error");
@@ -157,6 +161,7 @@ export default function VersusLocalPage() {
             prompts: selectedPrompts,
             currentPlayerIndex: 0,
             phase: "input",
+            insurance: 0, // 保険（対戦モードでは未使用だが型に必要）
             players: [
                 { id: "p1", name: "Player 1", totalScore: 0, rounds: roundsP1 },
                 { id: "p2", name: "Player 2", totalScore: 0, rounds: roundsP2 },

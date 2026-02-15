@@ -1,3 +1,5 @@
+import type { LabelId } from "@/lib/labels";
+
 /**
  * ボーナス計算結果
  */
@@ -11,7 +13,7 @@ export type BonusOut = {
  * @param labels マウント判定結果のラベル配列
  * @returns ボーナス標高と理由
  */
-export function computeBonus(labels: string[]): BonusOut {
+export function computeBonus(labels: LabelId[]): BonusOut {
     const uniqueLabels = new Set(labels);
     const count = uniqueLabels.size;
     let bonusAltitude = 0;

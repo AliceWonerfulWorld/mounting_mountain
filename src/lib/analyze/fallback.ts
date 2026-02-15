@@ -1,23 +1,38 @@
 import type { MountResult } from "@/types/game";
+import type { LabelId } from "@/lib/labels";
 import { clamp01 } from "@/lib/utils";
 
 /**
  * 🔹 fallback判定（APIキー無しでも動く）
  */
-export function fallbackAnalyze(text: string): MountResult & { source: string } {
+export function fallbackAnalyze(text: string): Partial<MountResult> & { source: string } {
     const mountScore = clamp01(text.length / 60);
-    const altitude = Math.round(mountScore * 8848);
+    // altitude は validator で計算するため削除
+
+    // ラベルを固定enumで返す
+    let labels: LabelId[];
+    const score = mountScore;
+    if (score > 0.68) {
+        labels = ["NUMERIC", "COMPARISON"];
+    } else if (score > 0.34) {
+        labels = ["COMPARISON"];
+    } else {
+        labels = ["EFFORT"];
+    }
+
+    // breakdown を生成
+    const breakdown: Record<string, number> = {};
+    labels.forEach((label, index) => {
+        breakdown[label] = 0.3 + (index * 0.1);
+    });
 
     return {
         mountScore,
-        altitude,
-        labels:
-            altitude > 6000
-                ? ["数値", "比較"]
-                : altitude > 3000
-                    ? ["比較"]
-                    : ["弱め"],
-        rewrite: "（fallback）もう少し柔らかく言うといいかも！",
+        // altitude は削除
+        labels,
+        breakdown,
+        tip: "文字数を増やすと標高が上がります！",
+        commentary: "fallbackモードで判定しました",
         source: "fallback",
     };
 }

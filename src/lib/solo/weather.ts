@@ -1,3 +1,6 @@
+import type { LabelId } from "@/lib/labels";
+import { CORE_LABELS, getLabelJa } from "@/lib/labels";
+
 /**
  * 天候の種類
  */
@@ -9,7 +12,7 @@ export type WeatherId = "SUNNY" | "WINDY" | "BLIZZARD";
 export type Weather = {
     id: WeatherId;
     label: string;
-    boostLabel: string;
+    boostLabel: LabelId; // 固定enumに変更
     emoji: string;
     description: string;
 };
@@ -21,21 +24,21 @@ export const WEATHERS: Weather[] = [
     {
         id: "SUNNY",
         label: "晴天",
-        boostLabel: "数値",
+        boostLabel: "NUMERIC",
         emoji: "☀",
         description: "「数値」を含むと+20%",
     },
     {
         id: "WINDY",
         label: "強風",
-        boostLabel: "比較",
+        boostLabel: "COMPARISON",
         emoji: "💨",
         description: "「比較」を含むと+20%",
     },
     {
         id: "BLIZZARD",
         label: "吹雪",
-        boostLabel: "努力",
+        boostLabel: "EFFORT",
         emoji: "❄",
         description: "「努力」を含むと+20%",
     },

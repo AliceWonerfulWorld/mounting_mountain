@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import type { MountResult } from "@/types/game";
+import type { LabelId } from "@/lib/labels";
 import { clamp01 } from "@/lib/utils";
 
 const API_KEY = process.env.GEMINI_API_KEY;
@@ -10,8 +11,10 @@ const JITTER_MS = 250;
 
 type GeminiOut = {
     mountScore: number;
-    labels: string[];
-    rewrite: string;
+    labels: LabelId[];
+    breakdown: Record<string, number>;
+    tip: string;
+    commentary: string;
 };
 
 // ユーティリティ: 指定ミリ秒待機
@@ -80,17 +83,18 @@ async function generateWithBackoff(model: any, prompt: string, retries = 0): Pro
     }
 }
 
-export async function analyzeWithGemini(text: string): Promise<MountResult & { source: string }> {
+export async function analyzeWithGemini(text: string): Promise<Partial<MountResult> & { source: string }> {
     if (!API_KEY) {
         throw new Error("GEMINI_API_KEY is not defined");
     }
 
     const genAI = new GoogleGenerativeAI(API_KEY);
-    // モデル名を指定された形式に統一
+    // 安定化のため temperature を低めに設定
     const model = genAI.getGenerativeModel({
         model: "models/gemini-2.0-flash-lite-001",
         generationConfig: {
             responseMimeType: "application/json",
+            temperature: 0.3, // 低めに設定して出力を安定化
         },
     });
 
@@ -100,17 +104,33 @@ export async function analyzeWithGemini(text: string): Promise<MountResult & { s
 
 # ルール
 - mountScore: 0.0〜1.0 (数値)
-- labels: マウントの種類 (例: ["数値","比較","皮肉","努力","自慢","知識"])
-- rewrite: 意図を保ちつつ角を取った言い換え (日本語)
+- labels: 以下の固定ラベルIDのみ使用可能（配列、最大5個）
+  - NUMERIC（数値）
+  - COMPARISON（比較）
+  - EFFORT（努力）
+  - AUTHORITY（権威）
+  - SARCASM（皮肉）
+  - CONDESCENDING（上から目線）
+  - BACKHANDED（褒めて落とす）
+  - GATEKEEP（分かってる人なら）
+- breakdown: 各ラベルの寄与度（0.0〜1.0）とpenalty（任意、-0.0〜-1.0）
+- tip: 次に標高を伸ばすための攻略ヒント（1行、80文字以内）
+- commentary: 実況コメント（1行、80文字以内）
 
 # 対象の文章
 ${JSON.stringify(text)}
 
-# 出力スキーマ
+# 出力スキーマ（必ずこの形式で）
 {
-  "mountScore": number,
-  "labels": string[],
-  "rewrite": string
+  "mountScore": 0.75,
+  "labels": ["NUMERIC", "COMPARISON"],
+  "breakdown": {
+    "NUMERIC": 0.4,
+    "COMPARISON": 0.35,
+    "penalty": -0.1
+  },
+  "tip": "具体的な数値を増やすとさらに高得点！",
+  "commentary": "数値と比較のコンボが決まった！"
 }
   `.trim();
 
@@ -122,13 +142,14 @@ ${JSON.stringify(text)}
         const parsed = safeJsonParse<Partial<GeminiOut>>(textRes);
 
         const mountScore = clamp01(Number(parsed.mountScore ?? 0));
-        const altitude = Math.round(mountScore * 8848);
 
         return {
             mountScore,
-            altitude,
-            labels: Array.isArray(parsed.labels) ? parsed.labels.map(String) : [],
-            rewrite: typeof parsed.rewrite === "string" ? parsed.rewrite : "",
+            // altitude は validator で計算するため削除
+            labels: Array.isArray(parsed.labels) ? parsed.labels : [],
+            breakdown: typeof parsed.breakdown === "object" && parsed.breakdown !== null ? parsed.breakdown : {},
+            tip: typeof parsed.tip === "string" ? parsed.tip.slice(0, 80) : "",
+            commentary: typeof parsed.commentary === "string" ? parsed.commentary.slice(0, 80) : "",
             source: "gemini",
         };
     } catch (error) {
