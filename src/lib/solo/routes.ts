@@ -21,23 +21,23 @@ export const ROUTES: Route[] = [
     {
         id: "SAFE",
         label: "安全ルート",
-        multiplier: 0.8,
-        description: "確実に積む（×0.8）",
+        multiplier: 0.7, // 安全だが低め（Issue #34で調整）
+        description: "滑落リスクなし。標高は控えめ。保険を獲得できる。",
         emoji: "🛡️",
     },
     {
         id: "NORMAL",
         label: "通常ルート",
         multiplier: 1.0,
-        description: "バランス型（×1.0）",
+        description: "バランス型。滑落リスクなし。",
         emoji: "⛰️",
     },
     {
         id: "RISKY",
         label: "危険ルート",
         multiplier: 1.3,
-        description: "一発逆転（×1.3）",
-        emoji: "🔥",
+        description: "50%の確率で滑落（標高2000m固定）。成功すれば高得点。8000m以上が狙える。",
+        emoji: "⚡",
     },
 ];
 
