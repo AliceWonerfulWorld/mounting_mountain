@@ -622,64 +622,114 @@ export default function SoloPage() {
               setShowingResult(true);
             }}
           >
-            {/* 背景 - グラデーション（軽量版） */}
-            <div 
-              className="absolute inset-0 bg-gradient-to-br from-red-600 via-orange-500 to-yellow-500"
-            />
+            {/* 背景 - 山の空 */}
+            <div className="absolute inset-0 bg-gradient-to-b from-blue-900 via-orange-400 to-yellow-300" />
 
-            {/* 山のシルエット - 下層（軽量版） */}
-            <div className="absolute bottom-0 left-0 right-0 h-2/3 overflow-hidden">
+            {/* 山のシルエット - 多層で立体感を出す */}
+            <div className="absolute bottom-0 left-0 right-0 h-full overflow-hidden">
+              {/* 最遠景の山々 - 淡い青 */}
               <motion.svg
                 initial={{ y: 50, opacity: 0 }}
-                animate={{ y: 0, opacity: 0.35 }}
-                transition={{ duration: 0.5, ease: "easeOut" }}
-                viewBox="0 0 1200 600"
+                animate={{ y: 0, opacity: 0.2 }}
+                transition={{ duration: 0.6, ease: "easeOut" }}
+                viewBox="0 0 1200 800"
                 className="absolute bottom-0 w-full h-full will-change-transform"
                 preserveAspectRatio="xMidYMax slice"
                 style={{ willChange: 'transform, opacity' }}
               >
-                {/* 遠景の山 */}
                 <path
-                  d="M0,600 L0,300 L200,200 L400,280 L600,150 L800,250 L1000,180 L1200,300 L1200,600 Z"
-                  fill="rgba(0,0,0,0.3)"
-                />
-                {/* 中景の山 */}
-                <path
-                  d="M0,600 L0,400 L150,300 L350,380 L550,250 L750,350 L950,280 L1150,400 L1200,600 Z"
-                  fill="rgba(0,0,0,0.5)"
-                />
-                {/* 近景の山 */}
-                <path
-                  d="M0,600 L0,450 L200,380 L400,480 L600,320 L800,450 L1000,380 L1200,500 L1200,600 Z"
-                  fill="rgba(0,0,0,0.7)"
+                  d="M0,800 L0,500 L150,400 L300,450 L450,350 L600,380 L750,320 L900,380 L1050,340 L1200,420 L1200,800 Z"
+                  fill="rgba(30,58,138,0.4)"
                 />
               </motion.svg>
 
-              {/* 雲のエフェクト（軽量版） */}
-              {[...Array(3)].map((_, i) => (
-                <motion.div
-                  key={`cloud-${i}`}
-                  initial={{ x: -100, opacity: 0 }}
-                  animate={{ 
-                    x: "100vw",
-                    opacity: [0, 0.5, 0]
-                  }}
-                  transition={{
-                    duration: 10 + i * 2,
-                    repeat: Infinity,
-                    delay: i * 2,
-                    ease: "linear"
-                  }}
-                  className="absolute text-5xl will-change-transform"
-                  style={{ 
-                    top: `${25 + i * 20}%`,
-                    willChange: 'transform, opacity'
-                  }}
-                >
-                  ☁️
-                </motion.div>
-              ))}
+              {/* 遠景の山 - より濃い */}
+              <motion.svg
+                initial={{ y: 50, opacity: 0 }}
+                animate={{ y: 0, opacity: 0.35 }}
+                transition={{ duration: 0.5, ease: "easeOut", delay: 0.1 }}
+                viewBox="0 0 1200 800"
+                className="absolute bottom-0 w-full h-full will-change-transform"
+                preserveAspectRatio="xMidYMax slice"
+              >
+                <path
+                  d="M0,800 L0,450 L200,320 L400,380 L600,250 L800,320 L1000,280 L1200,380 L1200,800 Z"
+                  fill="rgba(20,40,100,0.5)"
+                />
+              </motion.svg>
+
+              {/* 中景の山 - はっきりした山 */}
+              <motion.svg
+                initial={{ y: 50, opacity: 0 }}
+                animate={{ y: 0, opacity: 0.6 }}
+                transition={{ duration: 0.4, ease: "easeOut", delay: 0.2 }}
+                viewBox="0 0 1200 800"
+                className="absolute bottom-0 w-full h-full will-change-transform"
+                preserveAspectRatio="xMidYMax slice"
+              >
+                <path
+                  d="M0,800 L0,520 L150,420 L300,480 L450,350 L600,280 L750,380 L900,340 L1050,420 L1200,480 L1200,800 Z"
+                  fill="rgba(15,30,80,0.7)"
+                />
+              </motion.svg>
+
+              {/* 近景の山 - 最も濃い */}
+              <motion.svg
+                initial={{ y: 30, opacity: 0 }}
+                animate={{ y: 0, opacity: 0.85 }}
+                transition={{ duration: 0.3, ease: "easeOut", delay: 0.3 }}
+                viewBox="0 0 1200 800"
+                className="absolute bottom-0 w-full h-full will-change-transform"
+                preserveAspectRatio="xMidYMax slice"
+              >
+                <path
+                  d="M0,800 L0,550 L200,450 L400,520 L600,380 L800,480 L1000,440 L1200,540 L1200,800 Z"
+                  fill="rgba(10,20,60,0.9)"
+                />
+                {/* 雪の頂 */}
+                <path
+                  d="M600,380 L580,390 L560,385 L540,395 L600,380 L660,395 L640,385 L620,390 Z"
+                  fill="rgba(255,255,255,0.8)"
+                />
+                <path
+                  d="M800,480 L780,490 L760,485 L740,495 L800,480 L860,495 L840,485 L820,490 Z"
+                  fill="rgba(255,255,255,0.7)"
+                />
+              </motion.svg>
+
+              {/* 山頂の光の効果 */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: [0.3, 0.6, 0.3] }}
+                transition={{ duration: 2, repeat: Infinity }}
+                className="absolute top-1/3 left-1/2 -translate-x-1/2 w-96 h-96 bg-yellow-200/30 rounded-full blur-3xl"
+              />
             </div>
+
+            {/* 雲のエフェクト（軽量版） */}
+            {[...Array(3)].map((_, i) => (
+              <motion.div
+                key={`cloud-${i}`}
+                initial={{ x: -100, opacity: 0 }}
+                animate={{ 
+                  x: "100vw",
+                  opacity: [0, 0.4, 0]
+                }}
+                transition={{
+                  duration: 12 + i * 2,
+                  repeat: Infinity,
+                  delay: i * 3,
+                  ease: "linear"
+                }}
+                className="absolute text-5xl will-change-transform z-10"
+                style={{ 
+                  top: `${25 + i * 20}%`,
+                  willChange: 'transform, opacity'
+                }}
+              >
+                ☁️
+              </motion.div>
+            ))}
 
             {/* 集中線エフェクト（軽量版） */}
             <div className="absolute inset-0 overflow-hidden">
@@ -687,52 +737,19 @@ export default function SoloPage() {
                 <motion.div
                   key={`line-${i}`}
                   initial={{ scaleY: 0, opacity: 0 }}
-                  animate={{ scaleY: 1, opacity: 0.25 }}
+                  animate={{ scaleY: 1, opacity: 0.15 }}
                   transition={{ 
                     duration: 0.3,
                     delay: i * 0.02,
                     ease: "easeOut"
                   }}
-                  className="absolute top-1/2 left-1/2 w-1 h-full bg-white origin-top will-change-transform"
+                  className="absolute top-1/2 left-1/2 w-0.5 h-full bg-white origin-top will-change-transform"
                   style={{
                     transform: `rotate(${(360 / 12) * i}deg) translateX(-50%)`,
                     willChange: 'transform, opacity'
                   }}
                 />
               ))}
-            </div>
-
-            {/* 火花・稲妻エフェクト + 登山要素（軽量版） */}
-            <div className="absolute inset-0">
-              {[...Array(12)].map((_, i) => {
-                const mountainEmojis = ["⚡", "💥", "🔥", "✨", "💪"];
-                return (
-                  <motion.div
-                    key={`spark-${i}`}
-                    initial={{ 
-                      opacity: 0,
-                      scale: 0,
-                      x: "50vw",
-                      y: "50vh",
-                    }}
-                    animate={{ 
-                      opacity: [0, 0.9, 0],
-                      scale: [0, 1.5],
-                      x: `${Math.random() * 100}vw`,
-                      y: `${Math.random() * 100}vh`,
-                    }}
-                    transition={{
-                      duration: 1.2,
-                      delay: Math.random() * 0.6,
-                      ease: "easeOut"
-                    }}
-                    className="absolute text-3xl will-change-transform"
-                    style={{ willChange: 'transform, opacity' }}
-                  >
-                    {mountainEmojis[Math.floor(Math.random() * mountainEmojis.length)]}
-                  </motion.div>
-                );
-              })}
             </div>
 
             {/* メインカットイン */}
@@ -764,57 +781,11 @@ export default function SoloPage() {
                 {/* 山頂到達風装飾 */}
                 <div className="absolute left-20 top-1/2 -translate-y-1/2 flex items-center gap-2 text-white font-mono font-bold">
                   <span className="text-xl">CLIMBING TO THE TOP</span>
-                  <span className="text-2xl">🧗</span>
                 </div>
               </motion.div>
 
               {/* メインテキスト */}
               <div className="relative">
-                {/* 山アイコン - 背景（複数配置） */}
-                <motion.div
-                  initial={{ scale: 0, rotate: -45 }}
-                  animate={{ scale: 1.5, rotate: 0 }}
-                  transition={{ 
-                    type: "spring",
-                    stiffness: 300,
-                    damping: 10,
-                    delay: 0.1
-                  }}
-                  className="absolute -top-20 left-1/2 -translate-x-1/2 text-[12rem] opacity-20 pointer-events-none will-change-transform"
-                >
-                  🏔️
-                </motion.div>
-
-                {/* 旗を立てる演出 */}
-                <motion.div
-                  initial={{ y: 50, x: -100 }}
-                  animate={{ y: -80, x: -100 }}
-                  transition={{ 
-                    type: "spring",
-                    stiffness: 100,
-                    damping: 10,
-                    delay: 0.3
-                  }}
-                  className="absolute -top-20 left-0 text-6xl will-change-transform"
-                >
-                  🚩
-                </motion.div>
-
-                {/* 登山者が登る演出 */}
-                <motion.div
-                  initial={{ y: 100, x: 100, rotate: -30 }}
-                  animate={{ y: -60, x: 100, rotate: 0 }}
-                  transition={{ 
-                    type: "spring",
-                    stiffness: 100,
-                    damping: 10,
-                    delay: 0.4
-                  }}
-                  className="absolute -top-10 right-0 text-6xl will-change-transform"
-                >
-                  🧗
-                </motion.div>
-
                 {/* Let's マウント！ */}
                 <motion.div
                   initial={{ scale: 0, rotate: -90 }}
@@ -829,52 +800,6 @@ export default function SoloPage() {
                   }}
                   className="text-center will-change-transform"
                 >
-                  <div className="mb-4 flex items-center justify-center gap-4">
-                    <motion.span 
-                      className="text-6xl will-change-transform"
-                      animate={{ 
-                        rotate: [0, 15, -15, 0],
-                        scale: [1, 1.2, 1]
-                      }}
-                      transition={{ 
-                        duration: 0.6,
-                        repeat: Infinity,
-                        repeatDelay: 0.3
-                      }}
-                    >
-                      💪
-                    </motion.span>
-                    <motion.span 
-                      className="text-6xl will-change-transform"
-                      animate={{ 
-                        y: [0, -10, 0],
-                        scale: [1, 1.3, 1]
-                      }}
-                      transition={{ 
-                        duration: 0.6,
-                        repeat: Infinity,
-                        repeatDelay: 0.3
-                      }}
-                    >
-                      ⛰️
-                    </motion.span>
-                    <motion.span 
-                      className="text-6xl will-change-transform"
-                      animate={{ 
-                        rotate: [0, -15, 15, 0],
-                        scale: [1, 1.2, 1]
-                      }}
-                      transition={{ 
-                        duration: 0.6,
-                        repeat: Infinity,
-                        repeatDelay: 0.3,
-                        delay: 0.15
-                      }}
-                    >
-                      🔥
-                    </motion.span>
-                  </div>
-
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
