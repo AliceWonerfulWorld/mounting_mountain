@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { Mountain, Brain, TrendingUp, Sparkles, Trophy, Zap, Target } from "lucide-react";
+import { Mountain, Brain, TrendingUp, Sparkles, Trophy, Zap, Target, BookOpen } from "lucide-react";
 
 export default function Home() {
   return (
@@ -16,7 +16,7 @@ export default function Home() {
       {/* Hero Section */}
       <section className="relative z-10 flex min-h-screen flex-col items-center justify-center overflow-hidden px-6 py-16 text-center">
         {/* Mountain Image Animation (Behind Hero Content) */}
-        <motion.div 
+        <motion.div
           initial={{ y: "100%", opacity: 0 }}
           animate={{ y: "0%", opacity: 1 }}
           transition={{ duration: 2, ease: [0.22, 1, 0.36, 1] }} // Custom ease for "majestic" feel
@@ -52,20 +52,20 @@ export default function Home() {
           <br />
           マウンテン
         </h1>
-        
+
         {/* Altitude Badge */}
         <div className="mb-6 flex items-center gap-2 rounded-full border-2 border-yellow-400/50 bg-yellow-400/10 px-6 py-2 backdrop-blur-md shadow-lg shadow-black/40">
           <Trophy className="h-5 w-5 text-yellow-400 drop-shadow-md" />
           <span className="text-sm font-bold text-yellow-300 drop-shadow-md">標高で競え！マウント度測定ゲーム</span>
         </div>
-        
+
         <p className="mb-12 max-w-2xl text-xl font-semibold text-blue-100 drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] md:text-2xl">
           『マウント』を“標高”で可視化するAIゲーム
         </p>
-        
+
         {/* Main Actions Container */}
         <div className="flex flex-col items-center gap-6 w-full max-w-4xl">
-          
+
           {/* Row 1: Solo and Versus */}
           <div className="flex flex-col md:flex-row items-stretch justify-center gap-4 w-full">
             {/* Solo Mode Button - Primary */}
@@ -98,19 +98,34 @@ export default function Home() {
             </Link>
           </div>
 
-          {/* Row 2: Achievements - Tertiary (Now Styled Like Solo) */}
-          <Link
-            href="/achievements"
-            className="group relative overflow-hidden rounded-xl bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-600 px-12 py-4 text-lg font-bold text-white shadow-xl shadow-blue-500/40 transition-all duration-300 hover:scale-105 hover:shadow-blue-500/80 w-full md:w-auto flex items-center justify-center gap-2"
-          >
-            <span className="relative z-10 flex items-center gap-2">
-              <Trophy className="h-5 w-5" />
-              実績一覧
-            </span>
-            <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 via-blue-500 to-teal-500 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-            {/* Shine Effect */}
-            <div className="absolute inset-0 -translate-x-full transform bg-gradient-to-r from-transparent via-white/30 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
-          </Link>
+          {/* Row 2: Achievements and HowTo */}
+          <div className="flex flex-col md:flex-row items-center justify-center gap-4 w-full">
+            <Link
+              href="/achievements"
+              className="group relative overflow-hidden rounded-xl bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-600 px-8 py-4 text-lg font-bold text-white shadow-xl shadow-blue-500/40 transition-all duration-300 hover:scale-105 hover:shadow-blue-500/80 w-full md:flex-1 flex items-center justify-center gap-2"
+            >
+              <span className="relative z-10 flex items-center gap-2">
+                <Trophy className="h-5 w-5" />
+                実績一覧
+              </span>
+              <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 via-blue-500 to-teal-500 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+              {/* Shine Effect */}
+              <div className="absolute inset-0 -translate-x-full transform bg-gradient-to-r from-transparent via-white/30 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+            </Link>
+
+            <Link
+              href="/howto"
+              className="group relative overflow-hidden rounded-xl bg-gradient-to-r from-slate-600 via-zinc-600 to-neutral-600 px-8 py-4 text-lg font-bold text-white shadow-xl shadow-slate-500/40 transition-all duration-300 hover:scale-105 hover:shadow-slate-500/80 w-full md:flex-1 flex items-center justify-center gap-2"
+            >
+              <span className="relative z-10 flex items-center gap-2">
+                <BookOpen className="h-5 w-5" />
+                遊び方
+              </span>
+              <div className="absolute inset-0 bg-gradient-to-r from-zinc-500 via-slate-500 to-neutral-500 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+              {/* Shine Effect */}
+              <div className="absolute inset-0 -translate-x-full transform bg-gradient-to-r from-transparent via-white/30 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -123,34 +138,34 @@ export default function Home() {
           <p className="mb-12 text-center text-lg text-blue-300">
             3つのステップで頂点を目指せ
           </p>
-          
+
           <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
             {/* Feature 1: AI Analysis */}
             <div className="group relative overflow-hidden rounded-3xl border-2 border-blue-500/30 bg-gradient-to-br from-blue-900/60 to-slate-900/60 p-8 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:border-blue-400 hover:shadow-2xl hover:shadow-blue-500/40">
               <div className="absolute right-0 top-0 h-32 w-32 translate-x-8 -translate-y-8 rounded-full bg-blue-500/20 blur-3xl transition-all group-hover:bg-blue-400/30" />
-              
+
               <div className="relative mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 shadow-lg shadow-blue-500/50 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6">
                 <Brain className="h-10 w-10 text-white" />
               </div>
-              
+
               <div className="mb-2 flex items-center gap-2">
                 <span className="text-3xl font-black text-blue-400">01</span>
                 <h3 className="text-2xl font-bold text-white">AI解析</h3>
               </div>
               <p className="text-lg leading-relaxed text-blue-200">
                 あなたの何気ない一言をAIが判定。
-                
+
               </p>
             </div>
 
             {/* Feature 2: Scoring */}
             <div className="group relative overflow-hidden rounded-3xl border-2 border-red-500/30 bg-gradient-to-br from-red-900/60 to-slate-900/60 p-8 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:border-red-400 hover:shadow-2xl hover:shadow-red-500/40">
               <div className="absolute right-0 top-0 h-32 w-32 translate-x-8 -translate-y-8 rounded-full bg-red-500/20 blur-3xl transition-all group-hover:bg-red-400/30" />
-              
+
               <div className="relative mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-red-500 to-red-700 shadow-lg shadow-red-500/50 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6">
                 <TrendingUp className="h-10 w-10 text-white" />
               </div>
-              
+
               <div className="mb-2 flex items-center gap-2">
                 <span className="text-3xl font-black text-red-400">02</span>
                 <h3 className="text-2xl font-bold text-white">標高アップ</h3>
@@ -163,11 +178,11 @@ export default function Home() {
             {/* Feature 3: Solo Training */}
             <div className="group relative overflow-hidden rounded-3xl border-2 border-purple-500/30 bg-gradient-to-br from-purple-900/60 to-slate-900/60 p-8 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:border-purple-400 hover:shadow-2xl hover:shadow-purple-500/40">
               <div className="absolute right-0 top-0 h-32 w-32 translate-x-8 -translate-y-8 rounded-full bg-purple-500/20 blur-3xl transition-all group-hover:bg-purple-400/30" />
-              
+
               <div className="relative mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-500 to-purple-700 shadow-lg shadow-purple-500/50 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6">
                 <Mountain className="h-10 w-10 text-white" />
               </div>
-              
+
               <div className="mb-2 flex items-center gap-2">
                 <span className="text-3xl font-black text-purple-400">03</span>
                 <h3 className="text-2xl font-bold text-white">ソロトレーニング</h3>
