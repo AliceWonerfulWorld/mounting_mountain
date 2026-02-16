@@ -13,7 +13,7 @@ import { computeBonus } from "@/lib/solo/bonus";
 import { ROUTES, getRoute, type RouteId } from "@/lib/solo/routes";
 import { computeFinalAltitude } from "@/lib/solo/score";
 import { pickWeather, getWeather } from "@/lib/solo/weather";
-import { pickMission, evaluateMission } from "@/lib/solo/missions";
+import { pickMission, evaluateMission, type Mission } from "@/lib/solo/missions";
 import { buildSoloSummary } from "@/lib/solo/summary";
 import { SoloGameSummary } from "@/components/SoloGameSummary";
 import { getLabelJa } from "@/lib/labels";
@@ -54,13 +54,8 @@ export default function SoloPage() {
 
   useEffect(() => {
     setGame(initializeSoloGameState());
-
-    // Round 1のカットインを表示
-    setCutinRoundNumber(1);
-    setShowRoundCutin(true);
-    const timer = setTimeout(() => setShowRoundCutin(false), 2300);
-
-    return () => clearTimeout(timer);
+    // ミッション説明画面を表示 (カットインは後で)
+    setShowMissionBriefing(true);
   }, []);
 
   const [text, setText] = useState("");
@@ -76,6 +71,9 @@ export default function SoloPage() {
 
   // 結果表示中かどうかの状態
   const [showingResult, setShowingResult] = useState(false);
+
+  // ミッション説明画面の表示状態
+  const [showMissionBriefing, setShowMissionBriefing] = useState(true);
 
   if (!game) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
 
@@ -229,6 +227,30 @@ export default function SoloPage() {
     });
   }
 
+  function startGame() {
+    setShowMissionBriefing(false);
+
+    // Round 1のカットインを表示
+    setCutinRoundNumber(1);
+    setShowRoundCutin(true);
+    setTimeout(() => setShowRoundCutin(false), 2300);
+  }
+
+  function getMissionConditionText(mission: Mission | undefined): string {
+    if (!mission) return '';
+
+    switch (mission.id) {
+      case 'TOTAL_15000':
+        return `合計標高 ${mission.target?.toLocaleString() || '15,000'}m 以上`;
+      case 'EVEREST_1':
+        return `1回でも ${mission.target?.toLocaleString() || '8,000'}m 以上`;
+      case 'LABELS_3':
+        return `${mission.target || 3}種類以上のラベルを出す`;
+      default:
+        return '';
+    }
+  }
+
   function resetGame() {
     setGame(initializeSoloGameState());
     setText("");
@@ -260,6 +282,152 @@ export default function SoloPage() {
 
   return (
     <main className="min-h-screen relative overflow-x-hidden text-gray-800 dark:text-gray-200 font-sans">
+      {/* ミッション説明画面 */}
+      <AnimatePresence>
+        {showMissionBriefing && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, scale: 1.1 }}
+            transition={{ duration: 0.5 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-b from-slate-800 via-slate-700 to-slate-900 overflow-hidden"
+          >
+            {/* 背景装飾 - 山のシルエット */}
+            <div className="absolute inset-0 pointer-events-none">
+              {/* 遠景の山々 */}
+              <motion.div
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 0.3, y: 0 }}
+                transition={{ delay: 0.2, duration: 1 }}
+                className="absolute bottom-0 left-0 right-0"
+              >
+                <svg viewBox="0 0 1200 400" className="w-full h-auto opacity-40">
+                  <path d="M0,400 L0,200 L200,100 L400,180 L600,80 L800,160 L1000,120 L1200,200 L1200,400 Z" fill="url(#mountainGrad)" />
+                  <defs>
+                    <linearGradient id="mountainGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                      <stop offset="0%" stopColor="#1e293b" stopOpacity="0.8" />
+                      <stop offset="100%" stopColor="#0f172a" stopOpacity="0.9" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </motion.div>
+
+              {/* 星空エフェクト */}
+              <div className="absolute inset-0">
+                {[...Array(30)].map((_, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: [0, 1, 0] }}
+                    transition={{ delay: Math.random() * 2, duration: 2 + Math.random() * 2, repeat: Infinity }}
+                    className="absolute w-1 h-1 bg-white rounded-full"
+                    style={{
+                      left: `${Math.random() * 100}%`,
+                      top: `${Math.random() * 60}%`,
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* メインコンテンツ */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.3, duration: 0.5 }}
+              className="relative z-10 max-w-3xl px-8 w-full"
+            >
+              {/* ヘッダー */}
+              <div className="text-center mb-8">
+                <motion.div
+                  initial={{ y: -20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.5, duration: 0.5 }}
+                  className="text-5xl md:text-6xl font-black text-white mb-4 tracking-tight"
+                >
+                  MISSION BRIEFING
+                </motion.div>
+                <motion.div
+                  initial={{ y: -10, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.6, duration: 0.5 }}
+                  className="text-xl text-slate-300"
+                >
+                  今回の挑戦
+                </motion.div>
+              </div>
+
+              {/* ミッションカード */}
+              <motion.div
+                initial={{ y: 30, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.7, duration: 0.5 }}
+                className="bg-white/95 dark:bg-zinc-900/95 rounded-3xl p-8 md:p-12 shadow-2xl border-4 border-amber-500/50 backdrop-blur-sm"
+              >
+                {/* ミッションアイコンとタイトル */}
+                <div className="text-center mb-6">
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: 0.9, type: "spring", stiffness: 200 }}
+                    className="text-7xl mb-4"
+                  >
+                    🎯
+                  </motion.div>
+                  <div className="text-3xl md:text-4xl font-black text-gray-800 dark:text-gray-100">
+                    {game.mission?.title || 'ミッション'}
+                  </div>
+                </div>
+
+                {/* ミッション説明 */}
+                <div className="bg-blue-50 dark:bg-blue-950/50 rounded-2xl p-6 mb-6 border border-blue-200 dark:border-blue-800">
+                  <div className="text-sm font-bold text-blue-600 dark:text-blue-400 mb-2 uppercase tracking-wide">
+                    Mission Description
+                  </div>
+                  <div className="text-lg text-gray-800 dark:text-gray-100 leading-relaxed">
+                    {game.mission?.description || ''}
+                  </div>
+                </div>
+
+                {/* 達成条件 */}
+                <div className="bg-amber-50 dark:bg-amber-950/50 rounded-2xl p-6 mb-8 border border-amber-200 dark:border-amber-800">
+                  <div className="text-sm font-bold text-amber-600 dark:text-amber-400 mb-3 uppercase tracking-wide flex items-center gap-2">
+                    <span>🎯</span>
+                    <span>Clear Condition</span>
+                  </div>
+                  <div className="text-2xl md:text-3xl font-black text-amber-800 dark:text-amber-100">
+                    {getMissionConditionText(game.mission)}
+                  </div>
+                </div>
+
+                {/* スタートボタン */}
+                <motion.button
+                  onClick={startGame}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="w-full py-6 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-2xl transition-transform shadow-lg hover:shadow-xl"
+                >
+                  <div className="flex items-center justify-center gap-3">
+                    <span>挑戦を開始する</span>
+                    <span className="text-3xl">🏔️</span>
+                  </div>
+                </motion.button>
+              </motion.div>
+
+              {/* ヒント */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1.2, duration: 0.5 }}
+                className="text-center mt-6 text-slate-400 text-sm"
+              >
+                クリックして挑戦を開始
+              </motion.div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* ラウンドカットインエフェクト */}
       <AnimatePresence>
         {showRoundCutin && (
@@ -839,8 +1007,8 @@ export default function SoloPage() {
                     <button
                       onClick={proceedToNextRound}
                       className={`w-full py-5 rounded-xl text-white font-bold text-xl md:text-2xl hover:scale-[1.02] transition-transform shadow-lg ${game.roundIndex + 1 >= game.players[0].rounds.length
-                          ? 'bg-gradient-to-r from-yellow-600 to-orange-600'
-                          : 'bg-gradient-to-r from-green-600 to-emerald-600'
+                        ? 'bg-gradient-to-r from-yellow-600 to-orange-600'
+                        : 'bg-gradient-to-r from-green-600 to-emerald-600'
                         }`}
                     >
                       <div className="flex items-center justify-center gap-3">
