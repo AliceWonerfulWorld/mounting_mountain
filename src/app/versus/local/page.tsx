@@ -9,6 +9,8 @@ import { pickN } from "@/lib/random";
 import { createRounds } from "@/lib/game";
 import clsx from "clsx";
 import { updateStats } from "@/lib/achievementStore";
+import { ROUTES, getRoute, type RouteId } from "@/lib/solo/routes";
+import { computeFinalAltitude } from "@/lib/solo/score";
 
 
 type VersusState = GameState & {
@@ -16,6 +18,7 @@ type VersusState = GameState & {
     phase: "input" | "result" | "finished";
     lastResult: Round | undefined; // 直近の判定結果表示用
     roundWinner?: 0 | 1 | null; // 0: P1, 1: P2, null: 引き分け
+    selectedRoute: RouteId; // 現在のプレイヤーが選択したルート
 };
 
 export default function VersusLocalPage() {
@@ -42,6 +45,7 @@ export default function VersusLocalPage() {
             ],
             lastResult: undefined,
             roundWinner: undefined,
+            selectedRoute: "NORMAL",
         });
     }, []);
 
@@ -85,22 +89,46 @@ export default function VersusLocalPage() {
                 const player = next.players[next.currentPlayerIndex];
                 const round = player.rounds[next.roundIndex];
 
-                // 結果保存
+                // ルート情報取得
+                const route = getRoute(next.selectedRoute);
+
+                // 最終標高を計算（computeFinalAltitude を使用）
+                const scoreResult = computeFinalAltitude({
+                    baseAltitude: result.altitude,
+                    routeId: next.selectedRoute,
+                    routeMultiplier: route.multiplier,
+                    bonusAltitude: 0,
+                });
+
+                // 結果保存（ルート情報を追加）
                 round.inputText = text.trim();
-                round.result = result;
-                player.totalScore += result.altitude;
+                round.result = {
+                    ...result,
+                    routeId: next.selectedRoute,
+                    routeMultiplier: route.multiplier,
+                    finalAltitude: scoreResult.finalAltitude,
+                    didFall: scoreResult.didFall,
+                    fallReason: scoreResult.fallReason,
+                };
+
+                // totalScore は finalAltitude を加算
+                player.totalScore += scoreResult.finalAltitude;
 
                 // --- 称号判定 (ラウンド毎) ---
                 updateStats({
-                    highestAltitude: result.altitude,
-                    snowCount: result.altitude >= 6000 ? 1 : 0,
-                    everestCount: result.altitude >= 8000 ? 1 : 0,
+                    highestAltitude: scoreResult.finalAltitude,
+                    snowCount: scoreResult.finalAltitude >= 6000 ? 1 : 0,
+                    everestCount: scoreResult.finalAltitude >= 8000 ? 1 : 0,
                 });
 
-                // P2のターン終了時にラウンド勝者を判定
+                // P2のターン終了時にラウンド勝者を判定（finalAltitude 基準）
                 if (next.currentPlayerIndex === 1) {
-                    const p1Alt = next.players[0].rounds[next.roundIndex].result?.altitude || 0;
-                    const p2Alt = next.players[1].rounds[next.roundIndex].result?.altitude || 0;
+                    const p1Alt = next.players[0].rounds[next.roundIndex].result?.finalAltitude
+                        ?? next.players[0].rounds[next.roundIndex].result?.altitude
+                        ?? 0;
+                    const p2Alt = next.players[1].rounds[next.roundIndex].result?.finalAltitude
+                        ?? next.players[1].rounds[next.roundIndex].result?.altitude
+                        ?? 0;
 
                     if (p1Alt > p2Alt) {
                         next.roundWinner = 0;
@@ -193,6 +221,7 @@ export default function VersusLocalPage() {
             ],
             lastResult: undefined,
             roundWinner: undefined,
+            selectedRoute: "NORMAL",
         });
         setText("");
     }
@@ -264,6 +293,29 @@ export default function VersusLocalPage() {
                         <div className="text-lg font-bold">{currentRound.prompt}</div>
                     </div>
 
+                    {/* ルート選択 */}
+                    <div className="bg-white dark:bg-zinc-900 border rounded-xl p-4 space-y-2">
+                        <div className="text-xs text-gray-500 uppercase font-bold">ルート選択</div>
+                        <div className="grid grid-cols-3 gap-2">
+                            {ROUTES.map(route => (
+                                <button
+                                    key={route.id}
+                                    onClick={() => setGame(prev => prev ? { ...prev, selectedRoute: route.id } : null)}
+                                    className={clsx(
+                                        "p-3 rounded-lg border-2 transition-all",
+                                        game.selectedRoute === route.id
+                                            ? "border-blue-500 bg-blue-50 dark:bg-blue-900/30"
+                                            : "border-gray-200 hover:border-gray-300"
+                                    )}
+                                >
+                                    <div className="text-2xl">{route.emoji}</div>
+                                    <div className="text-xs font-bold">{route.label}</div>
+                                    <div className="text-xs text-gray-500">x{route.multiplier}</div>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
                     <textarea
                         className="w-full min-h-32 rounded-lg border p-4 text-lg focus:ring-2 outline-none"
                         placeholder={`${currentPlayer.name} のマウントを入力...`}
@@ -303,6 +355,27 @@ export default function VersusLocalPage() {
                             ))}
                         </div>
                     </div>
+
+                    {/* ルート情報 */}
+                    {game.lastResult.result.routeId && (
+                        <div className="text-sm text-gray-600 dark:text-gray-400">
+                            <span className="font-bold">ルート:</span> {getRoute(game.lastResult.result.routeId).emoji} {getRoute(game.lastResult.result.routeId).label}
+                        </div>
+                    )}
+
+                    {/* 滑落表示 */}
+                    {game.lastResult.result.didFall && (
+                        <div className="bg-red-100 dark:bg-red-900/30 p-3 rounded-lg border border-red-300 dark:border-red-700">
+                            <div className="text-red-700 dark:text-red-300 font-bold text-center">⚠️ 滑落！（2000m固定）</div>
+                        </div>
+                    )}
+
+                    {/* 最終標高 */}
+                    {game.lastResult.result.finalAltitude !== undefined && (
+                        <div className="text-sm text-gray-600 dark:text-gray-400">
+                            <span className="font-bold">最終標高:</span> {game.lastResult.result.finalAltitude}m
+                        </div>
+                    )}
 
                     {/* ラウンド勝者表示（P2のターン時のみ） */}
                     {game.currentPlayerIndex === 1 && game.roundWinner !== undefined && (
