@@ -196,19 +196,153 @@ export default function SoloPage() {
     setError(null);
   }
 
+  // 天候に応じた背景グラデーションを取得
+  const getWeatherBackground = () => {
+    if (!game.weather) {
+      return "bg-gradient-to-b from-blue-200 via-white to-gray-100 dark:from-slate-900 dark:via-slate-950 dark:to-black";
+    }
+
+    switch (game.weather) {
+      case "SUNNY":
+        // 晴れ - 明るい青空
+        return "bg-gradient-to-b from-sky-300 via-blue-100 to-white dark:from-slate-900 dark:via-slate-950 dark:to-black";
+      case "WINDY":
+        // 風 - やや曇りがち
+        return "bg-gradient-to-b from-gray-300 via-gray-200 to-gray-100 dark:from-slate-700 dark:via-slate-800 dark:to-black";
+      case "BLIZZARD":
+        // 吹雪 - 白っぽい暗い雪空
+        return "bg-gradient-to-b from-slate-300 via-slate-200 to-blue-50 dark:from-slate-700 dark:via-slate-800 dark:to-black";
+      default:
+        return "bg-gradient-to-b from-blue-200 via-white to-gray-100 dark:from-slate-900 dark:via-slate-950 dark:to-black";
+    }
+  };
+
   return (
     <main className="min-h-screen relative overflow-x-hidden text-gray-800 dark:text-gray-200 font-sans">
-      {/* 青空の背景 */}
-      <div className="fixed inset-0 bg-gradient-to-b from-blue-200 via-white to-gray-100 dark:from-slate-900 dark:via-slate-950 dark:to-black -z-20" />
+      {/* 天候に応じた背景 */}
+      <div className={`fixed inset-0 ${getWeatherBackground()} -z-20 transition-colors duration-1000`} />
+      
+      {/* 吹雪エフェクト */}
+      {game.weather === "BLIZZARD" && (
+        <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
+          {/* 雪のパーティクル */}
+          {Array.from({ length: 50 }).map((_, i) => (
+            <div
+              key={i}
+              className="absolute text-white opacity-70"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `-${Math.random() * 20}%`,
+                fontSize: `${Math.random() * 10 + 10}px`,
+                animation: `snowfall ${Math.random() * 3 + 2}s linear infinite`,
+                animationDelay: `${Math.random() * 5}s`,
+              }}
+            >
+              ❄
+            </div>
+          ))}
+          <style jsx>{`
+            @keyframes snowfall {
+              0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0.7;
+              }
+              70% {
+                opacity: 0.7;
+              }
+              100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+              }
+            }
+          `}</style>
+        </div>
+      )}
+
+      {/* 強風エフェクト */}
+      {game.weather === "WINDY" && (
+        <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
+          {/* 飛んでいく葉っぱ */}
+          {Array.from({ length: 20 }).map((_, i) => {
+            const leaves = ['🍁','🌿'];
+            const leaf = leaves[Math.floor(Math.random() * leaves.length)];
+            return (
+              <div
+                key={`leaf-${i}`}
+                className="absolute"
+                style={{
+                  top: `${Math.random() * 80}%`,
+                  left: '-50px',
+                  fontSize: `${Math.random() * 20 + 15}px`,
+                  animation: `windLeaf ${Math.random() * 3 + 2}s linear infinite`,
+                  animationDelay: `${Math.random() * 4}s`,
+                }}
+              >
+                {leaf}
+              </div>
+            );
+          })}
+          {/* 強い風の線 */}
+          {Array.from({ length: 40 }).map((_, i) => (
+            <div
+              key={`line-${i}`}
+              className="absolute bg-white/40"
+              style={{
+                top: `${Math.random() * 100}%`,
+                left: '-150px',
+                width: `${Math.random() * 150 + 100}px`,
+                height: '2px',
+                animation: `windBlow ${Math.random() * 1.5 + 0.8}s linear infinite`,
+                animationDelay: `${Math.random() * 3}s`,
+                transform: 'rotate(-5deg)',
+              }}
+            />
+          ))}
+          <style jsx>{`
+            @keyframes windLeaf {
+              0% {
+                transform: translateX(0) translateY(0) rotate(0deg);
+                opacity: 0;
+              }
+              10% {
+                opacity: 0.8;
+              }
+              90% {
+                opacity: 0.8;
+              }
+              100% {
+                transform: translateX(calc(100vw + 100px)) translateY(${Math.random() * 200 - 100}px) rotate(${Math.random() * 720}deg);
+                opacity: 0;
+              }
+            }
+            @keyframes windBlow {
+              0% {
+                transform: translateX(0) rotate(-5deg);
+                opacity: 0;
+              }
+              10% {
+                opacity: 0.6;
+              }
+              90% {
+                opacity: 0.6;
+              }
+              100% {
+                transform: translateX(calc(100vw + 200px)) rotate(-5deg);
+                opacity: 0;
+              }
+            }
+          `}</style>
+        </div>
+      )}
       
       {/* 遠景の山シルエット (下層) */}
-      <div className="fixed bottom-0 left-0 w-full h-1/3 pointer-events-none -z-10 opacity-30 dark:opacity-20">
-        <svg viewBox="0 0 1200 320" preserveAspectRatio="none" className="w-full h-full fill-stone-400 dark:fill-stone-600">
+      <div className="fixed bottom-0 left-0 w-full h-1/3 pointer-events-none -z-10 opacity-30 dark:opacity-20 transition-all duration-1000">
+        <svg viewBox="0 0 1200 320" preserveAspectRatio="none" className={`w-full h-full ${game.weather === "SUNNY" ? "fill-green-600 dark:fill-green-700" : "fill-stone-400 dark:fill-stone-600"}`}>
           <path d="M0,320 L200,160 L400,280 L600,100 L800,240 L1000,140 L1200,320 Z" />
         </svg>
       </div>
-      <div className="fixed bottom-0 left-0 w-full h-1/4 pointer-events-none -z-10 opacity-50 dark:opacity-40">
-        <svg viewBox="0 0 1200 320" preserveAspectRatio="none" className="w-full h-full fill-stone-500 dark:fill-stone-700">
+      <div className="fixed bottom-0 left-0 w-full h-1/4 pointer-events-none -z-10 opacity-50 dark:opacity-40 transition-all duration-1000">
+        <svg viewBox="0 0 1200 320" preserveAspectRatio="none" className={`w-full h-full ${game.weather === "SUNNY" ? "fill-green-700 dark:fill-green-800" : "fill-stone-500 dark:fill-stone-700"}`}>
           <path d="M0,320 L150,200 L350,300 L550,150 L850,280 L1100,180 L1200,320 Z" />
         </svg>
       </div>
