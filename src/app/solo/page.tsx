@@ -253,25 +253,20 @@ export default function SoloPage() {
         });
       } else {
         next.roundIndex += 1;
+        
+        // 次のラウンドのカットインを表示
+        const nextRoundNumber = next.roundIndex + 1;
+        setTimeout(() => {
+          setCutinRoundNumber(nextRoundNumber);
+          setShowRoundCutin(true);
+          setTimeout(() => setShowRoundCutin(false), 2300);
+        }, 100);
       }
 
       return next;
     });
 
     setShowingResult(false);
-
-    // 次のラウンドのカットインを表示
-    setGame((prev) => {
-      if (!prev || prev.status === "finished") return prev;
-
-      setTimeout(() => {
-        setCutinRoundNumber(prev.roundIndex + 1);
-        setShowRoundCutin(true);
-        setTimeout(() => setShowRoundCutin(false), 2300);
-      }, 100);
-
-      return prev;
-    });
   }
 
   function startGame() {
@@ -690,14 +685,14 @@ export default function SoloPage() {
                   </div>
 
                   {/* メイン数字 */}
-                  <div className="relative">
+                  <div className="relative flex flex-col items-center">
                     <div className="text-[12rem] md:text-[16rem] font-black text-white drop-shadow-2xl leading-none tracking-tight">
                       {cutinRoundNumber}
                     </div>
 
                     {/* 標高風のサブテキスト */}
-                    <div className="absolute -bottom-4 right-0 bg-slate-800/80 backdrop-blur-sm px-4 py-2 rounded-lg border border-amber-500/30">
-                      <div className="text-amber-400 text-sm font-mono font-bold">
+                    <div className="mt-4 bg-slate-800/80 backdrop-blur-sm px-4 py-2 rounded-lg border border-amber-500/30">
+                      <div className="text-amber-400 text-sm font-mono font-bold whitespace-nowrap">
                         STAGE {cutinRoundNumber}/3
                       </div>
                     </div>
@@ -1052,12 +1047,7 @@ export default function SoloPage() {
                 transition={{ delay: 1.2 }}
                 className="absolute bottom-4 left-1/2 -translate-x-1/2"
               >
-                <div className="inline-flex items-center gap-2 bg-black/50 backdrop-blur-sm px-4 py-2 rounded-full border-2 border-white/30">
-                  <span className="text-base">👆</span>
-                  <span className="text-xs text-white/90 font-bold">
-                    TAP TO SKIP
-                  </span>
-                </div>
+                
               </motion.div>
             </div>
           </motion.div>
