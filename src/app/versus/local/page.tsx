@@ -13,10 +13,12 @@ import { updateStats } from "@/lib/achievementStore";
 import { ROUTES, getRoute, type RouteId } from "@/lib/solo/routes";
 import { computeFinalAltitude } from "@/lib/solo/score";
 import { RotateCcw, TrendingUp, AlertTriangle, Mountain } from "lucide-react";
+import { RoundCutin } from "@/components/RoundCutin";
+import { TurnCutin } from "@/components/TurnCutin";
 
 type VersusState = GameState & {
     currentPlayerIndex: 0 | 1; // 0: Player 1, 1: Player 2
-    phase: "input" | "result" | "finished";
+    phase: "input" | "result" | "finished" | "round_start" | "turn_change";
     lastResult: Round | undefined; // 直近の判定結果表示用
     roundWinner?: 0 | 1 | null; // 0: P1, 1: P2, null: 引き分け
     selectedRoute: RouteId; // 現在のプレイヤーが選択したルート
@@ -43,7 +45,7 @@ export default function VersusLocalPage() {
             roundIndex: 0,
             prompts: selectedPrompts,
             currentPlayerIndex: 0,
-            phase: "input",
+            phase: "round_start",
             insurance: 0,
             players: [
                 { id: "p1", name: "Player 1", totalScore: 0, rounds: roundsP1 },
@@ -151,7 +153,7 @@ export default function VersusLocalPage() {
             if (next.currentPlayerIndex === 0) {
                 // P1 -> P2
                 next.currentPlayerIndex = 1;
-                next.phase = "input";
+                next.phase = "turn_change";
                 next.lastResult = undefined;
                 // P2のデフォルトルート
                 next.selectedRoute = "NORMAL";
@@ -170,7 +172,7 @@ export default function VersusLocalPage() {
                 } else {
                     next.roundIndex += 1;
                     next.currentPlayerIndex = 0;
-                    next.phase = "input";
+                    next.phase = "round_start";
                     next.lastResult = undefined;
                     next.roundWinner = undefined;
                     next.selectedRoute = "NORMAL";
@@ -192,7 +194,7 @@ export default function VersusLocalPage() {
             roundIndex: 0,
             prompts: selectedPrompts,
             currentPlayerIndex: 0,
-            phase: "input",
+            phase: "round_start",
             insurance: 0,
             players: [
                 { id: "p1", name: "Player 1", totalScore: 0, rounds: roundsP1 },
@@ -204,6 +206,27 @@ export default function VersusLocalPage() {
         });
         setText("");
         setIsHistoryOpen(false);
+    }
+
+    // Cut-in Handlers
+    function handleRoundCutinComplete() {
+        setGame((prev) => {
+            if (!prev) return null;
+            return {
+                ...prev,
+                phase: "turn_change" // Round Start -> P1 Turn Cutin
+            };
+        });
+    }
+
+    function handleTurnCutinComplete() {
+        setGame((prev) => {
+            if (!prev) return null;
+            return {
+                ...prev,
+                phase: "input" // Turn Cutin -> Input
+            };
+        });
     }
 
     // --- UI Components ---
@@ -365,6 +388,17 @@ export default function VersusLocalPage() {
                             </div>
                         </div>
 
+                    ) : game.phase === "round_start" ? (
+                        <RoundCutin
+                            roundNumber={game.roundIndex + 1}
+                            onComplete={handleRoundCutinComplete}
+                        />
+                    ) : game.phase === "turn_change" ? (
+                        <TurnCutin
+                            playerIndex={game.currentPlayerIndex}
+                            playerName={game.players[game.currentPlayerIndex].name}
+                            onComplete={handleTurnCutinComplete}
+                        />
                     ) : game.phase === "input" ? (
                         // --- INPUT PHASE ---
                         <div className="space-y-6 animate-in slide-in-from-right fade-in duration-300">
