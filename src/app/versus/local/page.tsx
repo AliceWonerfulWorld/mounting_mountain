@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import type { GameState, Round } from "@/types/game";
 import { PROMPTS } from "@/lib/prompts";
 import { MountainView } from "@/components/MountainView";
+import { DetailedMountain } from "@/components/DetailedMountain";
 import { pickN } from "@/lib/random";
 import { createRounds } from "@/lib/game";
 import { cn } from "@/lib/utils";
@@ -444,9 +445,21 @@ export default function VersusLocalPage() {
                                                             <span>{getRoute(p1Result?.routeId || "NORMAL").emoji}</span>
                                                             <span>{getRoute(p1Result?.routeId || "NORMAL").label}</span>
                                                         </div>
-                                                        <div className="text-5xl font-black text-red-600 dark:text-red-400">
+                                                        
+                                                        {/* 山の描画 */}
+                                                        <div className="flex justify-center my-4 -mx-2">
+                                                            <DetailedMountain
+                                                                altitude={p1Result?.altitude || 0}
+                                                                size={280}
+                                                                color="red"
+                                                                isWinner={game.roundWinner === 0}
+                                                                animate={true}
+                                                            />
+                                                        </div>
+                                                        
+                                                        <div className="text-4xl font-black text-red-600 dark:text-red-400 mt-2">
                                                             {p1Result?.altitude}
-                                                            <span className="text-xl text-slate-500 ml-1">m</span>
+                                                            <span className="text-lg text-slate-500 ml-1">m</span>
                                                         </div>
                                                         {p1Result?.didFall && (
                                                             <div className="flex items-center justify-center gap-1 text-red-500 text-xs font-bold mt-2">
@@ -481,9 +494,21 @@ export default function VersusLocalPage() {
                                                             <span>{getRoute(p2Result?.routeId || "NORMAL").emoji}</span>
                                                             <span>{getRoute(p2Result?.routeId || "NORMAL").label}</span>
                                                         </div>
-                                                        <div className="text-5xl font-black text-blue-600 dark:text-blue-400">
+                                                        
+                                                        {/* 山の描画 */}
+                                                        <div className="flex justify-center my-4 -mx-2">
+                                                            <DetailedMountain
+                                                                altitude={p2Result?.altitude || 0}
+                                                                size={280}
+                                                                color="blue"
+                                                                isWinner={game.roundWinner === 1}
+                                                                animate={true}
+                                                            />
+                                                        </div>
+                                                        
+                                                        <div className="text-4xl font-black text-blue-600 dark:text-blue-400 mt-2">
                                                             {p2Result?.altitude}
-                                                            <span className="text-xl text-slate-500 ml-1">m</span>
+                                                            <span className="text-lg text-slate-500 ml-1">m</span>
                                                         </div>
                                                         {p2Result?.didFall && (
                                                             <div className="flex items-center justify-center gap-1 text-red-500 text-xs font-bold mt-2">
