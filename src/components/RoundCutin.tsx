@@ -12,7 +12,7 @@ export function RoundCutin({ roundNumber, onComplete }: Props) {
     useEffect(() => {
         const timer = setTimeout(() => {
             onComplete();
-        }, 4000); // 4秒後に完了
+        }, 2500); // 2.5秒後に完了
         return () => clearTimeout(timer);
     }, [onComplete]);
 
@@ -21,126 +21,339 @@ export function RoundCutin({ roundNumber, onComplete }: Props) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md overflow-hidden"
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden"
         >
-            {/* 背景エフェクト */}
-            <div className="absolute inset-0 pointer-events-none">
-                <div className="absolute inset-0 bg-gradient-to-b from-blue-900/50 via-purple-900/50 to-black/80" />
+            {/* 背景: 空から雪山へのグラデーション */}
+            <motion.div
+                initial={{ scale: 1.2, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.8, ease: "easeOut" }}
+                className="absolute inset-0 bg-gradient-to-b from-sky-500 via-blue-200 to-slate-200"
+            />
 
-                {/* 集中線 */}
-                <div className="absolute inset-0 overflow-hidden opacity-30">
-                    {[...Array(12)].map((_, i) => (
-                        <motion.div
-                            key={`line-${i}`}
-                            initial={{ scaleY: 0, opacity: 0 }}
-                            animate={{ scaleY: 1, opacity: 0.15 }}
-                            transition={{
-                                duration: 0.3,
-                                delay: i * 0.02,
-                                ease: "easeOut"
-                            }}
-                            className="absolute top-1/2 left-1/2 w-0.5 h-full bg-white origin-top will-change-transform"
-                            style={{
-                                transform: `rotate(${(360 / 12) * i}deg) translateX(-50%)`,
-                            }}
-                        />
-                    ))}
-                </div>
+            {/* 遠景の山々 - 最背面 */}
+            <div className="absolute bottom-0 left-0 right-0 pointer-events-none">
+                <motion.svg
+                    initial={{ y: 50, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ duration: 0.8, delay: 0.1 }}
+                    viewBox="0 0 1200 400"
+                    className="w-full h-auto text-slate-300/60 fill-current"
+                    preserveAspectRatio="none"
+                >
+                    <path d="M0,400 L0,250 L150,180 L300,220 L450,150 L600,200 L750,170 L900,210 L1050,190 L1200,240 L1200,400 Z" />
+                    {/* 雪キャップ */}
+                    <path d="M450,150 L420,170 L480,170 Z" fill="white" opacity="0.8" />
+                    <path d="M600,200 L570,215 L630,215 Z" fill="white" opacity="0.8" />
+                    <path d="M750,170 L720,185 L780,185 Z" fill="white" opacity="0.8" />
+                </motion.svg>
             </div>
 
-            <div className="relative z-10 w-full max-w-4xl h-full max-h-[600px] flex flex-col items-center justify-center">
-
-                {/* 斜めストライプ装飾 - 上 */}
-                <motion.div
-                    initial={{ x: "-100%", rotate: -15 }}
-                    animate={{ x: "0%", rotate: -15 }}
-                    transition={{ duration: 0.4, ease: "easeOut" }}
-                    className="absolute top-1/4 -left-20 w-[120vw] h-32 bg-gradient-to-r from-black/80 via-black/60 to-transparent border-y-4 border-yellow-300 will-change-transform"
-                    style={{ transformOrigin: "left center" }}
+            {/* 中景の山々 */}
+            <div className="absolute bottom-0 left-0 right-0 pointer-events-none">
+                <motion.svg
+                    initial={{ y: 80, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ duration: 0.8, delay: 0.2 }}
+                    viewBox="0 0 1200 350"
+                    className="w-full h-auto text-slate-400/70 fill-current"
+                    preserveAspectRatio="none"
                 >
-                    <div className="absolute right-40 top-1/2 -translate-y-1/2 text-white font-mono font-bold text-xl tracking-widest">
-                        ROUND {roundNumber} START
-                    </div>
-                </motion.div>
+                    <path d="M0,350 L100,200 L180,240 L300,140 L420,180 L550,100 L680,160 L800,120 L920,180 L1050,140 L1200,220 L1200,350 Z" />
+                    {/* 雪キャップと影 */}
+                    <path d="M300,140 L260,165 L340,165 Z" fill="white" opacity="0.9" />
+                    <path d="M550,100 L510,130 L590,130 Z" fill="white" opacity="0.9" />
+                    <path d="M800,120 L760,145 L840,145 Z" fill="white" opacity="0.9" />
+                    {/* 岩肌のディテール */}
+                    <path d="M300,165 L280,200 L320,190 Z" fill="currentColor" opacity="0.3" />
+                    <path d="M550,130 L530,170 L570,160 Z" fill="currentColor" opacity="0.3" />
+                </motion.svg>
+            </div>
 
-                {/* 斜めストライプ装飾 - 下 */}
-                <motion.div
-                    initial={{ x: "100%", rotate: -15 }}
-                    animate={{ x: "0%", rotate: -15 }}
-                    transition={{ duration: 0.4, ease: "easeOut" }}
-                    className="absolute bottom-1/4 -right-20 w-[120vw] h-32 bg-gradient-to-l from-black/80 via-black/60 to-transparent border-y-4 border-yellow-300 will-change-transform"
-                    style={{ transformOrigin: "right center" }}
+            {/* 近景の山 - 左 */}
+            <div className="absolute bottom-0 left-0 pointer-events-none">
+                <motion.svg
+                    initial={{ x: -100, y: 100, opacity: 0 }}
+                    animate={{ x: 0, y: 0, opacity: 1 }}
+                    transition={{ duration: 0.8, delay: 0.3 }}
+                    viewBox="0 0 600 400"
+                    className="w-auto h-[400px] text-slate-600/80 fill-current"
+                    preserveAspectRatio="xMinYMax meet"
                 >
-                    <div className="absolute left-40 top-1/2 -translate-y-1/2 text-white font-mono font-bold text-xl tracking-widest">
-                        READY FOR BATTLE
-                    </div>
-                </motion.div>
+                    <path d="M0,400 L200,120 L280,180 L350,140 L420,200 L500,160 L600,240 L600,400 Z" />
+                    {/* 雪と岩肌 */}
+                    <path d="M200,120 L160,155 L240,155 Z" fill="white" opacity="0.95" />
+                    <path d="M350,140 L320,170 L380,170 Z" fill="white" opacity="0.95" />
+                    <path d="M240,155 L220,200 L260,190 Z" fill="currentColor" opacity="0.4" />
+                    <path d="M280,180 L260,220 L300,210 L320,240 Z" fill="currentColor" opacity="0.3" />
+                </motion.svg>
+            </div>
 
-                {/* メインテキスト */}
-                <div className="relative transform bg-black/40 p-12 rounded-3xl border border-white/10 backdrop-blur-sm">
+            {/* 近景の山 - 右 */}
+            <div className="absolute bottom-0 right-0 pointer-events-none">
+                <motion.svg
+                    initial={{ x: 100, y: 100, opacity: 0 }}
+                    animate={{ x: 0, y: 0, opacity: 1 }}
+                    transition={{ duration: 0.8, delay: 0.3 }}
+                    viewBox="0 0 600 400"
+                    className="w-auto h-[400px] text-slate-600/80 fill-current"
+                    preserveAspectRatio="xMaxYMax meet"
+                >
+                    <path d="M0,240 L100,180 L180,220 L250,140 L320,180 L400,100 L500,180 L600,400 L0,400 Z" />
+                    {/* 雪キャップ */}
+                    <path d="M400,100 L360,135 L440,135 Z" fill="white" opacity="0.95" />
+                    <path d="M250,140 L220,170 L280,170 Z" fill="white" opacity="0.95" />
+                    <path d="M360,135 L340,180 L380,170 L400,200 Z" fill="currentColor" opacity="0.4" />
+                </motion.svg>
+            </div>
+
+            {/* 雲エフェクト */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                {[...Array(5)].map((_, i) => (
                     <motion.div
-                        initial={{ scale: 0, rotate: -90 }}
-                        animate={{
-                            scale: [0, 1.2, 1],
-                            rotate: [90, -10, 0]
+                        key={`cloud-${i}`}
+                        initial={{ x: -200, opacity: 0 }}
+                        animate={{ 
+                            x: ["0%", "100%"],
+                            opacity: [0, 0.3, 0.3, 0]
                         }}
                         transition={{
+                            duration: 8 + i * 2,
+                            ease: "linear",
+                            repeat: Infinity,
+                            delay: i * 0.5
+                        }}
+                        className="absolute"
+                        style={{
+                            top: `${20 + i * 15}%`,
+                            width: `${100 + i * 20}px`,
+                            height: `${40 + i * 10}px`,
+                        }}
+                    >
+                        <div className="w-full h-full bg-white/40 rounded-full blur-xl" />
+                    </motion.div>
+                ))}
+            </div>
+
+            {/* 雪のパーティクル */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                {[...Array(15)].map((_, i) => (
+                    <motion.div
+                        key={`snow-${i}`}
+                        initial={{ 
+                            y: -20, 
+                            x: Math.random() * 100 + "%",
+                            opacity: 0
+                        }}
+                        animate={{ 
+                            y: "100vh",
+                            x: [
+                                `${Math.random() * 100}%`,
+                                `${Math.random() * 100}%`,
+                                `${Math.random() * 100}%`
+                            ],
+                            opacity: [0, 0.6, 0]
+                        }}
+                        transition={{
+                            duration: 8 + Math.random() * 4,
+                            ease: "linear",
+                            repeat: Infinity,
+                            delay: Math.random() * 3
+                        }}
+                        className="absolute"
+                    >
+                        <div 
+                            className="bg-white rounded-full blur-sm"
+                            style={{
+                                width: `${2 + Math.random() * 4}px`,
+                                height: `${2 + Math.random() * 4}px`,
+                            }}
+                        />
+                    </motion.div>
+                ))}
+            </div>
+
+            {/* メインコンテンツ */}
+            <div className="relative z-10 flex flex-col items-center justify-center space-y-8">
+                
+                {/* 山のシルエット群 - 下から浮上 */}
+                <motion.div
+                    initial={{ y: 100, opacity: 0, scale: 0.5 }}
+                    animate={{ y: 0, opacity: 1, scale: 1 }}
+                    transition={{
+                        duration: 0.6,
+                        ease: [0.34, 1.56, 0.64, 1]
+                    }}
+                    className="relative"
+                >
+                    {/* 光の背景 */}
+                    <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ 
                             duration: 0.5,
-                            times: [0, 0.6, 1],
+                            delay: 0.2,
                             ease: "easeOut"
                         }}
-                        className="text-center"
+                        className="absolute inset-0 -m-16 bg-gradient-radial from-white/80 via-white/40 to-transparent rounded-full blur-3xl"
+                    />
+                    
+                    {/* 3つの山のシルエット */}
+                    <motion.svg
+                        animate={{ 
+                            y: [0, -5, 0],
+                        }}
+                        transition={{
+                            duration: 3,
+                            repeat: Infinity,
+                            ease: "easeInOut"
+                        }}
+                        viewBox="0 0 300 180"
+                        className="relative w-72 h-auto drop-shadow-2xl"
                     >
-                        <motion.div
+                        {/* 背景の山 - 左 */}
+                        <motion.path
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.3 }}
-                            className="space-y-2"
-                        >
-                            {/* Let's */}
-                            <div className="text-5xl md:text-6xl font-black text-white tracking-wider drop-shadow-[0_0_30px_rgba(255,255,255,0.8)]"
-                                style={{
-                                    textShadow: '4px 4px 0px rgba(0,0,0,0.8), -2px -2px 0px rgba(255,255,255,0.5), 0 0 40px rgba(255,255,0,0.8)'
-                                }}
-                            >
-                                Let&apos;s
-                            </div>
+                            transition={{ delay: 0.3, duration: 0.4 }}
+                            d="M0,180 L50,100 L80,120 L110,90 L130,110 L150,140 L0,180 Z"
+                            fill="#64748b"
+                            opacity="0.5"
+                        />
+                        {/* 雪キャップ - 左の山 */}
+                        <path d="M50,100 L40,110 L60,110 Z" fill="white" opacity="0.6" />
+                        <path d="M110,90 L100,100 L120,100 Z" fill="white" opacity="0.6" />
 
-                            {/* マウント！ */}
-                            <motion.div
-                                className="text-7xl md:text-9xl font-black bg-gradient-to-r from-yellow-200 via-orange-300 to-red-300 bg-clip-text text-transparent tracking-tight"
-                                animate={{
-                                    scale: [1, 1.05, 1],
+                        {/* 背景の山 - 右 */}
+                        <motion.path
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.35, duration: 0.4 }}
+                            d="M150,140 L170,110 L200,90 L230,110 L250,100 L280,130 L300,150 L300,180 L150,180 Z"
+                            fill="#64748b"
+                            opacity="0.5"
+                        />
+                        {/* 雪キャップ - 右の山 */}
+                        <path d="M200,90 L190,100 L210,100 Z" fill="white" opacity="0.6" />
+                        <path d="M250,100 L240,110 L260,110 Z" fill="white" opacity="0.6" />
+
+                        {/* メインの山 - 中央（最も高い） */}
+                        <motion.path
+                            initial={{ opacity: 0, y: 30 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.4, duration: 0.5 }}
+                            d="M80,180 L120,110 L150,40 L180,100 L210,80 L240,120 L220,180 Z"
+                            fill="#475569"
+                            filter="drop-shadow(0 10px 20px rgba(0,0,0,0.3))"
+                        />
+                        {/* 雪キャップ - 中央の山頂 */}
+                        <motion.path
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.6 }}
+                            d="M150,40 L130,65 L170,65 Z"
+                            fill="white"
+                            opacity="0.95"
+                        />
+                        {/* 山頂の旗 */}
+                        <motion.g
+                            initial={{ opacity: 0, scale: 0 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ delay: 0.8, duration: 0.3 }}
+                        >
+                            <line x1="150" y1="40" x2="150" y2="20" stroke="#ef4444" strokeWidth="2" />
+                            <motion.path
+                                animate={{ 
+                                    d: [
+                                        "M150,20 L170,25 L150,30 Z",
+                                        "M150,20 L168,25 L150,30 Z",
+                                        "M150,20 L170,25 L150,30 Z"
+                                    ]
                                 }}
                                 transition={{
-                                    duration: 0.8,
+                                    duration: 1.5,
                                     repeat: Infinity,
                                     ease: "easeInOut"
                                 }}
-                                style={{
-                                    textShadow: '6px 6px 0px rgba(0,0,0,0.9), -3px -3px 0px rgba(255,255,255,0.3)',
-                                    WebkitTextStroke: '3px #000',
-                                    paintOrder: 'stroke fill'
-                                }}
-                            >
-                                マウント！
-                            </motion.div>
-                        </motion.div>
-                    </motion.div>
+                                fill="#ef4444"
+                            />
+                        </motion.g>
+                        {/* 岩肌のディテール */}
+                        <path d="M120,110 L110,140 L130,135 Z" fill="#334155" opacity="0.4" />
+                        <path d="M180,100 L170,130 L190,125 Z" fill="#334155" opacity="0.4" />
+                        <path d="M150,65 L145,90 L155,85 Z" fill="#334155" opacity="0.3" />
+                    </motion.svg>
+                </motion.div>
 
+                {/* ROUND テキスト */}
+                <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ 
+                        duration: 0.5,
+                        delay: 0.4,
+                        ease: "easeOut"
+                    }}
+                    className="text-center space-y-2"
+                >
                     <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.6 }}
-                        className="mt-8 text-center"
+                        initial={{ scale: 0.8 }}
+                        animate={{ scale: 1 }}
+                        transition={{
+                            duration: 0.3,
+                            delay: 0.5
+                        }}
+                        className="text-8xl md:text-9xl font-black text-slate-800 tracking-tight leading-none"
                     >
-                        <div className="inline-block bg-black/70 px-8 py-3 rounded-full border-2 border-yellow-400">
-                            <div className="text-2xl font-black text-yellow-300 tracking-widest uppercase">
-                                ROUND {roundNumber}
-                            </div>
+                        ROUND
+                    </motion.div>
+                    
+                    <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{
+                            duration: 0.4,
+                            delay: 0.7,
+                            ease: [0.34, 1.56, 0.64, 1]
+                        }}
+                        className="relative inline-block"
+                    >
+                        {/* 数字の背景円 */}
+                        <div className="absolute inset-0 -m-6 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full blur-xl opacity-60" />
+                        
+                        <div className="relative text-9xl md:text-[12rem] font-black text-white drop-shadow-2xl">
+                            {roundNumber}
                         </div>
                     </motion.div>
-                </div>
+                </motion.div>
+
+                {/* 準備完了メッセージ */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ 
+                        duration: 0.4,
+                        delay: 1.0
+                    }}
+                    className="text-center"
+                >
+                    <div className="inline-flex items-center gap-2 bg-white/90 backdrop-blur-sm px-6 py-3 rounded-full shadow-lg border-2 border-slate-200">
+                        <motion.div
+                            animate={{ scale: [1, 1.2, 1] }}
+                            transition={{
+                                duration: 1,
+                                repeat: Infinity,
+                                ease: "easeInOut"
+                            }}
+                        >
+                            ⛰️
+                        </motion.div>
+                        <span className="text-lg font-bold text-slate-700 tracking-wide">
+                            準備はいいですか？
+                        </span>
+                    </div>
+                </motion.div>
             </div>
         </motion.div>
     );
