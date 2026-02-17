@@ -18,7 +18,7 @@ import { TurnCutin } from "@/components/TurnCutin";
 
 type VersusState = GameState & {
     currentPlayerIndex: 0 | 1; // 0: Player 1, 1: Player 2
-    phase: "input" | "result" | "finished" | "round_start" | "turn_change";
+    phase: "input" | "result" | "finished" | "round_start" | "turn_change" | "both_results";
     lastResult: Round | undefined; // 直近の判定結果表示用
     roundWinner?: 0 | 1 | null; // 0: P1, 1: P2, null: 引き分け
     selectedRoute: RouteId; // 現在のプレイヤーが選択したルート
@@ -120,8 +120,11 @@ export default function VersusLocalPage() {
                     everestCount: scoreResult.finalAltitude >= 8000 ? 1 : 0,
                 });
 
-                // P2終了時にラウンド勝者判定
-                if (next.currentPlayerIndex === 1) {
+                // P1終了時は交代へ、P2終了時は両結果表示へ
+                if (next.currentPlayerIndex === 0) {
+                    next.phase = "turn_change";
+                } else {
+                    // P2終了時にラウンド勝者判定
                     const p1Res = next.players[0].rounds[next.roundIndex].result;
                     const p2Res = next.players[1].rounds[next.roundIndex].result;
                     const p1Alt = p1Res?.finalAltitude ?? 0;
@@ -130,10 +133,9 @@ export default function VersusLocalPage() {
                     if (p1Alt > p2Alt) next.roundWinner = 0;
                     else if (p2Alt > p1Alt) next.roundWinner = 1;
                     else next.roundWinner = null;
-                }
 
-                next.lastResult = structuredClone(round);
-                next.phase = "result";
+                    next.phase = "both_results";
+                }
 
                 return next;
             });
@@ -150,33 +152,24 @@ export default function VersusLocalPage() {
             if (!prev) return null;
             const next = structuredClone(prev);
 
-            if (next.currentPlayerIndex === 0) {
-                // P1 -> P2
-                next.currentPlayerIndex = 1;
-                next.phase = "turn_change";
-                next.lastResult = undefined;
-                // P2のデフォルトルート
-                next.selectedRoute = "NORMAL";
-            } else {
-                // P2 -> Next Round or Finish
-                // ボーナス加算
-                if (next.roundWinner === 0) next.players[0].totalScore += 1000;
-                else if (next.roundWinner === 1) next.players[1].totalScore += 1000;
+            // both_results から次のラウンドまたは終了へ
+            // ボーナス加算
+            if (next.roundWinner === 0) next.players[0].totalScore += 1000;
+            else if (next.roundWinner === 1) next.players[1].totalScore += 1000;
 
-                if (next.roundIndex + 1 >= ROUND_COUNT) {
-                    next.status = "finished";
-                    next.phase = "finished";
-                    // 終了時称号
-                    const p1Win = next.players[0].totalScore > next.players[1].totalScore;
-                    updateStats({ versusPlays: 1, versusWinsP1: p1Win ? 1 : 0 });
-                } else {
-                    next.roundIndex += 1;
-                    next.currentPlayerIndex = 0;
-                    next.phase = "round_start";
-                    next.lastResult = undefined;
-                    next.roundWinner = undefined;
-                    next.selectedRoute = "NORMAL";
-                }
+            if (next.roundIndex + 1 >= ROUND_COUNT) {
+                next.status = "finished";
+                next.phase = "finished";
+                // 終了時称号
+                const p1Win = next.players[0].totalScore > next.players[1].totalScore;
+                updateStats({ versusPlays: 1, versusWinsP1: p1Win ? 1 : 0 });
+            } else {
+                next.roundIndex += 1;
+                next.currentPlayerIndex = 0;
+                next.phase = "round_start";
+                next.lastResult = undefined;
+                next.roundWinner = undefined;
+                next.selectedRoute = "NORMAL";
             }
             return next;
         });
@@ -214,7 +207,7 @@ export default function VersusLocalPage() {
             if (!prev) return null;
             return {
                 ...prev,
-                phase: "turn_change" // Round Start -> P1 Turn Cutin
+                phase: "input" // Round Start -> P1 Input directly
             };
         });
     }
@@ -224,7 +217,9 @@ export default function VersusLocalPage() {
             if (!prev) return null;
             return {
                 ...prev,
-                phase: "input" // Turn Cutin -> Input
+                currentPlayerIndex: 1, // P2に交代
+                selectedRoute: "NORMAL", // P2のデフォルトルート
+                phase: "input" // Turn Cutin -> P2 Input
             };
         });
     }
@@ -342,7 +337,7 @@ export default function VersusLocalPage() {
                 </AnimatePresence>
 
                 {/* --- Main Game Card --- */}
-                {(game.phase === "input" || game.phase === "result" || game.phase === "finished") && (
+                {(game.phase === "input" || game.phase === "result" || game.phase === "both_results" || game.phase === "finished") && (
                     <motion.div
                         layout
                         className="flex-1 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 dark:border-slate-800 p-6 md:p-8 relative overflow-hidden flex flex-col"
@@ -408,6 +403,131 @@ export default function VersusLocalPage() {
                                 </div>
                             </div>
 
+                        ) : game.phase === "both_results" ? (
+                            // --- BOTH RESULTS PHASE ---
+                            <div className="flex flex-col h-full animate-in zoom-in duration-300">
+                                <div className="flex-1 space-y-6">
+                                    {/* Round Title */}
+                                    <div className="text-center mb-4">
+                                        <h2 className="text-2xl font-black text-slate-800 dark:text-white mb-1">ROUND {game.roundIndex + 1} 結果</h2>
+                                        <div className="text-sm text-slate-500">Q. {game.prompts[game.roundIndex]}</div>
+                                    </div>
+
+                                    {/* Both Players Results - Side by Side */}
+                                    <div className="grid grid-cols-2 gap-4">
+                                        {/* Player 1 Result */}
+                                        {(() => {
+                                            const p1Round = game.players[0].rounds[game.roundIndex];
+                                            const p1Result = p1Round.result;
+                                            return (
+                                                <div className="bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/10 border-2 border-red-200 dark:border-red-800 rounded-2xl p-4 space-y-3">
+                                                    <div className="text-center">
+                                                        <div className="text-xs font-bold text-red-600 dark:text-red-400 uppercase tracking-wider mb-2">Player 1</div>
+                                                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/70 dark:bg-slate-800/70 text-slate-600 dark:text-slate-300 text-xs font-bold mb-3">
+                                                            <span>{getRoute(p1Result?.routeId || "NORMAL").emoji}</span>
+                                                            <span>{getRoute(p1Result?.routeId || "NORMAL").label}</span>
+                                                        </div>
+                                                        <div className="text-5xl font-black text-red-600 dark:text-red-400">
+                                                            {p1Result?.altitude}
+                                                            <span className="text-xl text-slate-500 ml-1">m</span>
+                                                        </div>
+                                                        {p1Result?.didFall && (
+                                                            <div className="flex items-center justify-center gap-1 text-red-500 text-xs font-bold mt-2">
+                                                                <AlertTriangle className="w-3 h-3" />
+                                                                <span>滑落！</span>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    <div className="flex flex-wrap gap-1.5 justify-center">
+                                                        {p1Result?.labels.map((label, i) => (
+                                                            <span key={i} className="px-2 py-0.5 bg-white/80 dark:bg-slate-800/80 text-red-600 dark:text-red-400 rounded-full text-xs font-bold border border-red-200 dark:border-red-700">
+                                                                {label}
+                                                            </span>
+                                                        ))}
+                                                    </div>
+                                                    <div className="text-xs text-slate-600 dark:text-slate-400 line-clamp-2 bg-white/50 dark:bg-slate-800/50 p-2 rounded">
+                                                        {p1Round.inputText}
+                                                    </div>
+                                                </div>
+                                            );
+                                        })()}
+
+                                        {/* Player 2 Result */}
+                                        {(() => {
+                                            const p2Round = game.players[1].rounds[game.roundIndex];
+                                            const p2Result = p2Round.result;
+                                            return (
+                                                <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/10 border-2 border-blue-200 dark:border-blue-800 rounded-2xl p-4 space-y-3">
+                                                    <div className="text-center">
+                                                        <div className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider mb-2">Player 2</div>
+                                                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/70 dark:bg-slate-800/70 text-slate-600 dark:text-slate-300 text-xs font-bold mb-3">
+                                                            <span>{getRoute(p2Result?.routeId || "NORMAL").emoji}</span>
+                                                            <span>{getRoute(p2Result?.routeId || "NORMAL").label}</span>
+                                                        </div>
+                                                        <div className="text-5xl font-black text-blue-600 dark:text-blue-400">
+                                                            {p2Result?.altitude}
+                                                            <span className="text-xl text-slate-500 ml-1">m</span>
+                                                        </div>
+                                                        {p2Result?.didFall && (
+                                                            <div className="flex items-center justify-center gap-1 text-red-500 text-xs font-bold mt-2">
+                                                                <AlertTriangle className="w-3 h-3" />
+                                                                <span>滑落！</span>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    <div className="flex flex-wrap gap-1.5 justify-center">
+                                                        {p2Result?.labels.map((label, i) => (
+                                                            <span key={i} className="px-2 py-0.5 bg-white/80 dark:bg-slate-800/80 text-blue-600 dark:text-blue-400 rounded-full text-xs font-bold border border-blue-200 dark:border-blue-700">
+                                                                {label}
+                                                            </span>
+                                                        ))}
+                                                    </div>
+                                                    <div className="text-xs text-slate-600 dark:text-slate-400 line-clamp-2 bg-white/50 dark:bg-slate-800/50 p-2 rounded">
+                                                        {p2Round.inputText}
+                                                    </div>
+                                                </div>
+                                            );
+                                        })()}
+                                    </div>
+
+                                    {/* Round Winner Banner */}
+                                    <div className="w-full bg-gradient-to-r from-purple-500 to-indigo-600 text-white p-5 rounded-2xl shadow-lg">
+                                        <div className="text-center">
+                                            {game.roundWinner === null ? (
+                                                <>
+                                                    <div className="text-3xl mb-2">🤝</div>
+                                                    <div className="font-bold text-2xl">DRAW</div>
+                                                    <div className="text-sm opacity-80 mt-1">このラウンドは引き分け！</div>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <div className="text-3xl mb-2">🏆</div>
+                                                    <div className="text-sm opacity-80 mb-1">Round {game.roundIndex + 1} Winner</div>
+                                                    <div className="text-3xl font-black">
+                                                        Player {game.roundWinner + 1}
+                                                    </div>
+                                                    <div className="text-sm font-bold mt-2 bg-white/20 inline-block px-3 py-1 rounded-full">
+                                                        +1000m Bonus
+                                                    </div>
+                                                </>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Next Action Button */}
+                                <div className="mt-6">
+                                    <button
+                                        onClick={nextTurn}
+                                        className="w-full py-4 bg-slate-900 text-white hover:bg-slate-800 rounded-xl font-bold text-lg shadow-lg flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
+                                    >
+                                        <span>
+                                            {game.roundIndex + 1 >= ROUND_COUNT ? "最終結果を見る" : "次のラウンドへ"}
+                                        </span>
+                                        <TrendingUp className="w-5 h-5" />
+                                    </button>
+                                </div>
+                            </div>
                         ) : game.phase === "input" ? (
                             // --- INPUT PHASE ---
                             <div className="space-y-6 animate-in slide-in-from-right fade-in duration-300">
@@ -481,92 +601,7 @@ export default function VersusLocalPage() {
                                     )}
                                 </button>
                             </div>
-                        ) : (
-                            // --- RESULT PHASE ---
-                            <div className="flex flex-col h-full animate-in zoom-in duration-300">
-                                <div className="flex-1 flex flex-col items-center justify-center text-center space-y-6">
-                                    {/* Route Badge */}
-                                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 text-xs font-bold uppercase tracking-wider">
-                                        <span>{getRoute(game.lastResult?.routeId || "NORMAL").emoji}</span>
-                                        <span>{getRoute(game.lastResult?.routeId || "NORMAL").label} Route</span>
-                                    </div>
-
-                                    {/* Altitude Display */}
-                                    <div>
-                                        <div className="text-7xl md:text-8xl font-black text-slate-800 dark:text-white tracking-tighter">
-                                            {game.lastResult?.result?.altitude}
-                                            <span className="text-2xl md:text-3xl text-slate-400 ml-1">m</span>
-                                        </div>
-
-                                        {/* Labels */}
-                                        <div className="flex flex-wrap justify-center gap-2 mt-4">
-                                            {game.lastResult?.result?.labels.map((label, i) => (
-                                                <span key={i} className="px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-full text-sm font-bold border border-slate-200 dark:border-slate-700">
-                                                    {label}
-                                                </span>
-                                            ))}
-                                        </div>
-                                    </div>
-
-                                    {/* Fall Warning */}
-                                    {game.lastResult?.result?.didFall && (
-                                        <div className="flex items-center gap-2 text-red-500 font-bold bg-red-50 dark:bg-red-900/20 px-4 py-2 rounded-lg animate-pulse border border-red-200 dark:border-red-900">
-                                            <AlertTriangle className="w-5 h-5" />
-                                            <span>滑落発生！ 最終標高 {game.lastResult?.result?.finalAltitude}m</span>
-                                        </div>
-                                    )}
-
-                                    {/* Mountain Graphic */}
-                                    <div className="relative w-full max-w-xs h-40 flex items-end justify-center">
-                                        <MountainView altitude={game.lastResult?.result?.altitude || 0} size={200} />
-                                    </div>
-
-                                    {/* Commentary */}
-                                    <div className="w-full bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-800/30 p-4 rounded-xl text-left">
-                                        <div className="text-xs font-bold text-amber-500 mb-1 uppercase tracking-wider">Commentary</div>
-                                        <p className="text-amber-900 dark:text-amber-100 font-medium">
-                                            {game.lastResult?.result?.commentary}
-                                        </p>
-                                    </div>
-
-                                    {/* Round Winner (P2 Result Only) */}
-                                    {game.currentPlayerIndex === 1 && game.roundWinner !== undefined && (
-                                        <div className="w-full bg-gradient-to-r from-purple-500 to-indigo-600 text-white p-4 rounded-xl shadow-lg transform scale-105">
-                                            <div className="text-center">
-                                                {game.roundWinner === null ? (
-                                                    <div className="font-bold text-xl">🤝 DRAW (Round {game.roundIndex + 1})</div>
-                                                ) : (
-                                                    <>
-                                                        <div className="text-sm opacity-80 mb-1">Round Winner</div>
-                                                        <div className="text-2xl font-black">
-                                                            🏆 Player {game.roundWinner + 1}
-                                                        </div>
-                                                        <div className="text-sm font-bold mt-1 bg-white/20 inline-block px-2 py-0.5 rounded">
-                                                            +1000m Bonus
-                                                        </div>
-                                                    </>
-                                                )}
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* Next Action Button */}
-                                <div className="mt-6">
-                                    <button
-                                        onClick={nextTurn}
-                                        className="w-full py-4 bg-slate-900 text-white hover:bg-slate-800 rounded-xl font-bold text-lg shadow-lg flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
-                                    >
-                                        <span>
-                                            {game.currentPlayerIndex === 0
-                                                ? "Player 2 のターンへ"
-                                                : (game.roundIndex + 1 >= ROUND_COUNT ? "最終結果を見る" : "次のラウンドへ")}
-                                        </span>
-                                        <TrendingUp className="w-5 h-5" />
-                                    </button>
-                                </div>
-                            </div>
-                        )}
+                        ) : null}
                     </motion.div>
                 )}
 
