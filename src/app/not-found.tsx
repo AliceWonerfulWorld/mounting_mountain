@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { a } from "framer-motion/client";
 
+
 export default function NotFound() {
   // Generate particle properties only on client side to prevent hydration errors
   const [particles, setParticles] = useState<Array<{
@@ -83,7 +84,7 @@ export default function NotFound() {
             遭難しました
           </h2>
           <p className="text-xl md:text-2xl text-blue-200 font-semibold" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.9), 0 4px 16px rgba(0,0,0,0.6)' }}>
-            お探しのページは見つかりませんでした
+            お探しのページは見つかりませんでした。
           </p>
         </motion.div>
 
