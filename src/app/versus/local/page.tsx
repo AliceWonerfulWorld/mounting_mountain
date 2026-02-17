@@ -122,7 +122,9 @@ export default function VersusLocalPage() {
 
                 // P1終了時は交代へ、P2終了時は両結果表示へ
                 if (next.currentPlayerIndex === 0) {
-                    next.phase = "turn_change";
+                    next.currentPlayerIndex = 1; // Player2に切り替え
+                    next.selectedRoute = "NORMAL"; // P2のデフォルトルート
+                    next.phase = "turn_change"; // Player2のTurnCutinを表示
                 } else {
                     // P2終了時にラウンド勝者判定
                     const p1Res = next.players[0].rounds[next.roundIndex].result;
@@ -207,7 +209,7 @@ export default function VersusLocalPage() {
             if (!prev) return null;
             return {
                 ...prev,
-                phase: "input" // Round Start -> P1 Input directly
+                phase: "turn_change" // Round Start -> P1 Turn Cutin
             };
         });
     }
@@ -217,9 +219,7 @@ export default function VersusLocalPage() {
             if (!prev) return null;
             return {
                 ...prev,
-                currentPlayerIndex: 1, // P2に交代
-                selectedRoute: "NORMAL", // P2のデフォルトルート
-                phase: "input" // Turn Cutin -> P2 Input
+                phase: "input" // TurnCutin完了 -> 入力画面へ
             };
         });
     }
