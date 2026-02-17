@@ -1,5 +1,4 @@
 import type { LabelId } from "@/lib/labels";
-import { CORE_LABELS, getLabelJa } from "@/lib/labels";
 
 /**
  * 天候の種類

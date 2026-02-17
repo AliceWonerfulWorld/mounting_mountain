@@ -15,24 +15,28 @@ export default function AchievementsPage() {
     const [isDayFog, setIsDayFog] = useState(false);
 
     useEffect(() => {
-        setMounted(true);
-        setUnlockedIds(loadUnlocked());
+        // 遅延させることで "Calling setState synchronously within an effect" を回避
+        const timer = setTimeout(() => {
+            setMounted(true);
+            setUnlockedIds(loadUnlocked());
 
-        const hour = new Date().getHours();
+            const hour = new Date().getHours();
 
-        if (hour >= 4 && hour < 8) {
-            setSkyClass("from-amber-200 via-orange-200 to-sky-200");
-        } else if (hour >= 8 && hour < 12) {
-            setSkyClass("from-sky-300 via-blue-200 to-sky-100");
-        } else if (hour >= 12 && hour < 16) {
-            setSkyClass("from-slate-100 via-sky-100 to-white");
-            setIsDayFog(true);
-        } else if (hour >= 16 && hour < 19) {
-            setSkyClass("from-rose-300 via-orange-200 to-amber-100");
-        } else {
-            setSkyClass("from-slate-900 via-slate-950 to-black");
-            setIsNight(true);
-        }
+            if (hour >= 4 && hour < 8) {
+                setSkyClass("from-amber-200 via-orange-200 to-sky-200");
+            } else if (hour >= 8 && hour < 12) {
+                setSkyClass("from-sky-300 via-blue-200 to-sky-100");
+            } else if (hour >= 12 && hour < 16) {
+                setSkyClass("from-slate-100 via-sky-100 to-white");
+                setIsDayFog(true);
+            } else if (hour >= 16 && hour < 19) {
+                setSkyClass("from-rose-300 via-orange-200 to-amber-100");
+            } else {
+                setSkyClass("from-slate-900 via-slate-950 to-black");
+                setIsNight(true);
+            }
+        }, 0);
+        return () => clearTimeout(timer);
     }, []);
 
     if (!mounted) {

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { GameState, Round } from "@/types/game";
 import { PROMPTS } from "@/lib/prompts";
@@ -10,7 +10,7 @@ import { pickN } from "@/lib/random";
 import { createRounds } from "@/lib/game";
 import { updateStats } from "@/lib/achievementStore";
 import { computeBonus } from "@/lib/solo/bonus";
-import { ROUTES, getRoute, type RouteId } from "@/lib/solo/routes";
+import { ROUTES, getRoute } from "@/lib/solo/routes";
 import { computeFinalAltitude } from "@/lib/solo/score";
 import { pickWeather, getWeather } from "@/lib/solo/weather";
 import { pickMission, evaluateMission, type Mission } from "@/lib/solo/missions";
@@ -194,14 +194,14 @@ export default function SoloPage() {
 
       setText("");
       setIsHistoryOpen(false); // 判定後は履歴を閉じて結果に集中させる
-      
+
       // 結果に応じて演出を選択
       setGame((prev) => {
         if (!prev) return prev;
-        
+
         const currentRound = prev.players[0].rounds[prev.roundIndex];
         const result = currentRound.result;
-        
+
         if (result) {
           // 滑落した場合（保険未使用）
           if (result.didFall && !result.insuranceUsed) {
@@ -228,7 +228,7 @@ export default function SoloPage() {
             }, 2500);
           }
         }
-        
+
         return prev;
       });
     } catch (e) {
@@ -254,7 +254,7 @@ export default function SoloPage() {
         });
       } else {
         next.roundIndex += 1;
-        
+
         // 次のラウンドのカットインを表示
         const nextRoundNumber = next.roundIndex + 1;
         setTimeout(() => {
@@ -335,13 +335,12 @@ export default function SoloPage() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0, scale: 1.1 }}
             transition={{ duration: 0.5 }}
-            className={`fixed inset-0 z-50 flex items-center justify-center overflow-hidden ${
-              missionTheme === 0 
-                ? "bg-gradient-to-b from-slate-800 via-slate-700 to-slate-900"
-                : missionTheme === 1
+            className={`fixed inset-0 z-50 flex items-center justify-center overflow-hidden ${missionTheme === 0
+              ? "bg-gradient-to-b from-slate-800 via-slate-700 to-slate-900"
+              : missionTheme === 1
                 ? "bg-gradient-to-b from-orange-400 via-pink-400 to-purple-600"
                 : "bg-gradient-to-b from-cyan-200 via-blue-300 to-indigo-400"
-            }`}
+              }`}
           >
             {/* 背景装飾 - パターン1: 夜の山と星空 */}
             {missionTheme === 0 && (
@@ -393,7 +392,7 @@ export default function SoloPage() {
                   transition={{ delay: 0.3, duration: 1.5 }}
                   className="absolute top-20 right-20 w-40 h-40 bg-yellow-300 rounded-full blur-2xl"
                 />
-                
+
                 {/* 朝焼けの山々 */}
                 <motion.div
                   initial={{ opacity: 0, y: 50 }}
@@ -413,11 +412,11 @@ export default function SoloPage() {
                     <motion.div
                       key={i}
                       initial={{ opacity: 0, y: 100 }}
-                      animate={{ 
+                      animate={{
                         opacity: [0, 0.6, 0],
                         y: [100, -100]
                       }}
-                      transition={{ 
+                      transition={{
                         delay: Math.random() * 3,
                         duration: 4 + Math.random() * 2,
                         repeat: Infinity
@@ -457,11 +456,11 @@ export default function SoloPage() {
                     <motion.div
                       key={i}
                       initial={{ opacity: 0, y: -20 }}
-                      animate={{ 
+                      animate={{
                         opacity: [0, 0.8, 0],
                         y: ['0vh', '100vh']
                       }}
-                      transition={{ 
+                      transition={{
                         delay: Math.random() * 5,
                         duration: 5 + Math.random() * 3,
                         repeat: Infinity,
@@ -493,9 +492,8 @@ export default function SoloPage() {
                   initial={{ y: -20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 0.5, duration: 0.5 }}
-                  className={`text-5xl md:text-6xl font-black mb-4 tracking-tight ${
-                    missionTheme === 2 ? 'text-slate-800' : 'text-white'
-                  }`}
+                  className={`text-5xl md:text-6xl font-black mb-4 tracking-tight ${missionTheme === 2 ? 'text-slate-800' : 'text-white'
+                    }`}
                 >
                   MISSION BRIEFING
                 </motion.div>
@@ -514,13 +512,12 @@ export default function SoloPage() {
                 initial={{ y: 30, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.7, duration: 0.5 }}
-                className={`bg-white/95 dark:bg-zinc-900/95 rounded-3xl p-8 md:p-12 shadow-2xl backdrop-blur-sm border-4 ${
-                  missionTheme === 0
-                    ? 'border-amber-500/50'
-                    : missionTheme === 1
+                className={`bg-white/95 dark:bg-zinc-900/95 rounded-3xl p-8 md:p-12 shadow-2xl backdrop-blur-sm border-4 ${missionTheme === 0
+                  ? 'border-amber-500/50'
+                  : missionTheme === 1
                     ? 'border-yellow-400/60'
                     : 'border-cyan-400/60'
-                }`}
+                  }`}
               >
                 {/* ミッションアイコンとタイトル */}
                 <div className="text-center mb-6">
@@ -563,13 +560,12 @@ export default function SoloPage() {
                   onClick={startGame}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className={`w-full py-6 rounded-xl text-white font-bold text-2xl transition-transform shadow-lg hover:shadow-xl ${
-                    missionTheme === 0
-                      ? 'bg-gradient-to-r from-blue-600 to-indigo-600'
-                      : missionTheme === 1
+                  className={`w-full py-6 rounded-xl text-white font-bold text-2xl transition-transform shadow-lg hover:shadow-xl ${missionTheme === 0
+                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600'
+                    : missionTheme === 1
                       ? 'bg-gradient-to-r from-orange-600 to-pink-600'
                       : 'bg-gradient-to-r from-cyan-600 to-blue-600'
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center justify-center gap-3">
                     <span>挑戦を開始する</span>
@@ -583,9 +579,8 @@ export default function SoloPage() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 1.2, duration: 0.5 }}
-                className={`text-center mt-6 text-sm ${
-                  missionTheme === 2 ? 'text-slate-600' : 'text-slate-400'
-                }`}
+                className={`text-center mt-6 text-sm ${missionTheme === 2 ? 'text-slate-600' : 'text-slate-400'
+                  }`}
               >
               </motion.div>
             </motion.div>
@@ -602,13 +597,12 @@ export default function SoloPage() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.4 }}
             onClick={() => setShowRoundCutin(false)}
-            className={`fixed inset-0 z-50 flex items-center justify-center cursor-pointer overflow-hidden ${
-              cutinTheme === 0 
-                ? 'bg-gradient-to-b from-slate-800 via-slate-700 to-slate-900'
-                : cutinTheme === 1
+            className={`fixed inset-0 z-50 flex items-center justify-center cursor-pointer overflow-hidden ${cutinTheme === 0
+              ? 'bg-gradient-to-b from-slate-800 via-slate-700 to-slate-900'
+              : cutinTheme === 1
                 ? 'bg-gradient-to-b from-blue-900 via-cyan-800 to-blue-950'
                 : 'bg-gradient-to-b from-emerald-900 via-green-800 to-emerald-950'
-            }`}
+              }`}
           >
             {/* テーマ0: 雪山・星空 */}
             {cutinTheme === 0 && (
@@ -630,7 +624,7 @@ export default function SoloPage() {
                     <path d="M0,500 L100,300 L250,350 L400,200 L550,280 L700,180 L850,260 L1000,220 L1200,340 L1200,500 Z" fill="url(#mountain-grad-1)" />
                   </svg>
                 </motion.div>
-                
+
                 {/* 遠景の雪山 */}
                 <motion.div
                   initial={{ opacity: 0, y: 50 }}
@@ -651,7 +645,7 @@ export default function SoloPage() {
                     <path d="M1000,140 L980,155 L970,148 L960,158 L1000,140 L1040,158 L1030,148 L1020,155 Z" fill="rgba(255,255,255,0.85)" />
                   </svg>
                 </motion.div>
-                
+
                 {/* 中景の山 - より立体的 */}
                 <motion.div
                   initial={{ opacity: 0, y: 50 }}
@@ -672,7 +666,7 @@ export default function SoloPage() {
                     <path d="M600,80 L580,98 L570,90 L560,102 L550,95 L600,80 L650,95 L640,102 L630,90 L620,98 Z" fill="rgba(255,255,255,1)" />
                   </svg>
                 </motion.div>
-                
+
                 {/* 近景の岩山 */}
                 <motion.div
                   initial={{ opacity: 0, y: 30 }}
@@ -684,7 +678,7 @@ export default function SoloPage() {
                     <path d="M0,300 L200,180 L400,240 L600,160 L800,220 L1000,180 L1200,260 L1200,300 Z" />
                   </svg>
                 </motion.div>
-                
+
                 {/* 星空 */}
                 {Array.from({ length: 40 }).map((_, i) => (
                   <motion.div
@@ -727,7 +721,7 @@ export default function SoloPage() {
                     <path d="M0,400 L150,250 L300,300 L500,180 L700,260 L900,200 L1100,280 L1200,320 L1200,400 Z" fill="url(#sky-mountain-1)" />
                   </svg>
                 </motion.div>
-                
+
                 {/* 雲海の上に突き出る山頂 */}
                 <motion.div
                   initial={{ opacity: 0, y: 30 }}
@@ -746,18 +740,18 @@ export default function SoloPage() {
                     {/* 左の山頂 */}
                     <path d="M0,300 L100,180 L200,220 L300,300" fill="url(#sky-mountain-2)" />
                     <path d="M100,180 L90,188 L85,182 L100,180 L115,182 L110,188 Z" fill="rgba(255,255,255,0.8)" />
-                    
+
                     {/* 中央の主峰 */}
                     <path d="M400,300 L550,80 L700,300" fill="url(#sky-mountain-2)" />
                     <path d="M550,80 L535,95 L528,88 L520,98 L550,80 L580,98 L572,88 L565,95 Z" fill="rgba(255,255,255,0.95)" />
                     <circle cx="550" cy="85" r="3" fill="rgba(255,223,0,0.8)" />
-                    
+
                     {/* 右の山頂 */}
                     <path d="M850,300 L950,160 L1050,240 L1200,300" fill="url(#sky-mountain-2)" />
                     <path d="M950,160 L940,170 L935,164 L950,160 L965,164 L960,170 Z" fill="rgba(255,255,255,0.85)" />
                   </svg>
                 </motion.div>
-                
+
                 {/* 雲海レイヤー（下層） */}
                 <motion.div
                   initial={{ opacity: 0 }}
@@ -765,7 +759,7 @@ export default function SoloPage() {
                   transition={{ duration: 4, repeat: Infinity }}
                   className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-white/20 to-transparent"
                 />
-                
+
                 {/* 流れる雲 */}
                 {Array.from({ length: 10 }).map((_, i) => (
                   <motion.div
@@ -786,13 +780,13 @@ export default function SoloPage() {
                     ☁️
                   </motion.div>
                 ))}
-                
+
                 {/* 光の粒子（朝日の光） */}
                 {Array.from({ length: 20 }).map((_, i) => (
                   <motion.div
                     key={`light-${i}`}
                     initial={{ opacity: 0, scale: 0 }}
-                    animate={{ 
+                    animate={{
                       opacity: [0, 1, 0],
                       scale: [0, 1.5, 0],
                       y: [0, -30]
@@ -833,7 +827,7 @@ export default function SoloPage() {
                     <path d="M0,500 L150,280 L350,340 L550,220 L750,300 L950,240 L1150,320 L1200,350 L1200,500 Z" fill="url(#forest-mountain-1)" />
                   </svg>
                 </motion.div>
-                
+
                 {/* 中景の山 */}
                 <motion.div
                   initial={{ opacity: 0, y: 40 }}
@@ -853,7 +847,7 @@ export default function SoloPage() {
                     <path d="M600,140 L585,152 L578,146 L600,140 L622,146 L615,152 Z" fill="rgba(255,255,255,0.6)" />
                   </svg>
                 </motion.div>
-                
+
                 {/* 森林の木々（遠景） */}
                 <motion.div
                   initial={{ opacity: 0, scale: 0.9 }}
@@ -869,12 +863,12 @@ export default function SoloPage() {
                       </linearGradient>
                     </defs>
                     {/* 森のシルエット */}
-                    <path d="M0,300 L0,180 Q50,160 100,180 Q150,200 200,180 Q250,160 300,180 Q350,200 400,180 Q450,160 500,180 Q550,200 600,180 Q650,160 700,180 Q750,200 800,180 Q850,160 900,180 Q950,200 1000,180 Q1050,160 1100,180 Q1150,200 1200,180 L1200,300 Z" 
-                      fill="url(#forest-trees)" 
+                    <path d="M0,300 L0,180 Q50,160 100,180 Q150,200 200,180 Q250,160 300,180 Q350,200 400,180 Q450,160 500,180 Q550,200 600,180 Q650,160 700,180 Q750,200 800,180 Q850,160 900,180 Q950,200 1000,180 Q1050,160 1100,180 Q1150,200 1200,180 L1200,300 Z"
+                      fill="url(#forest-trees)"
                     />
                   </svg>
                 </motion.div>
-                
+
                 {/* 近景の森（三角形の木々） */}
                 <motion.div
                   initial={{ opacity: 0, scale: 0.8 }}
@@ -895,7 +889,7 @@ export default function SoloPage() {
                         }}
                       >
                         {/* 木の三角形 */}
-                        <div 
+                        <div
                           className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0"
                           style={{
                             borderLeft: `${width / 2}px solid transparent`,
@@ -904,7 +898,7 @@ export default function SoloPage() {
                           }}
                         />
                         {/* 幹 */}
-                        <div 
+                        <div
                           className="absolute bottom-0 left-1/2 -translate-x-1/2 bg-amber-900"
                           style={{
                             width: `${width * 0.2}px`,
@@ -915,13 +909,13 @@ export default function SoloPage() {
                     );
                   })}
                 </motion.div>
-                
+
                 {/* 葉っぱエフェクト */}
                 {Array.from({ length: 15 }).map((_, i) => (
                   <motion.div
                     key={`leaf-${i}`}
                     initial={{ y: -50, opacity: 0, rotate: 0 }}
-                    animate={{ 
+                    animate={{
                       y: '110vh',
                       opacity: [0, 0.8, 0.8, 0],
                       rotate: 360 + Math.random() * 180
@@ -940,13 +934,13 @@ export default function SoloPage() {
                     🍃
                   </motion.div>
                 ))}
-                
+
                 {/* 鳥のシルエット */}
                 {Array.from({ length: 5 }).map((_, i) => (
                   <motion.div
                     key={`bird-${i}`}
                     initial={{ x: '-10%', y: '30%' }}
-                    animate={{ 
+                    animate={{
                       x: '110%',
                       y: `${20 + Math.random() * 30}%`
                     }}
@@ -979,13 +973,12 @@ export default function SoloPage() {
                 transition={{ delay: 0.2, duration: 0.5 }}
                 className="flex justify-center mb-6"
               >
-                <div className={`inline-flex items-center gap-3 text-white px-6 py-3 rounded-lg shadow-2xl border-2 ${
-                  cutinTheme === 0
-                    ? 'bg-gradient-to-r from-amber-600 to-orange-600 border-amber-400/50'
-                    : cutinTheme === 1
+                <div className={`inline-flex items-center gap-3 text-white px-6 py-3 rounded-lg shadow-2xl border-2 ${cutinTheme === 0
+                  ? 'bg-gradient-to-r from-amber-600 to-orange-600 border-amber-400/50'
+                  : cutinTheme === 1
                     ? 'bg-gradient-to-r from-cyan-600 to-blue-600 border-cyan-400/50'
                     : 'bg-gradient-to-r from-green-600 to-emerald-600 border-green-400/50'
-                }`}>
+                  }`}>
                   <span className="text-2xl">
                     {cutinTheme === 0 ? '⛰️' : cutinTheme === 1 ? '☁️' : '🌲'}
                   </span>
@@ -1017,20 +1010,18 @@ export default function SoloPage() {
                     </div>
 
                     {/* STAGEバッジ */}
-                    <div className={`mt-4 backdrop-blur-sm px-4 py-2 rounded-lg border ${
-                      cutinTheme === 0
-                        ? 'bg-slate-800/80 border-amber-500/30'
-                        : cutinTheme === 1
+                    <div className={`mt-4 backdrop-blur-sm px-4 py-2 rounded-lg border ${cutinTheme === 0
+                      ? 'bg-slate-800/80 border-amber-500/30'
+                      : cutinTheme === 1
                         ? 'bg-blue-900/80 border-cyan-500/30'
                         : 'bg-emerald-900/80 border-green-500/30'
-                    }`}>
-                      <div className={`text-sm font-mono font-bold whitespace-nowrap ${
-                        cutinTheme === 0
-                          ? 'text-amber-400'
-                          : cutinTheme === 1
+                      }`}>
+                      <div className={`text-sm font-mono font-bold whitespace-nowrap ${cutinTheme === 0
+                        ? 'text-amber-400'
+                        : cutinTheme === 1
                           ? 'text-cyan-400'
                           : 'text-green-400'
-                      }`}>
+                        }`}>
                         STAGE {cutinRoundNumber}/3
                       </div>
                     </div>
@@ -1046,36 +1037,32 @@ export default function SoloPage() {
                   transition={{ delay: 0.4, duration: 0.5 }}
                   className="text-center"
                 >
-                  <div className={`inline-block backdrop-blur-md border-2 rounded-2xl px-8 py-6 shadow-2xl max-w-2xl ${
-                    cutinTheme === 0
-                      ? 'bg-slate-800/90 border-amber-500/40'
-                      : cutinTheme === 1
+                  <div className={`inline-block backdrop-blur-md border-2 rounded-2xl px-8 py-6 shadow-2xl max-w-2xl ${cutinTheme === 0
+                    ? 'bg-slate-800/90 border-amber-500/40'
+                    : cutinTheme === 1
                       ? 'bg-blue-900/90 border-cyan-500/40'
                       : 'bg-emerald-900/90 border-green-500/40'
-                  }`}>
+                    }`}>
                     {/* ルートマーカー */}
                     <div className="flex items-center justify-center gap-2 mb-3">
-                      <div className={`w-3 h-3 rounded-full ${
-                        cutinTheme === 0
-                          ? 'bg-amber-500'
-                          : cutinTheme === 1
+                      <div className={`w-3 h-3 rounded-full ${cutinTheme === 0
+                        ? 'bg-amber-500'
+                        : cutinTheme === 1
                           ? 'bg-cyan-500'
                           : 'bg-green-500'
-                      }`}></div>
-                      <div className={`text-xs font-bold tracking-widest ${
-                        cutinTheme === 0
-                          ? 'text-amber-400'
-                          : cutinTheme === 1
+                        }`}></div>
+                      <div className={`text-xs font-bold tracking-widest ${cutinTheme === 0
+                        ? 'text-amber-400'
+                        : cutinTheme === 1
                           ? 'text-cyan-400'
                           : 'text-green-400'
-                      }`}>MISSION</div>
-                      <div className={`w-3 h-3 rounded-full ${
-                        cutinTheme === 0
-                          ? 'bg-amber-500'
-                          : cutinTheme === 1
+                        }`}>MISSION</div>
+                      <div className={`w-3 h-3 rounded-full ${cutinTheme === 0
+                        ? 'bg-amber-500'
+                        : cutinTheme === 1
                           ? 'bg-cyan-500'
                           : 'bg-green-500'
-                      }`}></div>
+                        }`}></div>
                     </div>
 
                     {/* お題テキスト */}
@@ -1094,41 +1081,36 @@ export default function SoloPage() {
                 className="flex justify-center mt-8"
               >
                 <div className="flex items-center gap-2">
-                  <div className={`w-2 h-2 rounded-full ${
-                    cutinTheme === 0
-                      ? 'bg-amber-500'
-                      : cutinTheme === 1
+                  <div className={`w-2 h-2 rounded-full ${cutinTheme === 0
+                    ? 'bg-amber-500'
+                    : cutinTheme === 1
                       ? 'bg-cyan-500'
                       : 'bg-green-500'
-                  }`}></div>
-                  <div className={`w-16 h-0.5 ${
-                    cutinTheme === 0
-                      ? 'bg-gradient-to-r from-amber-500 to-orange-500'
-                      : cutinTheme === 1
+                    }`}></div>
+                  <div className={`w-16 h-0.5 ${cutinTheme === 0
+                    ? 'bg-gradient-to-r from-amber-500 to-orange-500'
+                    : cutinTheme === 1
                       ? 'bg-gradient-to-r from-cyan-500 to-blue-500'
                       : 'bg-gradient-to-r from-green-500 to-emerald-500'
-                  }`}></div>
-                  <div className={`w-3 h-3 rounded-full animate-pulse ${
-                    cutinTheme === 0
-                      ? 'bg-orange-500'
-                      : cutinTheme === 1
+                    }`}></div>
+                  <div className={`w-3 h-3 rounded-full animate-pulse ${cutinTheme === 0
+                    ? 'bg-orange-500'
+                    : cutinTheme === 1
                       ? 'bg-blue-500'
                       : 'bg-emerald-500'
-                  }`}></div>
-                  <div className={`w-16 h-0.5 ${
-                    cutinTheme === 0
-                      ? 'bg-gradient-to-r from-orange-500 to-amber-500'
-                      : cutinTheme === 1
+                    }`}></div>
+                  <div className={`w-16 h-0.5 ${cutinTheme === 0
+                    ? 'bg-gradient-to-r from-orange-500 to-amber-500'
+                    : cutinTheme === 1
                       ? 'bg-gradient-to-r from-blue-500 to-cyan-500'
                       : 'bg-gradient-to-r from-emerald-500 to-green-500'
-                  }`}></div>
-                  <div className={`w-2 h-2 rounded-full ${
-                    cutinTheme === 0
-                      ? 'bg-amber-500'
-                      : cutinTheme === 1
+                    }`}></div>
+                  <div className={`w-2 h-2 rounded-full ${cutinTheme === 0
+                    ? 'bg-amber-500'
+                    : cutinTheme === 1
                       ? 'bg-cyan-500'
                       : 'bg-green-500'
-                  }`}></div>
+                    }`}></div>
                 </div>
               </motion.div>
             </motion.div>
@@ -1253,7 +1235,7 @@ export default function SoloPage() {
               <motion.div
                 key={`cloud-${i}`}
                 initial={{ x: -100, opacity: 0 }}
-                animate={{ 
+                animate={{
                   x: "100vw",
                   opacity: [0, 0.4, 0]
                 }}
@@ -1264,7 +1246,7 @@ export default function SoloPage() {
                   ease: "linear"
                 }}
                 className="absolute text-5xl will-change-transform z-10"
-                style={{ 
+                style={{
                   top: `${25 + i * 20}%`,
                   willChange: 'transform, opacity'
                 }}
@@ -1280,7 +1262,7 @@ export default function SoloPage() {
                   key={`line-${i}`}
                   initial={{ scaleY: 0, opacity: 0 }}
                   animate={{ scaleY: 1, opacity: 0.15 }}
-                  transition={{ 
+                  transition={{
                     duration: 0.3,
                     delay: i * 0.02,
                     ease: "easeOut"
@@ -1296,7 +1278,7 @@ export default function SoloPage() {
 
             {/* メインカットイン */}
             <div className="relative z-10 w-full h-full flex items-center justify-center">
-              
+
               {/* 斜めストライプ装飾 - 上 */}
               <motion.div
                 initial={{ x: "-100%", rotate: -15 }}
@@ -1331,11 +1313,11 @@ export default function SoloPage() {
                 {/* Let's マウント！ */}
                 <motion.div
                   initial={{ scale: 0, rotate: -90 }}
-                  animate={{ 
+                  animate={{
                     scale: [0, 1.2, 1],
                     rotate: [90, -10, 0]
                   }}
-                  transition={{ 
+                  transition={{
                     duration: 0.5,
                     times: [0, 0.6, 1],
                     ease: "easeOut"
@@ -1354,11 +1336,11 @@ export default function SoloPage() {
                         textShadow: '4px 4px 0px rgba(0,0,0,0.8), -2px -2px 0px rgba(255,255,255,0.5), 0 0 40px rgba(255,255,0,0.8)'
                       }}
                     >
-                      Let's
+                      Let&apos;s
                     </div>
-                    
+
                     {/* マウント！ */}
-                    <motion.div 
+                    <motion.div
                       className="text-7xl md:text-9xl font-black bg-gradient-to-r from-yellow-200 via-orange-300 to-red-300 bg-clip-text text-transparent tracking-tight will-change-transform"
                       animate={{
                         scale: [1, 1.05, 1],
@@ -1439,7 +1421,7 @@ export default function SoloPage() {
                 transition={{ delay: 1.2 }}
                 className="absolute bottom-4 left-1/2 -translate-x-1/2"
               >
-                
+
               </motion.div>
             </div>
           </motion.div>
@@ -1460,7 +1442,7 @@ export default function SoloPage() {
             }}
           >
             {/* 背景 - 危険な赤黒グラデーション */}
-            <motion.div 
+            <motion.div
               className="absolute inset-0 bg-gradient-to-b from-red-950 via-red-900 to-black"
               animate={{
                 opacity: [0.8, 1, 0.8]
@@ -1477,7 +1459,7 @@ export default function SoloPage() {
               {[...Array(20)].map((_, i) => (
                 <motion.div
                   key={`rock-${i}`}
-                  initial={{ 
+                  initial={{
                     x: `${Math.random() * 100}%`,
                     y: -50,
                     rotate: 0,
@@ -1548,7 +1530,7 @@ export default function SoloPage() {
               {/* 滑落テキスト */}
               <motion.div
                 initial={{ scale: 0, rotate: -180 }}
-                animate={{ 
+                animate={{
                   scale: [0, 1.3, 1],
                   rotate: [-180, 10, 0]
                 }}
@@ -1635,7 +1617,7 @@ export default function SoloPage() {
             }}
           >
             {/* 背景 - 安全な緑青グラデーション */}
-            <motion.div 
+            <motion.div
               className="absolute inset-0 bg-gradient-to-b from-emerald-950 via-teal-900 to-cyan-950"
               animate={{
                 opacity: [0.9, 1, 0.9]
@@ -1652,7 +1634,7 @@ export default function SoloPage() {
               {[...Array(30)].map((_, i) => (
                 <motion.div
                   key={`sparkle-${i}`}
-                  initial={{ 
+                  initial={{
                     x: `${Math.random() * 100}%`,
                     y: `${Math.random() * 100}%`,
                     scale: 0,
@@ -1715,7 +1697,7 @@ export default function SoloPage() {
               {/* 盾アイコン */}
               <motion.div
                 initial={{ scale: 0, rotate: -180 }}
-                animate={{ 
+                animate={{
                   scale: [0, 1.2, 1],
                   rotate: [-180, 0, 0]
                 }}
@@ -1747,7 +1729,7 @@ export default function SoloPage() {
               {/* 保険獲得テキスト */}
               <motion.div
                 initial={{ scale: 0, y: 50 }}
-                animate={{ 
+                animate={{
                   scale: [0, 1.2, 1],
                   y: 0
                 }}
@@ -1794,7 +1776,7 @@ export default function SoloPage() {
                     安全ルートで保険を入手
                   </div>
                 </div>
-                
+
                 <motion.div
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -2391,13 +2373,12 @@ export default function SoloPage() {
               onClick={(e) => e.stopPropagation()}
             >
               {/* ヘッダー */}
-              <div className={`p-6 ${
-                game.weather === "SUNNY" 
-                  ? "bg-gradient-to-br from-blue-400 to-blue-600" 
-                  : game.weather === "WINDY"
+              <div className={`p-6 ${game.weather === "SUNNY"
+                ? "bg-gradient-to-br from-blue-400 to-blue-600"
+                : game.weather === "WINDY"
                   ? "bg-gradient-to-br from-teal-400 to-teal-600"
                   : "bg-gradient-to-br from-indigo-400 to-indigo-600"
-              }`}>
+                }`}>
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-3">
                     <span className="text-5xl">{getWeather(game.weather).emoji}</span>

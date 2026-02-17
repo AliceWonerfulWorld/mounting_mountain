@@ -2,8 +2,27 @@
 
 import { motion } from "framer-motion";
 import { Mountain, ArrowUp } from "lucide-react";
+import { useState, useEffect } from "react";
 
 export default function SoloLoading() {
+  const [dots] = useState<number[]>([0, 1, 2]); // Initial state for stability
+  const [particles, setParticles] = useState<{ x1: number; x2: number; duration: number; delay: number; left: number }[]>([]);
+
+  useEffect(() => {
+    // Generate random particles on client side only
+    const timer = setTimeout(() => {
+      const newParticles = Array.from({ length: 15 }).map(() => ({
+        x1: Math.random() * 100 - 50,
+        x2: Math.random() * 100 - 50,
+        duration: 4 + Math.random() * 3,
+        delay: Math.random() * 3,
+        left: Math.random() * 100,
+      }));
+      setParticles(newParticles);
+    }, 0);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-b from-slate-900 via-blue-900 to-slate-900">
       {/* Animated Mountain Silhouettes */}
@@ -23,7 +42,7 @@ export default function SoloLoading() {
             clipPath: "polygon(0% 100%, 0% 60%, 20% 40%, 40% 55%, 60% 35%, 80% 50%, 100% 30%, 100% 100%)",
           }}
         />
-        
+
         {/* Front Layer Mountains */}
         <motion.div
           animate={{
@@ -58,7 +77,7 @@ export default function SoloLoading() {
           className="relative"
         >
           <Mountain className="h-24 w-24 text-blue-300 drop-shadow-[0_0_30px_rgba(147,197,253,0.8)]" />
-          
+
           {/* Arrow Moving Up */}
           <motion.div
             animate={{
@@ -94,7 +113,7 @@ export default function SoloLoading() {
 
           {/* Loading Dots */}
           <div className="flex gap-2">
-            {[0, 1, 2].map((i) => (
+            {dots.map((i) => (
               <motion.div
                 key={i}
                 animate={{
@@ -131,26 +150,23 @@ export default function SoloLoading() {
 
       {/* Floating Particles */}
       <div className="pointer-events-none absolute inset-0">
-        {Array.from({ length: 15 }).map((_, i) => (
+        {particles.map((p, i) => (
           <motion.div
             key={i}
             animate={{
               y: [600, -100],
-              x: [
-                Math.random() * 100 - 50,
-                Math.random() * 100 - 50,
-              ],
+              x: [p.x1, p.x2],
               opacity: [0, 1, 1, 0],
             }}
             transition={{
-              duration: 4 + Math.random() * 3,
+              duration: p.duration,
               repeat: Infinity,
-              delay: Math.random() * 3,
+              delay: p.delay,
               ease: "linear",
             }}
             className="absolute h-1 w-1 rounded-full bg-blue-300/60"
             style={{
-              left: `${Math.random() * 100}%`,
+              left: `${p.left}%`,
               bottom: 0,
             }}
           />

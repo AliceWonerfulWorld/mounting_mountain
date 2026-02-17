@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { Mountain, Brain, TrendingUp, Sparkles, Trophy, Zap, Target, BookOpen } from "lucide-react";
+import { Mountain, Trophy, BookOpen, Zap, Target, Brain, TrendingUp } from "lucide-react";
 
 export default function Home() {
   return (

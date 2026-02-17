@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { GameState, Round } from "@/types/game";
 import { PROMPTS } from "@/lib/prompts";
@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 import { updateStats } from "@/lib/achievementStore";
 import { ROUTES, getRoute, type RouteId } from "@/lib/solo/routes";
 import { computeFinalAltitude } from "@/lib/solo/score";
-import { RotateCcw, TrendingUp, AlertTriangle, Shield, Mountain } from "lucide-react";
+import { RotateCcw, TrendingUp, AlertTriangle, Mountain } from "lucide-react";
 
 type VersusState = GameState & {
     currentPlayerIndex: 0 | 1; // 0: Player 1, 1: Player 2
@@ -136,7 +136,7 @@ export default function VersusLocalPage() {
                 return next;
             });
             setText("");
-        } catch (e) {
+        } catch {
             setError("判定に失敗しました。もう一度お試しください。");
         } finally {
             setLoading(false);
@@ -385,7 +385,7 @@ export default function VersusLocalPage() {
                                     "absolute left-0 -top-3 px-3 py-1 text-xs font-bold text-white rounded-full",
                                     isP1 ? "bg-red-500" : "bg-blue-500"
                                 )}>
-                                    {currentPlayer.name}'s Turn
+                                    {currentPlayer.name}&apos;s Turn
                                 </span>
                             </div>
 

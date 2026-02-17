@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenerativeAI, GenerativeModel } from "@google/generative-ai";
 import type { MountResult } from "@/types/game";
 import type { LabelId } from "@/lib/labels";
 import { clamp01 } from "@/lib/utils";
@@ -49,19 +49,22 @@ function safeJsonParse<T>(text: string): T {
 }
 
 // 指数バックオフ + ジッタ付きのリトライ関数
-async function generateWithBackoff(model: any, prompt: string, retries = 0): Promise<string> {
+async function generateWithBackoff(model: GenerativeModel, prompt: string, retries = 0): Promise<string> {
     try {
         const result = await model.generateContent(prompt);
         const response = await result.response;
         return response.text();
-    } catch (error: any) {
+    } catch (error: unknown) {
+        // error は unknown 型なので、プロパティアクセスには型ガードやキャストが必要
         if (retries >= MAX_RETRIES) {
             throw error;
         }
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const err = error as any; // 既存ロジック維持のため一時的にキャスト
         // 429 (Resource Exhausted) または 503 (Service Unavailable) の場合のみリトライ
-        const status = error.status || error.response?.status;
-        const isRateLimit = status === 429 || error.message?.includes("429") || error.message?.includes("Resource exhausted");
+        const status = err.status || err.response?.status;
+        const isRateLimit = status === 429 || err.message?.includes("429") || err.message?.includes("Resource exhausted");
         const isServiceUnavailable = status === 503;
 
         if (isRateLimit || isServiceUnavailable) {
