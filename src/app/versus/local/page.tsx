@@ -227,260 +227,287 @@ export default function VersusLocalPage() {
     }
 
 
+
     return (
-        <main className="min-h-screen p-4 max-w-xl mx-auto space-y-6">
-            <header className="text-center space-y-2">
-                <h1 className="text-xl font-bold">🔥 ローカル対戦モード</h1>
-                {!isFinished && (
-                    <div className="flex justify-between items-center bg-gray-100 dark:bg-zinc-800 p-2 rounded-lg">
-                        <div className={clsx("p-2 rounded w-1/3 text-center transition-all", game.currentPlayerIndex === 0 && "bg-red-500 text-white font-bold")}>
-                            <div>P1</div>
-                            <div className="text-sm">{game.players[0].totalScore}m</div>
+        <main className="min-h-screen relative overflow-x-hidden text-gray-800 dark:text-gray-200 font-sans">
+            {/* 青空の背景 */}
+            <div className="fixed inset-0 bg-gradient-to-b from-blue-200 via-white to-gray-100 dark:from-slate-900 dark:via-slate-950 dark:to-black -z-20" />
+            
+            {/* 遠景の山シルエット (下層) */}
+            <div className="fixed bottom-0 left-0 w-full h-1/3 pointer-events-none -z-10 opacity-30 dark:opacity-20">
+                <svg viewBox="0 0 1200 320" preserveAspectRatio="none" className="w-full h-full fill-green-600 dark:fill-green-700">
+                    <path d="M0,320 L200,160 L400,280 L600,100 L800,240 L1000,140 L1200,320 Z" />
+                </svg>
+            </div>
+            <div className="fixed bottom-0 left-0 w-full h-1/4 pointer-events-none -z-10 opacity-50 dark:opacity-40">
+                <svg viewBox="0 0 1200 320" preserveAspectRatio="none" className="w-full h-full fill-green-700 dark:fill-green-800">
+                    <path d="M0,320 L150,200 L350,300 L550,150 L850,280 L1100,180 L1200,320 Z" />
+                </svg>
+            </div>
+
+            <div className="max-w-5xl mx-auto p-4 md:p-6 pb-24 space-y-6 relative z-10">
+                <header className="text-center space-y-2">
+                    <h1 className="text-2xl md:text-3xl font-bold">🔥 ローカル対戦モード</h1>
+                    {!isFinished && (
+                        <div className="flex justify-between items-center bg-white dark:bg-zinc-800 backdrop-blur p-3 rounded-lg shadow-md">
+                            <div className={clsx("p-3 rounded w-1/3 text-center transition-all", game.currentPlayerIndex === 0 && "bg-red-500 text-white font-bold shadow-lg scale-105")}>
+                                <div className="text-sm md:text-base">P1</div>
+                                <div className="text-lg md:text-xl font-bold">{game.players[0].totalScore}m</div>
+                            </div>
+                            <div className="font-bold text-gray-600 dark:text-gray-400 text-sm md:text-base">
+                                Round {game.roundIndex + 1}/{ROUND_COUNT}
+                            </div>
+                            <div className={clsx("p-3 rounded w-1/3 text-center transition-all", game.currentPlayerIndex === 1 && "bg-blue-500 text-white font-bold shadow-lg scale-105")}>
+                                <div className="text-sm md:text-base">P2</div>
+                                <div className="text-lg md:text-xl font-bold">{game.players[1].totalScore}m</div>
+                            </div>
                         </div>
-                        <div className="font-bold text-gray-400">
-                            Round {game.roundIndex + 1}/{ROUND_COUNT}
+                    )}
+                </header>
+
+                {/* 結果発表 */}
+                {isFinished && (
+                    <section className="bg-white dark:bg-zinc-900 p-8 rounded-xl border shadow-lg text-center space-y-6 animate-in zoom-in duration-300">
+                        <h2 className="text-3xl md:text-4xl font-black">WINNER</h2>
+
+                        <div className="text-5xl md:text-6xl my-4">
+                            {game.players[0].totalScore > game.players[1].totalScore ? "🏆 Player 1" :
+                                game.players[1].totalScore > game.players[0].totalScore ? "🏆 Player 2" : "🤝 DRAW"}
                         </div>
-                        <div className={clsx("p-2 rounded w-1/3 text-center transition-all", game.currentPlayerIndex === 1 && "bg-blue-500 text-white font-bold")}>
-                            <div>P2</div>
-                            <div className="text-sm">{game.players[1].totalScore}m</div>
+
+                        <div className="flex justify-center gap-8 text-xl">
+                            <div>
+                                <div className="text-sm text-gray-500">Player 1</div>
+                                <div className="font-bold text-2xl">{game.players[0].totalScore}m</div>
+                            </div>
+                            <div>
+                                <div className="text-sm text-gray-500">Player 2</div>
+                                <div className="font-bold text-2xl">{game.players[1].totalScore}m</div>
+                            </div>
                         </div>
-                    </div>
+
+                        <button onClick={resetGame} className="w-full py-3 bg-black text-white rounded-lg font-bold hover:bg-gray-800 hover:scale-[1.02] transition-all">
+                            再戦する (Rematch)
+                        </button>
+                        <Link
+                            href="/"
+                            className="block w-full py-3 text-center rounded-lg border hover:bg-gray-50 dark:hover:bg-zinc-800 hover:scale-[1.02] transition-all"
+                        >
+                            タイトルに戻る
+                        </Link>
+                    </section>
                 )}
-            </header>
 
-            {/* 結果発表 */}
-            {isFinished && (
-                <section className="bg-white dark:bg-zinc-900 p-8 rounded-xl border shadow-lg text-center space-y-6 animate-in zoom-in duration-300">
-                    <h2 className="text-3xl font-black">WINNER</h2>
 
-                    <div className="text-6xl my-4">
-                        {game.players[0].totalScore > game.players[1].totalScore ? "🏆 Player 1" :
-                            game.players[1].totalScore > game.players[0].totalScore ? "🏆 Player 2" : "🤝 DRAW"}
-                    </div>
+                {/* プレイエリア全体を白背景で囲む */}
+                {!isFinished && (
+                    <div className="bg-white dark:bg-zinc-900 p-6 rounded-xl shadow-xl border-2 border-gray-200 dark:border-zinc-700">
+                        {/* プレイエリア */}
+                        {game.phase === "input" && (
+                            <section className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                                <div className={clsx("text-center py-3 text-white font-bold rounded-lg shadow-md text-lg", game.currentPlayerIndex === 0 ? "bg-red-500" : "bg-blue-500")}>
+                                    {currentPlayer.name} のターン
+                                </div>
 
-                    <div className="flex justify-center gap-8 text-xl">
-                        <div>
-                            <div className="text-sm text-gray-500">Player 1</div>
-                            <div className="font-bold">{game.players[0].totalScore}m</div>
-                        </div>
-                        <div>
-                            <div className="text-sm text-gray-500">Player 2</div>
-                            <div className="font-bold">{game.players[1].totalScore}m</div>
-                        </div>
-                    </div>
+                                <div className="bg-gray-50 dark:bg-zinc-800 border rounded-xl p-5 space-y-2 shadow-sm">
+                                    <div className="text-xs text-gray-500 uppercase font-bold tracking-wide">Theme</div>
+                                    <div className="text-xl md:text-2xl font-bold">{currentRound.prompt}</div>
+                                </div>
 
-                    <button onClick={resetGame} className="w-full py-3 bg-black text-white rounded-lg font-bold">
-                        再戦する (Rematch)
-                    </button>
-                    <Link
-                        href="/"
-                        className="block w-full py-3 text-center rounded-lg border hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors"
-                    >
-                        タイトルに戻る
-                    </Link>
-                </section>
-            )}
-
-            {/* プレイエリア */}
-            {!isFinished && game.phase === "input" && (
-                <section className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
-                    <div className={clsx("text-center py-2 text-white font-bold rounded", game.currentPlayerIndex === 0 ? "bg-red-500" : "bg-blue-500")}>
-                        {currentPlayer.name} のターン
-                    </div>
-
-                    <div className="bg-white dark:bg-zinc-900 border rounded-xl p-4 space-y-2">
-                        <div className="text-xs text-gray-500 uppercase font-bold">Theme</div>
-                        <div className="text-lg font-bold">{currentRound.prompt}</div>
-                    </div>
-
-                    {/* ルート選択 */}
-                    <div className="bg-white dark:bg-zinc-900 border rounded-xl p-4 space-y-2">
-                        <div className="text-xs text-gray-500 uppercase font-bold">ルート選択</div>
-                        <div className="grid grid-cols-3 gap-2">
-                            {ROUTES.map(route => (
-                                <button
-                                    key={route.id}
-                                    onClick={() => setGame(prev => prev ? { ...prev, selectedRoute: route.id } : null)}
-                                    className={clsx(
-                                        "p-3 rounded-lg border-2 transition-all",
-                                        game.selectedRoute === route.id
-                                            ? "border-blue-500 bg-blue-50 dark:bg-blue-900/30"
-                                            : "border-gray-200 hover:border-gray-300"
-                                    )}
-                                >
-                                    <div className="text-2xl">{route.emoji}</div>
-                                    <div className="text-xs font-bold">{route.label}</div>
-                                    <div className="text-xs text-gray-500">x{route.multiplier}</div>
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-
-                    <textarea
-                        className="w-full min-h-32 rounded-lg border p-4 text-lg focus:ring-2 outline-none"
-                        placeholder={`${currentPlayer.name} のマウントを入力...`}
-                        value={text}
-                        onChange={(e) => setText(e.target.value)}
-                    />
-
-                    {error && <div className="text-red-500 text-sm mb-2">{error}</div>}
-
-                    <button
-                        className={clsx("w-full py-4 rounded-lg text-white font-bold text-lg transition-all",
-                            game.currentPlayerIndex === 0 ? "bg-red-600 hover:bg-red-700" : "bg-blue-600 hover:bg-blue-700",
-                            (!text.trim() || loading) && "opacity-50 cursor-not-allowed"
-                        )}
-                        disabled={!text.trim() || loading}
-                        onClick={submitRound}
-                    >
-                        {loading ? "判定中..." : "マウント！"}
-                    </button>
-                </section>
-            )}
-
-            {/* 判定結果表示フェーズ（ターン交代前） */}
-            {!isFinished && game.phase === "result" && game.lastResult && game.lastResult.result && (
-                <section className="bg-stone-50 dark:bg-zinc-900 border-2 border-stone-200 p-6 rounded-xl text-center space-y-6 animate-in zoom-in duration-300">
-                    <h3 className="text-stone-500 font-bold uppercase tracking-widest">Judgment</h3>
-
-                    <div className="flex justify-center">
-                        <MountainView altitude={game.lastResult.result.altitude} size={200} />
-                    </div>
-
-                    <div>
-                        <div className="text-5xl font-black">{game.lastResult.result.altitude}m</div>
-                        <div className="flex justify-center gap-2 mt-2">
-                            {game.lastResult.result.labels.map(l => (
-                                <span key={l} className="bg-stone-200 text-stone-700 px-2 py-1 rounded text-xs font-bold">{l}</span>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* ルート情報 */}
-                    {game.lastResult.result.routeId && (
-                        <div className="text-sm text-gray-600 dark:text-gray-400">
-                            <span className="font-bold">ルート:</span> {getRoute(game.lastResult.result.routeId).emoji} {getRoute(game.lastResult.result.routeId).label}
-                        </div>
-                    )}
-
-                    {/* 滑落表示 */}
-                    {game.lastResult.result.didFall && (
-                        <div className="bg-red-100 dark:bg-red-900/30 p-3 rounded-lg border border-red-300 dark:border-red-700">
-                            <div className="text-red-700 dark:text-red-300 font-bold text-center">⚠️ 滑落！（2000m固定）</div>
-                        </div>
-                    )}
-
-                    {/* 最終標高 */}
-                    {game.lastResult.result.finalAltitude !== undefined && (
-                        <div className="text-sm text-gray-600 dark:text-gray-400">
-                            <span className="font-bold">最終標高:</span> {game.lastResult.result.finalAltitude}m
-                        </div>
-                    )}
-
-                    {/* ラウンド勝者表示（P2のターン時のみ） */}
-                    {game.currentPlayerIndex === 1 && game.roundWinner !== undefined && (
-                        <div className="bg-gradient-to-r from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 p-4 rounded-xl border-2 border-purple-300 dark:border-purple-700">
-                            {game.roundWinner === null ? (
-                                <div className="text-center text-lg font-bold">🤝 引き分け！</div>
-                            ) : (
-                                <>
-                                    <div className="text-center text-lg font-bold mb-2">
-                                        🏆 Round Winner: Player {game.roundWinner + 1}
-                                    </div>
-                                    <div className="text-center text-2xl font-black text-purple-600 dark:text-purple-300">
-                                        +1000m Bonus!
-                                    </div>
-                                </>
-                            )}
-                        </div>
-                    )}
-
-                    {/* AI Commentary（実況） */}
-                    {game.lastResult.result.commentary && (
-                        <div className="bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 p-4 rounded-lg border-2 border-yellow-200 dark:border-yellow-800">
-                            <div className="text-xs text-yellow-700 dark:text-yellow-400 font-bold mb-1 uppercase tracking-wider">🎤 実況</div>
-                            <div className="text-lg font-semibold text-yellow-900 dark:text-yellow-100">
-                                {game.lastResult.result.commentary}
-                            </div>
-                        </div>
-                    )}
-
-                    {/* AI Tip（攻略ヒント） */}
-                    {game.lastResult.result.tip && (
-                        <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg border border-blue-200 dark:border-blue-800">
-                            <div className="text-xs text-blue-700 dark:text-blue-400 font-bold mb-1 uppercase tracking-wider">💡 ヒント</div>
-                            <div className="text-sm text-blue-800 dark:text-blue-200">
-                                {game.lastResult.result.tip}
-                            </div>
-                        </div>
-                    )}
-
-                    <div className="bg-white dark:bg-black p-3 rounded text-left text-sm border">
-                        <div className="text-xs text-gray-400 font-bold mb-1">言い換え</div>
-                        {game.lastResult.result.rewrite}
-                    </div>
-
-                    <button
-                        onClick={nextTurn}
-                        className="w-full py-3 bg-black text-white rounded-lg font-bold animate-pulse"
-                    >
-                        次は {game.currentPlayerIndex === 0 ? "Player 2" : "次のラウンド"} へ
-                    </button>
-                </section>
-            )}
-
-            {/* 履歴 (History) */}
-            <section className="space-y-4 pt-4 border-t">
-                <button
-                    onClick={() => setIsHistoryOpen(!isHistoryOpen)}
-                    className="w-full flex items-center justify-between text-sm text-gray-500 hover:text-gray-800 transition-colors px-2"
-                >
-                    <span>📜 対戦履歴</span>
-                    <span>{isHistoryOpen ? "閉じる ▲" : "開く ▼"}</span>
-                </button>
-
-                {isHistoryOpen && (
-                    <div className="space-y-3 animate-in slide-in-from-top-2 fade-in duration-300">
-                        {Array.from({ length: Math.max(game.players[0].rounds.length, game.players[1].rounds.length) }).map((_, i) => {
-                            const r1 = game.players[0].rounds[i];
-                            const r2 = game.players[1].rounds[i];
-                            if (!r1 && !r2) return null;
-
-                            return (
-                                <div key={i} className="space-y-2">
-                                    <div className="text-xs font-bold text-center text-gray-400">Round {i + 1}</div>
-                                    <div className="grid grid-cols-2 gap-2">
-                                        {/* P1 History */}
-                                        <div className={clsx("p-2 rounded text-xs border", r1?.result ? "bg-red-50 border-red-100 dark:bg-red-900/20 dark:border-red-900" : "bg-gray-50 border-gray-100 opacity-50")}>
-                                            <div className="font-bold text-red-600 mb-1">Player 1</div>
-                                            {r1?.result ? (
-                                                <>
-                                                    <div className="font-bold text-lg">{r1.result.altitude}m</div>
-                                                    <div className="text-gray-600 dark:text-gray-400 line-clamp-2">{r1.inputText}</div>
-                                                </>
-                                            ) : (
-                                                <div className="text-gray-400">-</div>
-                                            )}
-                                        </div>
-                                        {/* P2 History */}
-                                        <div className={clsx("p-2 rounded text-xs border", r2?.result ? "bg-blue-50 border-blue-100 dark:bg-blue-900/20 dark:border-blue-900" : "bg-gray-50 border-gray-100 opacity-50")}>
-                                            <div className="font-bold text-blue-600 mb-1">Player 2</div>
-                                            {r2?.result ? (
-                                                <>
-                                                    <div className="font-bold text-lg">{r2.result.altitude}m</div>
-                                                    <div className="text-gray-600 dark:text-gray-400 line-clamp-2">{r2.inputText}</div>
-                                                </>
-                                            ) : (
-                                                <div className="text-gray-400">-</div>
-                                            )}
-                                        </div>
+                                {/* ルート選択 */}
+                                <div className="bg-gray-50 dark:bg-zinc-800 border rounded-xl p-5 space-y-3 shadow-sm">
+                                    <div className="text-xs text-gray-500 uppercase font-bold tracking-wide">ルート選択</div>
+                                    <div className="grid grid-cols-3 gap-3">
+                                        {ROUTES.map(route => (
+                                            <button
+                                                key={route.id}
+                                                onClick={() => setGame(prev => prev ? { ...prev, selectedRoute: route.id } : null)}
+                                                className={clsx(
+                                                    "p-4 rounded-lg border-2 transition-all hover:scale-[1.02]",
+                                                    game.selectedRoute === route.id
+                                                        ? "border-blue-500 bg-blue-50 dark:bg-blue-900/30 shadow-md scale-105"
+                                                        : "border-gray-200 hover:border-gray-300 bg-white dark:bg-zinc-700"
+                                                )}
+                                            >
+                                                <div className="text-3xl md:text-4xl">{route.emoji}</div>
+                                                <div className="text-sm md:text-base font-bold mt-1">{route.label}</div>
+                                                <div className="text-xs md:text-sm text-gray-500">{route.multiplier}x</div>
+                                            </button>
+                                        ))}
                                     </div>
                                 </div>
-                            );
-                        })}
+
+                                <textarea
+                                    className="w-full min-h-40 rounded-xl border-2 border-gray-300 bg-white dark:bg-zinc-800 dark:border-zinc-600 p-5 text-lg md:text-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all resize-y shadow-sm"
+                                    placeholder={`${currentPlayer.name} のマウントを入力...`}
+                                    value={text}
+                                    onChange={(e) => setText(e.target.value)}
+                                />
+
+                                {error && <div className="text-red-500 text-sm mb-2 font-semibold">⚠️ {error}</div>}
+
+                                <button
+                                    className={clsx("w-full py-4 rounded-xl text-white font-bold text-xl transition-all shadow-md hover:scale-[1.02]",
+                                        game.currentPlayerIndex === 0 ? "bg-red-600 hover:bg-red-700" : "bg-blue-600 hover:bg-blue-700",
+                                        (!text.trim() || loading) && "opacity-50 cursor-not-allowed"
+                                    )}
+                                    disabled={!text.trim() || loading}
+                                    onClick={submitRound}
+                                >
+                                    {loading ? "判定中..." : "マウント！"}
+                                </button>
+                            </section>
+                        )}
+
+                        {/* 判定結果表示フェーズ（ターン交代前） */}
+                        {game.phase === "result" && game.lastResult && game.lastResult.result && (
+                            <section className="text-center space-y-6 animate-in zoom-in duration-300">
+                                <h3 className="text-stone-500 font-bold uppercase tracking-widest text-lg">Judgment</h3>
+
+                                <div className="flex justify-center">
+                                    <MountainView altitude={game.lastResult.result.altitude} size={240} />
+                                </div>
+
+                                <div>
+                                    <div className="text-6xl md:text-7xl font-black">{game.lastResult.result.altitude}m</div>
+                                    <div className="flex justify-center gap-2 mt-2 flex-wrap">
+                                        {game.lastResult.result.labels.map(l => (
+                                            <span key={l} className="bg-stone-200 dark:bg-stone-700 text-stone-700 dark:text-stone-200 px-3 py-1 rounded-full text-sm font-bold">{l}</span>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* ルート情報 */}
+                                {game.lastResult.result.routeId && (
+                                    <div className="text-base text-gray-600 dark:text-gray-400">
+                                        <span className="font-bold">ルート:</span> {getRoute(game.lastResult.result.routeId).emoji} {getRoute(game.lastResult.result.routeId).label}
+                                    </div>
+                                )}
+
+                                {/* 滑落表示 */}
+                                {game.lastResult.result.didFall && (
+                                    <div className="bg-red-100 dark:bg-red-900/30 p-4 rounded-lg border border-red-300 dark:border-red-700">
+                                        <div className="text-red-700 dark:text-red-300 font-bold text-center text-lg">⚠️ 滑落！（2000m固定）</div>
+                                    </div>
+                                )}
+
+                                {/* 最終標高 */}
+                                {game.lastResult.result.finalAltitude !== undefined && (
+                                    <div className="text-base text-gray-600 dark:text-gray-400">
+                                        <span className="font-bold">最終標高:</span> {game.lastResult.result.finalAltitude}m
+                                    </div>
+                                )}
+
+                                {/* ラウンド勝者表示（P2のターン時のみ） */}
+                                {game.currentPlayerIndex === 1 && game.roundWinner !== undefined && (
+                                    <div className="bg-gradient-to-r from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 p-5 rounded-xl border-2 border-purple-300 dark:border-purple-700">
+                                        {game.roundWinner === null ? (
+                                            <div className="text-center text-xl font-bold">🤝 引き分け！</div>
+                                        ) : (
+                                            <>
+                                                <div className="text-center text-xl font-bold mb-2">
+                                                    🏆 Round Winner: Player {game.roundWinner + 1}
+                                                </div>
+                                                <div className="text-center text-3xl font-black text-purple-600 dark:text-purple-300">
+                                                    +1000m Bonus!
+                                                </div>
+                                            </>
+                                        )}
+                                    </div>
+                                )}
+
+                                {/* AI Commentary（実況） */}
+                                {game.lastResult.result.commentary && (
+                                    <div className="bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 p-4 rounded-lg border-2 border-yellow-200 dark:border-yellow-800">
+                                        <div className="text-xs text-yellow-700 dark:text-yellow-400 font-bold mb-1 uppercase tracking-wider">🎤 実況</div>
+                                        <div className="text-lg font-semibold text-yellow-900 dark:text-yellow-100">
+                                            {game.lastResult.result.commentary}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* AI Tip（攻略ヒント） */}
+                                {game.lastResult.result.tip && (
+                                    <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg border border-blue-200 dark:border-blue-800">
+                                        <div className="text-xs text-blue-700 dark:text-blue-400 font-bold mb-1 uppercase tracking-wider">💡 ヒント</div>
+                                        <div className="text-sm text-blue-800 dark:text-blue-200">
+                                            {game.lastResult.result.tip}
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div className="bg-gray-50 dark:bg-black p-4 rounded-xl text-left text-sm border shadow-inner">
+                                    <div className="text-xs text-gray-400 font-bold mb-2">言い換え</div>
+                                    <div className="text-base">{game.lastResult.result.rewrite}</div>
+                                </div>
+
+                                <button
+                                    onClick={nextTurn}
+                                    className="w-full py-4 bg-black text-white rounded-lg font-bold text-lg animate-pulse hover:bg-gray-800 hover:scale-[1.02] transition-all"
+                                >
+                                    {game.currentPlayerIndex === 0 
+                                        ? "Player 2 のターンへ" 
+                                        : (game.roundIndex + 1 >= ROUND_COUNT ? "結果を表示" : "次のラウンドへ")}
+                                </button>
+                            </section>
+                        )}
                     </div>
                 )}
-            </section>
+
+                {/* 履歴 (History) */}
+                <section className="bg-white dark:bg-zinc-900 p-6 rounded-xl shadow-xl border-2 border-gray-200 dark:border-zinc-700 space-y-4">
+                    <button
+                        onClick={() => setIsHistoryOpen(!isHistoryOpen)}
+                        className="w-full flex items-center justify-between text-base md:text-lg text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors font-bold"
+                    >
+                        <span>📜 対戦履歴</span>
+                        <span>{isHistoryOpen ? "閉じる ▲" : "開く ▼"}</span>
+                    </button>
+
+                    {isHistoryOpen && (
+                        <div className="space-y-3 animate-in slide-in-from-top-2 fade-in duration-300">
+                            {Array.from({ length: Math.max(game.players[0].rounds.length, game.players[1].rounds.length) }).map((_, i) => {
+                                const r1 = game.players[0].rounds[i];
+                                const r2 = game.players[1].rounds[i];
+                                if (!r1 && !r2) return null;
+
+                                return (
+                                    <div key={i} className="bg-gray-50 dark:bg-zinc-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-zinc-700">
+                                        <div className="text-xs md:text-sm font-bold text-center text-gray-500 dark:text-gray-400 mb-3">Round {i + 1}</div>
+                                        <div className="grid grid-cols-2 gap-3">
+                                            {/* P1 History */}
+                                            <div className={clsx("p-3 rounded-lg text-xs md:text-sm border", r1?.result ? "bg-red-50 border-red-200 dark:bg-red-900/30 dark:border-red-900" : "bg-white dark:bg-zinc-900 border-gray-300 dark:border-zinc-600 opacity-50")}>
+                                                <div className="font-bold text-red-600 mb-2">Player 1</div>
+                                                {r1?.result ? (
+                                                    <>
+                                                        <div className="font-bold text-xl md:text-2xl">{r1.result.altitude}m</div>
+                                                        <div className="text-gray-600 dark:text-gray-400 line-clamp-2 mt-1">{r1.inputText}</div>
+                                                    </>
+                                                ) : (
+                                                    <div className="text-gray-400">-</div>
+                                                )}
+                                            </div>
+                                            {/* P2 History */}
+                                            <div className={clsx("p-3 rounded-lg text-xs md:text-sm border", r2?.result ? "bg-blue-50 border-blue-200 dark:bg-blue-900/30 dark:border-blue-900" : "bg-white dark:bg-zinc-900 border-gray-300 dark:border-zinc-600 opacity-50")}>
+                                                <div className="font-bold text-blue-600 mb-2">Player 2</div>
+                                                {r2?.result ? (
+                                                    <>
+                                                        <div className="font-bold text-xl md:text-2xl">{r2.result.altitude}m</div>
+                                                        <div className="text-gray-600 dark:text-gray-400 line-clamp-2 mt-1">{r2.inputText}</div>
+                                                    </>
+                                                ) : (
+                                                    <div className="text-gray-400">-</div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
+                </section>
+            </div>
+
         </main>
     );
 }
