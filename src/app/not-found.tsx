@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
+import { a } from "framer-motion/client";
 
 export default function NotFound() {
   // Generate particle properties only on client side to prevent hydration errors
