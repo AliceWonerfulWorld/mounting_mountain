@@ -15,10 +15,11 @@ import { computeFinalAltitude } from "@/lib/solo/score";
 import { RotateCcw, TrendingUp, AlertTriangle, Mountain } from "lucide-react";
 import { RoundCutin } from "@/components/RoundCutin";
 import { TurnCutin } from "@/components/TurnCutin";
+import { BattleCutin } from "@/components/BattleCutin";
 
 type VersusState = GameState & {
     currentPlayerIndex: 0 | 1; // 0: Player 1, 1: Player 2
-    phase: "input" | "result" | "finished" | "round_start" | "turn_change" | "both_results";
+    phase: "input" | "result" | "finished" | "round_start" | "turn_change" | "both_results" | "battle_cutin";
     lastResult: Round | undefined; // 直近の判定結果表示用
     roundWinner?: 0 | 1 | null; // 0: P1, 1: P2, null: 引き分け
     selectedRoute: RouteId; // 現在のプレイヤーが選択したルート
@@ -136,7 +137,7 @@ export default function VersusLocalPage() {
                     else if (p2Alt > p1Alt) next.roundWinner = 1;
                     else next.roundWinner = null;
 
-                    next.phase = "both_results";
+                    next.phase = "battle_cutin"; // BattleCutinを表示
                 }
 
                 return next;
@@ -220,6 +221,16 @@ export default function VersusLocalPage() {
             return {
                 ...prev,
                 phase: "input" // TurnCutin完了 -> 入力画面へ
+            };
+        });
+    }
+
+    function handleBattleCutinComplete() {
+        setGame((prev) => {
+            if (!prev) return null;
+            return {
+                ...prev,
+                phase: "both_results" // BattleCutin完了 -> 両結果表示
             };
         });
     }
@@ -332,6 +343,12 @@ export default function VersusLocalPage() {
                             playerIndex={game.currentPlayerIndex}
                             playerName={game.players[game.currentPlayerIndex].name}
                             onComplete={handleTurnCutinComplete}
+                        />
+                    )}
+                    {game.phase === "battle_cutin" && (
+                        <BattleCutin
+                            key="battle-cutin"
+                            onComplete={handleBattleCutinComplete}
                         />
                     )}
                 </AnimatePresence>
