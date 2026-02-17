@@ -322,243 +322,253 @@ export default function VersusLocalPage() {
                     </header>
                 )}
 
-                {/* --- Main Game Card --- */}
-                <motion.div
-                    layout
-                    className="flex-1 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 dark:border-slate-800 p-6 md:p-8 relative overflow-hidden flex flex-col"
-                >
-                    {/* Corner Decorations */}
-                    <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
-                        <Mountain className="w-24 h-24 text-slate-500" />
-                    </div>
-
-                    {isFinished ? (
-                        // --- FINISHED SCREEN ---
-                        <div className="flex flex-col items-center justify-center h-full text-center space-y-8 animate-in fade-in zoom-in duration-500">
-                            <div>
-                                <h2 className="text-4xl md:text-5xl font-black text-slate-800 dark:text-white mb-2">GAME SET!</h2>
-                                <p className="text-slate-500 dark:text-slate-400">最終結果発表</p>
-                            </div>
-
-                            <div className="flex items-end justify-center gap-8 w-full">
-                                {/* P1 Result */}
-                                <div className="text-center">
-                                    <div className="text-sm font-bold text-red-500 mb-2">Player 1</div>
-                                    <div className="text-4xl font-black text-slate-800 dark:text-slate-100">
-                                        {game.players[0].totalScore.toLocaleString()}m
-                                    </div>
-                                </div>
-                                <div className="text-2xl text-slate-300 dark:text-slate-600 font-light pb-2">vs</div>
-                                {/* P2 Result */}
-                                <div className="text-center">
-                                    <div className="text-sm font-bold text-blue-500 mb-2">Player 2</div>
-                                    <div className="text-4xl font-black text-slate-800 dark:text-slate-100">
-                                        {game.players[1].totalScore.toLocaleString()}m
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="py-6">
-                                {game.players[0].totalScore > game.players[1].totalScore ? (
-                                    <div className="flex flex-col items-center animate-bounce">
-                                        <span className="text-6xl">🏆</span>
-                                        <span className="text-2xl font-black text-red-500 mt-2">Player 1 WINS!</span>
-                                    </div>
-                                ) : game.players[1].totalScore > game.players[0].totalScore ? (
-                                    <div className="flex flex-col items-center animate-bounce">
-                                        <span className="text-6xl">🏆</span>
-                                        <span className="text-2xl font-black text-blue-500 mt-2">Player 2 WINS!</span>
-                                    </div>
-                                ) : (
-                                    <div className="flex flex-col items-center">
-                                        <span className="text-6xl">🤝</span>
-                                        <span className="text-2xl font-black text-slate-500 mt-2">DRAW</span>
-                                    </div>
-                                )}
-                            </div>
-
-                            <div className="flex flex-col w-full gap-3 max-w-sm">
-                                <button onClick={resetGame} className="w-full py-4 bg-slate-900 text-white hover:bg-slate-800 rounded-xl font-bold shadow-lg transition-transform active:scale-95 flex items-center justify-center gap-2">
-                                    <RotateCcw className="w-5 h-5" />
-                                    再戦する
-                                </button>
-                                <Link href="/" className="w-full py-4 bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 rounded-xl font-bold transition-colors text-center">
-                                    タイトルに戻る
-                                </Link>
-                            </div>
-                        </div>
-
-                    ) : game.phase === "round_start" ? (
+                {/* Cut-in Overlays (Full Screen) */}
+                <AnimatePresence>
+                    {game.phase === "round_start" && (
                         <RoundCutin
+                            key="round-cutin"
                             roundNumber={game.roundIndex + 1}
                             onComplete={handleRoundCutinComplete}
                         />
-                    ) : game.phase === "turn_change" ? (
+                    )}
+                    {game.phase === "turn_change" && (
                         <TurnCutin
+                            key="turn-cutin"
                             playerIndex={game.currentPlayerIndex}
                             playerName={game.players[game.currentPlayerIndex].name}
                             onComplete={handleTurnCutinComplete}
                         />
-                    ) : game.phase === "input" ? (
-                        // --- INPUT PHASE ---
-                        <div className="space-y-6 animate-in slide-in-from-right fade-in duration-300">
-                            {/* Prompt Section */}
-                            <div>
-                                <div className="text-xs font-bold text-slate-400 mb-2 flex items-center gap-2">
-                                    <div className={cn("w-2 h-2 rounded-full", isP1 ? "bg-red-500" : "bg-blue-500")} />
-                                    <span>ROUND {game.roundIndex + 1} / {ROUND_COUNT}</span>
-                                </div>
-                                <h2 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-slate-100 leading-tight">
-                                    Q. <span className="text-transparent bg-clip-text bg-gradient-to-r from-slate-800 to-slate-600 dark:from-white dark:to-slate-300">{currentRound.prompt}</span>
-                                </h2>
-                            </div>
+                    )}
+                </AnimatePresence>
 
-                            {/* Divider with Player Label */}
-                            <div className="relative h-px bg-slate-200 dark:bg-slate-700 my-4">
-                                <span className={cn(
-                                    "absolute left-0 -top-3 px-3 py-1 text-xs font-bold text-white rounded-full",
-                                    isP1 ? "bg-red-500" : "bg-blue-500"
-                                )}>
-                                    {currentPlayer.name}&apos;s Turn
-                                </span>
-                            </div>
-
-                            {/* Route Selection */}
-                            <div>
-                                <label className="block text-xs font-bold text-slate-400 mb-3 uppercase tracking-wider">Select Route</label>
-                                <div className="grid grid-cols-3 gap-3">
-                                    {ROUTES.map(route => (
-                                        <RouteCard key={route.id} routeId={route.id} />
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Text Input */}
-                            <div>
-                                <textarea
-                                    value={text}
-                                    onChange={(e) => setText(e.target.value)}
-                                    placeholder={`${currentPlayer.name} のマウント発言を入力...`}
-                                    className="w-full min-h-[160px] p-4 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-lg focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all resize-y"
-                                />
-                                {error && (
-                                    <div className="mt-2 text-red-500 text-sm font-bold flex items-center gap-2 animate-pulse">
-                                        <AlertTriangle className="w-4 h-4" />
-                                        {error}
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Submit Button */}
-                            <button
-                                onClick={submitRound}
-                                disabled={!text.trim() || loading}
-                                className={cn(
-                                    "w-full py-4 rounded-xl font-bold text-xl shadow-lg transition-all transform active:scale-[0.98] flex items-center justify-center gap-2",
-                                    !text.trim() || loading
-                                        ? "bg-slate-200 text-slate-400 cursor-not-allowed"
-                                        : isP1
-                                            ? "bg-gradient-to-r from-red-500 to-red-600 text-white hover:shadow-red-500/25"
-                                            : "bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:shadow-blue-500/25"
-                                )}
-                            >
-                                {loading ? (
-                                    <span className="inline-block animate-spin">⏳</span>
-                                ) : (
-                                    <>
-                                        <span>マウントを取る!</span>
-                                        <Mountain className="w-5 h-5" />
-                                    </>
-                                )}
-                            </button>
+                {/* --- Main Game Card --- */}
+                {(game.phase === "input" || game.phase === "result" || game.phase === "finished") && (
+                    <motion.div
+                        layout
+                        className="flex-1 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 dark:border-slate-800 p-6 md:p-8 relative overflow-hidden flex flex-col"
+                    >
+                        {/* Corner Decorations */}
+                        <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
+                            <Mountain className="w-24 h-24 text-slate-500" />
                         </div>
-                    ) : (
-                        // --- RESULT PHASE ---
-                        <div className="flex flex-col h-full animate-in zoom-in duration-300">
-                            <div className="flex-1 flex flex-col items-center justify-center text-center space-y-6">
-                                {/* Route Badge */}
-                                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 text-xs font-bold uppercase tracking-wider">
-                                    <span>{getRoute(game.lastResult?.routeId || "NORMAL").emoji}</span>
-                                    <span>{getRoute(game.lastResult?.routeId || "NORMAL").label} Route</span>
+
+                        {isFinished ? (
+                            // --- FINISHED SCREEN ---
+                            <div className="flex flex-col items-center justify-center h-full text-center space-y-8 animate-in fade-in zoom-in duration-500">
+                                <div>
+                                    <h2 className="text-4xl md:text-5xl font-black text-slate-800 dark:text-white mb-2">GAME SET!</h2>
+                                    <p className="text-slate-500 dark:text-slate-400">最終結果発表</p>
                                 </div>
 
-                                {/* Altitude Display */}
-                                <div>
-                                    <div className="text-7xl md:text-8xl font-black text-slate-800 dark:text-white tracking-tighter">
-                                        {game.lastResult?.result?.altitude}
-                                        <span className="text-2xl md:text-3xl text-slate-400 ml-1">m</span>
+                                <div className="flex items-end justify-center gap-8 w-full">
+                                    {/* P1 Result */}
+                                    <div className="text-center">
+                                        <div className="text-sm font-bold text-red-500 mb-2">Player 1</div>
+                                        <div className="text-4xl font-black text-slate-800 dark:text-slate-100">
+                                            {game.players[0].totalScore.toLocaleString()}m
+                                        </div>
                                     </div>
+                                    <div className="text-2xl text-slate-300 dark:text-slate-600 font-light pb-2">vs</div>
+                                    {/* P2 Result */}
+                                    <div className="text-center">
+                                        <div className="text-sm font-bold text-blue-500 mb-2">Player 2</div>
+                                        <div className="text-4xl font-black text-slate-800 dark:text-slate-100">
+                                            {game.players[1].totalScore.toLocaleString()}m
+                                        </div>
+                                    </div>
+                                </div>
 
-                                    {/* Labels */}
-                                    <div className="flex flex-wrap justify-center gap-2 mt-4">
-                                        {game.lastResult?.result?.labels.map((label, i) => (
-                                            <span key={i} className="px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-full text-sm font-bold border border-slate-200 dark:border-slate-700">
-                                                {label}
-                                            </span>
+                                <div className="py-6">
+                                    {game.players[0].totalScore > game.players[1].totalScore ? (
+                                        <div className="flex flex-col items-center animate-bounce">
+                                            <span className="text-6xl">🏆</span>
+                                            <span className="text-2xl font-black text-red-500 mt-2">Player 1 WINS!</span>
+                                        </div>
+                                    ) : game.players[1].totalScore > game.players[0].totalScore ? (
+                                        <div className="flex flex-col items-center animate-bounce">
+                                            <span className="text-6xl">🏆</span>
+                                            <span className="text-2xl font-black text-blue-500 mt-2">Player 2 WINS!</span>
+                                        </div>
+                                    ) : (
+                                        <div className="flex flex-col items-center">
+                                            <span className="text-6xl">🤝</span>
+                                            <span className="text-2xl font-black text-slate-500 mt-2">DRAW</span>
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="flex flex-col w-full gap-3 max-w-sm">
+                                    <button onClick={resetGame} className="w-full py-4 bg-slate-900 text-white hover:bg-slate-800 rounded-xl font-bold shadow-lg transition-transform active:scale-95 flex items-center justify-center gap-2">
+                                        <RotateCcw className="w-5 h-5" />
+                                        再戦する
+                                    </button>
+                                    <Link href="/" className="w-full py-4 bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 rounded-xl font-bold transition-colors text-center">
+                                        タイトルに戻る
+                                    </Link>
+                                </div>
+                            </div>
+
+                        ) : game.phase === "input" ? (
+                            // --- INPUT PHASE ---
+                            <div className="space-y-6 animate-in slide-in-from-right fade-in duration-300">
+                                {/* Prompt Section */}
+                                <div>
+                                    <div className="text-xs font-bold text-slate-400 mb-2 flex items-center gap-2">
+                                        <div className={cn("w-2 h-2 rounded-full", isP1 ? "bg-red-500" : "bg-blue-500")} />
+                                        <span>ROUND {game.roundIndex + 1} / {ROUND_COUNT}</span>
+                                    </div>
+                                    <h2 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-slate-100 leading-tight">
+                                        Q. <span className="text-transparent bg-clip-text bg-gradient-to-r from-slate-800 to-slate-600 dark:from-white dark:to-slate-300">{currentRound.prompt}</span>
+                                    </h2>
+                                </div>
+
+                                {/* Divider with Player Label */}
+                                <div className="relative h-px bg-slate-200 dark:bg-slate-700 my-4">
+                                    <span className={cn(
+                                        "absolute left-0 -top-3 px-3 py-1 text-xs font-bold text-white rounded-full",
+                                        isP1 ? "bg-red-500" : "bg-blue-500"
+                                    )}>
+                                        {currentPlayer.name}&apos;s Turn
+                                    </span>
+                                </div>
+
+                                {/* Route Selection */}
+                                <div>
+                                    <label className="block text-xs font-bold text-slate-400 mb-3 uppercase tracking-wider">Select Route</label>
+                                    <div className="grid grid-cols-3 gap-3">
+                                        {ROUTES.map(route => (
+                                            <RouteCard key={route.id} routeId={route.id} />
                                         ))}
                                     </div>
                                 </div>
 
-                                {/* Fall Warning */}
-                                {game.lastResult?.result?.didFall && (
-                                    <div className="flex items-center gap-2 text-red-500 font-bold bg-red-50 dark:bg-red-900/20 px-4 py-2 rounded-lg animate-pulse border border-red-200 dark:border-red-900">
-                                        <AlertTriangle className="w-5 h-5" />
-                                        <span>滑落発生！ 最終標高 {game.lastResult?.result?.finalAltitude}m</span>
-                                    </div>
-                                )}
-
-                                {/* Mountain Graphic */}
-                                <div className="relative w-full max-w-xs h-40 flex items-end justify-center">
-                                    <MountainView altitude={game.lastResult?.result?.altitude || 0} size={200} />
-                                </div>
-
-                                {/* Commentary */}
-                                <div className="w-full bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-800/30 p-4 rounded-xl text-left">
-                                    <div className="text-xs font-bold text-amber-500 mb-1 uppercase tracking-wider">Commentary</div>
-                                    <p className="text-amber-900 dark:text-amber-100 font-medium">
-                                        {game.lastResult?.result?.commentary}
-                                    </p>
-                                </div>
-
-                                {/* Round Winner (P2 Result Only) */}
-                                {game.currentPlayerIndex === 1 && game.roundWinner !== undefined && (
-                                    <div className="w-full bg-gradient-to-r from-purple-500 to-indigo-600 text-white p-4 rounded-xl shadow-lg transform scale-105">
-                                        <div className="text-center">
-                                            {game.roundWinner === null ? (
-                                                <div className="font-bold text-xl">🤝 DRAW (Round {game.roundIndex + 1})</div>
-                                            ) : (
-                                                <>
-                                                    <div className="text-sm opacity-80 mb-1">Round Winner</div>
-                                                    <div className="text-2xl font-black">
-                                                        🏆 Player {game.roundWinner + 1}
-                                                    </div>
-                                                    <div className="text-sm font-bold mt-1 bg-white/20 inline-block px-2 py-0.5 rounded">
-                                                        +1000m Bonus
-                                                    </div>
-                                                </>
-                                            )}
+                                {/* Text Input */}
+                                <div>
+                                    <textarea
+                                        value={text}
+                                        onChange={(e) => setText(e.target.value)}
+                                        placeholder={`${currentPlayer.name} のマウント発言を入力...`}
+                                        className="w-full min-h-[160px] p-4 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-lg focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all resize-y"
+                                    />
+                                    {error && (
+                                        <div className="mt-2 text-red-500 text-sm font-bold flex items-center gap-2 animate-pulse">
+                                            <AlertTriangle className="w-4 h-4" />
+                                            {error}
                                         </div>
-                                    </div>
-                                )}
-                            </div>
+                                    )}
+                                </div>
 
-                            {/* Next Action Button */}
-                            <div className="mt-6">
+                                {/* Submit Button */}
                                 <button
-                                    onClick={nextTurn}
-                                    className="w-full py-4 bg-slate-900 text-white hover:bg-slate-800 rounded-xl font-bold text-lg shadow-lg flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
+                                    onClick={submitRound}
+                                    disabled={!text.trim() || loading}
+                                    className={cn(
+                                        "w-full py-4 rounded-xl font-bold text-xl shadow-lg transition-all transform active:scale-[0.98] flex items-center justify-center gap-2",
+                                        !text.trim() || loading
+                                            ? "bg-slate-200 text-slate-400 cursor-not-allowed"
+                                            : isP1
+                                                ? "bg-gradient-to-r from-red-500 to-red-600 text-white hover:shadow-red-500/25"
+                                                : "bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:shadow-blue-500/25"
+                                    )}
                                 >
-                                    <span>
-                                        {game.currentPlayerIndex === 0
-                                            ? "Player 2 のターンへ"
-                                            : (game.roundIndex + 1 >= ROUND_COUNT ? "最終結果を見る" : "次のラウンドへ")}
-                                    </span>
-                                    <TrendingUp className="w-5 h-5" />
+                                    {loading ? (
+                                        <span className="inline-block animate-spin">⏳</span>
+                                    ) : (
+                                        <>
+                                            <span>マウントを取る!</span>
+                                            <Mountain className="w-5 h-5" />
+                                        </>
+                                    )}
                                 </button>
                             </div>
-                        </div>
-                    )}
-                </motion.div>
+                        ) : (
+                            // --- RESULT PHASE ---
+                            <div className="flex flex-col h-full animate-in zoom-in duration-300">
+                                <div className="flex-1 flex flex-col items-center justify-center text-center space-y-6">
+                                    {/* Route Badge */}
+                                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 text-xs font-bold uppercase tracking-wider">
+                                        <span>{getRoute(game.lastResult?.routeId || "NORMAL").emoji}</span>
+                                        <span>{getRoute(game.lastResult?.routeId || "NORMAL").label} Route</span>
+                                    </div>
+
+                                    {/* Altitude Display */}
+                                    <div>
+                                        <div className="text-7xl md:text-8xl font-black text-slate-800 dark:text-white tracking-tighter">
+                                            {game.lastResult?.result?.altitude}
+                                            <span className="text-2xl md:text-3xl text-slate-400 ml-1">m</span>
+                                        </div>
+
+                                        {/* Labels */}
+                                        <div className="flex flex-wrap justify-center gap-2 mt-4">
+                                            {game.lastResult?.result?.labels.map((label, i) => (
+                                                <span key={i} className="px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-full text-sm font-bold border border-slate-200 dark:border-slate-700">
+                                                    {label}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Fall Warning */}
+                                    {game.lastResult?.result?.didFall && (
+                                        <div className="flex items-center gap-2 text-red-500 font-bold bg-red-50 dark:bg-red-900/20 px-4 py-2 rounded-lg animate-pulse border border-red-200 dark:border-red-900">
+                                            <AlertTriangle className="w-5 h-5" />
+                                            <span>滑落発生！ 最終標高 {game.lastResult?.result?.finalAltitude}m</span>
+                                        </div>
+                                    )}
+
+                                    {/* Mountain Graphic */}
+                                    <div className="relative w-full max-w-xs h-40 flex items-end justify-center">
+                                        <MountainView altitude={game.lastResult?.result?.altitude || 0} size={200} />
+                                    </div>
+
+                                    {/* Commentary */}
+                                    <div className="w-full bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-800/30 p-4 rounded-xl text-left">
+                                        <div className="text-xs font-bold text-amber-500 mb-1 uppercase tracking-wider">Commentary</div>
+                                        <p className="text-amber-900 dark:text-amber-100 font-medium">
+                                            {game.lastResult?.result?.commentary}
+                                        </p>
+                                    </div>
+
+                                    {/* Round Winner (P2 Result Only) */}
+                                    {game.currentPlayerIndex === 1 && game.roundWinner !== undefined && (
+                                        <div className="w-full bg-gradient-to-r from-purple-500 to-indigo-600 text-white p-4 rounded-xl shadow-lg transform scale-105">
+                                            <div className="text-center">
+                                                {game.roundWinner === null ? (
+                                                    <div className="font-bold text-xl">🤝 DRAW (Round {game.roundIndex + 1})</div>
+                                                ) : (
+                                                    <>
+                                                        <div className="text-sm opacity-80 mb-1">Round Winner</div>
+                                                        <div className="text-2xl font-black">
+                                                            🏆 Player {game.roundWinner + 1}
+                                                        </div>
+                                                        <div className="text-sm font-bold mt-1 bg-white/20 inline-block px-2 py-0.5 rounded">
+                                                            +1000m Bonus
+                                                        </div>
+                                                    </>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Next Action Button */}
+                                <div className="mt-6">
+                                    <button
+                                        onClick={nextTurn}
+                                        className="w-full py-4 bg-slate-900 text-white hover:bg-slate-800 rounded-xl font-bold text-lg shadow-lg flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
+                                    >
+                                        <span>
+                                            {game.currentPlayerIndex === 0
+                                                ? "Player 2 のターンへ"
+                                                : (game.roundIndex + 1 >= ROUND_COUNT ? "最終結果を見る" : "次のラウンドへ")}
+                                        </span>
+                                        <TrendingUp className="w-5 h-5" />
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </motion.div>
+                )}
 
                 {/* --- History Toggle (Footer) --- */}
                 {!isFinished && (
