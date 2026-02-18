@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { GameState, Round } from "@/types/game";
 import { PROMPTS } from "@/lib/prompts";
-import { MountainView } from "@/components/MountainView";
+import { DetailedMountain } from "@/components/DetailedMountain";
 import { pickN } from "@/lib/random";
 import { createRounds } from "@/lib/game";
 import { updateStats } from "@/lib/achievementStore";
@@ -2134,7 +2134,7 @@ export default function SoloPage() {
                     {/* 左側: マウンテンビュー */}
                     <div className="flex-shrink-0 relative group">
                       <div className="absolute inset-0 bg-blue-500/20 blur-3xl rounded-full transform scale-75 group-hover:scale-110 transition-transform duration-700"></div>
-                      <MountainView altitude={lastResult.result.altitude} size={320} />
+                      <DetailedMountain altitude={lastResult.result.altitude} size={320} />
                     </div>
 
                     {/* 右側: 情報エリア */}
@@ -2339,7 +2339,7 @@ export default function SoloPage() {
                   </div>
 
                   <div className="absolute top-2 right-2 opacity-5 pointer-events-none group-hover:opacity-10 transition-opacity">
-                    <MountainView altitude={r.result?.altitude || 0} size={50} />
+                    <DetailedMountain altitude={r.result?.altitude || 0} size={50} animate={false} />
                   </div>
                 </div>
               ))}
