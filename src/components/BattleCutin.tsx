@@ -1,13 +1,34 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 type Props = {
     onComplete: () => void;
 };
 
 export function BattleCutin({ onComplete }: Props) {
+    // Pre-calculate random values for particles and snow
+    const [particles] = useState(() => 
+        Array.from({ length: 20 }, () => ({
+            xOffset: (Math.random() - 0.5) * 100,
+            yOffset: (Math.random() - 0.5) * 100,
+            duration: 1 + Math.random(),
+            delay: Math.random() * 0.5
+        }))
+    );
+
+    const [snowflakes] = useState(() => 
+        Array.from({ length: 15 }, () => ({
+            startX: Math.random() * 100,
+            x1: Math.random() * 100,
+            x2: Math.random() * 100,
+            duration: 2 + Math.random() * 2,
+            delay: Math.random() * 0.5,
+            width: 3 + Math.random() * 5,
+            height: 3 + Math.random() * 5
+        }))
+    );
     useEffect(() => {
         const timer = setTimeout(() => {
             onComplete();
@@ -182,7 +203,7 @@ export function BattleCutin({ onComplete }: Props) {
             />
 
             {/* 輝くパーティクル */}
-            {[...Array(20)].map((_, i) => (
+            {particles.map((particle, i) => (
                 <motion.div
                     key={`particle-${i}`}
                     initial={{
@@ -192,14 +213,14 @@ export function BattleCutin({ onComplete }: Props) {
                         opacity: 0
                     }}
                     animate={{
-                        x: `${50 + (Math.random() - 0.5) * 100}%`,
-                        y: `${50 + (Math.random() - 0.5) * 100}%`,
+                        x: `${50 + particle.xOffset}%`,
+                        y: `${50 + particle.yOffset}%`,
                         scale: [0, 1, 0],
                         opacity: [0, 1, 0]
                     }}
                     transition={{
-                        duration: 1 + Math.random(),
-                        delay: Math.random() * 0.5,
+                        duration: particle.duration,
+                        delay: particle.delay,
                         ease: "easeOut"
                     }}
                     className="absolute w-2 h-2 bg-white rounded-full blur-sm"
@@ -207,35 +228,35 @@ export function BattleCutin({ onComplete }: Props) {
             ))}
 
             {/* 雪のエフェクト */}
-            {[...Array(15)].map((_, i) => (
+            {snowflakes.map((snow, i) => (
                 <motion.div
                     key={`snow-${i}`}
                     initial={{
                         y: -20,
-                        x: Math.random() * 100 + "%",
+                        x: snow.startX + "%",
                         opacity: 0
                     }}
                     animate={{
                         y: "100vh",
                         x: [
-                            `${Math.random() * 100}%`,
-                            `${Math.random() * 100}%`
+                            `${snow.x1}%`,
+                            `${snow.x2}%`
                         ],
                         opacity: [0, 0.8, 0.8, 0],
                         rotate: [0, 360]
                     }}
                     transition={{
-                        duration: 2 + Math.random() * 2,
+                        duration: snow.duration,
                         ease: "linear",
-                        delay: Math.random() * 0.5
+                        delay: snow.delay
                     }}
                     className="absolute"
                 >
                     <div
                         className="bg-white rounded-full"
                         style={{
-                            width: `${3 + Math.random() * 5}px`,
-                            height: `${3 + Math.random() * 5}px`,
+                            width: `${snow.width}px`,
+                            height: `${snow.height}px`,
                             boxShadow: '0 0 3px rgba(255,255,255,0.8)'
                         }}
                     />

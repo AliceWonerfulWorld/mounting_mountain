@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 type Props = {
     roundNumber: number;
@@ -9,6 +9,19 @@ type Props = {
 };
 
 export function RoundCutin({ roundNumber, onComplete }: Props) {
+    // Pre-calculate random values for snow particles
+    const [snowflakes] = useState(() => 
+        Array.from({ length: 15 }, () => ({
+            startX: Math.random() * 100,
+            x1: Math.random() * 100,
+            x2: Math.random() * 100,
+            x3: Math.random() * 100,
+            duration: 8 + Math.random() * 4,
+            delay: Math.random() * 3,
+            width: 2 + Math.random() * 4,
+            height: 2 + Math.random() * 4
+        }))
+    );
     useEffect(() => {
         const timer = setTimeout(() => {
             onComplete();
@@ -138,36 +151,36 @@ export function RoundCutin({ roundNumber, onComplete }: Props) {
 
             {/* 雪のパーティクル */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                {[...Array(15)].map((_, i) => (
+                {snowflakes.map((snow, i) => (
                     <motion.div
                         key={`snow-${i}`}
                         initial={{ 
                             y: -20, 
-                            x: Math.random() * 100 + "%",
+                            x: snow.startX + "%",
                             opacity: 0
                         }}
                         animate={{ 
                             y: "100vh",
                             x: [
-                                `${Math.random() * 100}%`,
-                                `${Math.random() * 100}%`,
-                                `${Math.random() * 100}%`
+                                `${snow.x1}%`,
+                                `${snow.x2}%`,
+                                `${snow.x3}%`
                             ],
                             opacity: [0, 0.6, 0]
                         }}
                         transition={{
-                            duration: 8 + Math.random() * 4,
+                            duration: snow.duration,
                             ease: "linear",
                             repeat: Infinity,
-                            delay: Math.random() * 3
+                            delay: snow.delay
                         }}
                         className="absolute"
                     >
                         <div 
                             className="bg-white rounded-full blur-sm"
                             style={{
-                                width: `${2 + Math.random() * 4}px`,
-                                height: `${2 + Math.random() * 4}px`,
+                                width: `${snow.width}px`,
+                                height: `${snow.height}px`,
                             }}
                         />
                     </motion.div>

@@ -5,7 +5,6 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { GameState, Round } from "@/types/game";
 import { PROMPTS } from "@/lib/prompts";
-import { MountainView } from "@/components/MountainView";
 import { DetailedMountain } from "@/components/DetailedMountain";
 import { pickN } from "@/lib/random";
 import { createRounds } from "@/lib/game";
