@@ -663,6 +663,33 @@ export default function VersusLocalPage() {
                                                     <div className="text-xs text-slate-600 dark:text-slate-400 line-clamp-2 bg-white/50 dark:bg-slate-800/50 p-2 rounded">
                                                         {p1Round.inputText}
                                                     </div>
+                                                    
+                                                    {/* Player 1 AI Comment */}
+                                                    <div className="mt-4 space-y-3">
+                                                        {/* 実況コメント */}
+                                                        <div className="relative">
+                                                            <div className="absolute -left-3 top-0 text-2xl">💬</div>
+                                                            <div className="bg-gradient-to-br from-red-100/80 to-red-50/80 dark:from-red-900/40 dark:to-red-950/40 border-l-4 border-red-400 dark:border-red-500 rounded-r-lg p-3 pl-8 shadow-sm">
+                                                                <div className="text-[10px] font-bold text-red-600 dark:text-red-400 uppercase tracking-wider mb-1">AI Judge</div>
+                                                                <div className="text-sm text-slate-800 dark:text-slate-200 leading-relaxed font-medium">
+                                                                    {p1Result?.commentary || "..."}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        {/* 攻略ヒント */}
+                                                        {p1Result?.tip && (
+                                                            <div className="relative">
+                                                                <div className="absolute -left-3 top-0 text-xl">💡</div>
+                                                                <div className="bg-gradient-to-br from-amber-100/60 to-yellow-50/60 dark:from-amber-900/30 dark:to-yellow-950/30 border-l-4 border-amber-400 dark:border-amber-500 rounded-r-lg p-3 pl-8 shadow-sm">
+                                                                    <div className="text-[10px] font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider mb-1">Strategy Tip</div>
+                                                                    <div className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed">
+                                                                        {p1Result.tip}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             );
                                         })()}
@@ -736,52 +763,36 @@ export default function VersusLocalPage() {
                                                     <div className="text-xs text-slate-600 dark:text-slate-400 line-clamp-2 bg-white/50 dark:bg-slate-800/50 p-2 rounded">
                                                         {p2Round.inputText}
                                                     </div>
+                                                    
+                                                    {/* Player 2 AI Comment */}
+                                                    <div className="mt-4 space-y-3">
+                                                        {/* 実況コメント */}
+                                                        <div className="relative">
+                                                            <div className="absolute -left-3 top-0 text-2xl">💬</div>
+                                                            <div className="bg-gradient-to-br from-blue-100/80 to-blue-50/80 dark:from-blue-900/40 dark:to-blue-950/40 border-l-4 border-blue-400 dark:border-blue-500 rounded-r-lg p-3 pl-8 shadow-sm">
+                                                                <div className="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider mb-1">AI Judge</div>
+                                                                <div className="text-sm text-slate-800 dark:text-slate-200 leading-relaxed font-medium">
+                                                                    {p2Result?.commentary || "..."}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        {/* 攻略ヒント */}
+                                                        {p2Result?.tip && (
+                                                            <div className="relative">
+                                                                <div className="absolute -left-3 top-0 text-xl">💡</div>
+                                                                <div className="bg-gradient-to-br from-amber-100/60 to-yellow-50/60 dark:from-amber-900/30 dark:to-yellow-950/30 border-l-4 border-amber-400 dark:border-amber-500 rounded-r-lg p-3 pl-8 shadow-sm">
+                                                                    <div className="text-[10px] font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider mb-1">Strategy Tip</div>
+                                                                    <div className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed">
+                                                                        {p2Result.tip}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             );
                                         })()}
-                                    </div>
-
-                                    {/* AI Comments Section */}
-                                    <div className="w-full space-y-4">
-                                        {/* Title */}
-                                        <div className="text-center">
-                                            <h3 className="text-lg font-bold text-slate-700 dark:text-slate-300 flex items-center justify-center gap-2">
-                                                <span>💬</span>
-                                                <span>AI Judge Comments</span>
-                                            </h3>
-                                        </div>
-
-                                        {/* Player 1 Comment */}
-                                        <div className="bg-gradient-to-br from-red-50 to-red-100 dark:from-red-950/30 dark:to-red-900/30 border-2 border-red-200 dark:border-red-800 rounded-xl p-4 space-y-2">
-                                            <div className="flex items-center gap-2">
-                                                <div className="w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs font-bold">
-                                                    P1
-                                                </div>
-                                                <span className="font-bold text-red-700 dark:text-red-300">Player 1</span>
-                                            </div>
-                                            <div className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
-                                                <span className="font-bold text-slate-500 dark:text-slate-400">AIのツッコミ:</span>{" "}
-                                                <span className="italic">
-                                                    {game.players[0].rounds[game.roundIndex]?.result?.commentary || "..."}
-                                                </span>
-                                            </div>
-                                        </div>
-
-                                        {/* Player 2 Comment */}
-                                        <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/30 dark:to-blue-900/30 border-2 border-blue-200 dark:border-blue-800 rounded-xl p-4 space-y-2">
-                                            <div className="flex items-center gap-2">
-                                                <div className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold">
-                                                    P2
-                                                </div>
-                                                <span className="font-bold text-blue-700 dark:text-blue-300">Player 2</span>
-                                            </div>
-                                            <div className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
-                                                <span className="font-bold text-slate-500 dark:text-slate-400">AIのツッコミ:</span>{" "}
-                                                <span className="italic">
-                                                    {game.players[1].rounds[game.roundIndex]?.result?.commentary || "..."}
-                                                </span>
-                                            </div>
-                                        </div>
                                     </div>
                                 </div>
 
