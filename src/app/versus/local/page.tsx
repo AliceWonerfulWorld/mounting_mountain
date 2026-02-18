@@ -761,13 +761,41 @@ export default function VersusLocalPage() {
                                     const r2 = game.players[1].rounds[i];
                                     if (!r1 && !r2) return null;
 
+                                    // 勝者判定
+                                    const p1Alt = r1?.result?.altitude || 0;
+                                    const p2Alt = r2?.result?.altitude || 0;
+                                    const p1Wins = p1Alt > p2Alt;
+                                    const p2Wins = p2Alt > p1Alt;
+                                    const isDraw = p1Alt === p2Alt;
+
                                     return (
                                         <div key={i} className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-4 border border-slate-100 dark:border-slate-800">
                                             <div className="text-xs font-bold text-center text-slate-400 mb-3">ROUND {i + 1}</div>
                                             <div className="grid grid-cols-2 gap-4">
                                                 {/* P1 */}
                                                 <div className={cn("p-3 rounded-lg text-sm border", r1?.result ? "bg-white dark:bg-slate-800 border-red-100 dark:border-red-900/30" : "opacity-30")}>
-                                                    <div className="text-red-500 font-bold text-xs mb-1">Player 1</div>
+                                                    <div className="flex items-center justify-between mb-2">
+                                                        <div className="text-red-500 font-bold text-xs">Player 1</div>
+                                                        {r1?.result && r2?.result && (
+                                                            <>
+                                                                {p1Wins && (
+                                                                    <span className="px-2 py-0.5 bg-gradient-to-r from-yellow-400 to-amber-400 text-white text-[10px] font-black rounded">
+                                                                        WIN
+                                                                    </span>
+                                                                )}
+                                                                {p2Wins && (
+                                                                    <span className="px-2 py-0.5 bg-slate-300 dark:bg-slate-700 text-slate-600 dark:text-slate-400 text-[10px] font-bold rounded">
+                                                                        LOSE
+                                                                    </span>
+                                                                )}
+                                                                {isDraw && (
+                                                                    <span className="px-2 py-0.5 bg-gradient-to-r from-purple-400 to-indigo-400 text-white text-[10px] font-bold rounded">
+                                                                        DRAW
+                                                                    </span>
+                                                                )}
+                                                            </>
+                                                        )}
+                                                    </div>
                                                     {r1?.result ? (
                                                         <>
                                                             <div className="font-black text-lg">{r1.result.altitude}m</div>
@@ -777,7 +805,28 @@ export default function VersusLocalPage() {
                                                 </div>
                                                 {/* P2 */}
                                                 <div className={cn("p-3 rounded-lg text-sm border", r2?.result ? "bg-white dark:bg-slate-800 border-blue-100 dark:border-blue-900/30" : "opacity-30")}>
-                                                    <div className="text-blue-500 font-bold text-xs mb-1">Player 2</div>
+                                                    <div className="flex items-center justify-between mb-2">
+                                                        <div className="text-blue-500 font-bold text-xs">Player 2</div>
+                                                        {r1?.result && r2?.result && (
+                                                            <>
+                                                                {p2Wins && (
+                                                                    <span className="px-2 py-0.5 bg-gradient-to-r from-yellow-400 to-amber-400 text-white text-[10px] font-black rounded">
+                                                                        WIN
+                                                                    </span>
+                                                                )}
+                                                                {p1Wins && (
+                                                                    <span className="px-2 py-0.5 bg-slate-300 dark:bg-slate-700 text-slate-600 dark:text-slate-400 text-[10px] font-bold rounded">
+                                                                        LOSE
+                                                                    </span>
+                                                                )}
+                                                                {isDraw && (
+                                                                    <span className="px-2 py-0.5 bg-gradient-to-r from-purple-400 to-indigo-400 text-white text-[10px] font-bold rounded">
+                                                                        DRAW
+                                                                    </span>
+                                                                )}
+                                                            </>
+                                                        )}
+                                                    </div>
                                                     {r2?.result ? (
                                                         <>
                                                             <div className="font-black text-lg">{r2.result.altitude}m</div>
