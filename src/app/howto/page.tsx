@@ -17,8 +17,15 @@ import {
 
 export default function HowToPage() {
     return (
-        <main className="min-h-screen bg-slate-950 text-slate-100 p-6 md:p-12">
-            <div className="max-w-4xl mx-auto space-y-12">
+        <main className="min-h-screen relative overflow-hidden bg-gradient-to-b from-blue-950 via-sky-900 via-sky-700 to-sky-400">
+
+            {/* 🌫 空気感レイヤー（追加） */}
+            <div className="absolute inset-0 pointer-events-none">
+                <div className="absolute -top-40 -left-40 w-[500px] h-[500px] bg-cyan-400/20 rounded-full blur-3xl" />
+                <div className="absolute top-20 right-0 w-[600px] h-[600px] bg-blue-400/10 rounded-full blur-3xl" />
+            </div>
+
+            <div className="max-w-4xl mx-auto space-y-12 relative z-10">
 
                 {/* Header */}
                 <header className="text-center space-y-4">
@@ -95,21 +102,21 @@ export default function HowToPage() {
                                 <div className="flex items-start gap-3 p-3 bg-green-900/20 border border-green-900/50 rounded-lg">
                                     <Shield className="w-5 h-5 text-green-400 mt-1 shrink-0" />
                                     <div>
-                                        <div className="font-bold text-green-400">SAFE (×1.0)</div>
+                                        <div className="font-bold text-green-400">SAFE (×0.7)</div>
                                         <div className="text-sm text-green-200/70">安全ルート。滑落しません。保険が1つ回復します。</div>
                                     </div>
                                 </div>
                                 <div className="flex items-start gap-3 p-3 bg-blue-900/20 border border-blue-900/50 rounded-lg">
                                     <Mountain className="w-5 h-5 text-blue-400 mt-1 shrink-0" />
                                     <div>
-                                        <div className="font-bold text-blue-400">NORMAL (×1.2)</div>
+                                        <div className="font-bold text-blue-400">NORMAL (×1.0)</div>
                                         <div className="text-sm text-blue-200/70">標準ルート。バランスが良い選択。</div>
                                     </div>
                                 </div>
                                 <div className="flex items-start gap-3 p-3 bg-red-900/20 border border-red-900/50 rounded-lg">
                                     <Skull className="w-5 h-5 text-red-400 mt-1 shrink-0" />
                                     <div>
-                                        <div className="font-bold text-red-500">RISKY (×1.5)</div>
+                                        <div className="font-bold text-red-500">RISKY (×1.3)</div>
                                         <div className="text-sm text-red-200/70">
                                             危険ルート。高得点ですが、AIの評価が低いと<span className="font-bold text-red-400">滑落</span>します。
                                             <br />
@@ -132,10 +139,9 @@ export default function HowToPage() {
                                     天候に合ったマウントを取るとボーナス（+20%）が発生します。
                                 </p>
                                 <div className="grid grid-cols-2 gap-2 text-xs">
-                                    <div className="bg-slate-800 p-2 rounded">☀️ 具体的な数値を入れる</div>
-                                    <div className="bg-slate-800 p-2 rounded">🌪 権威を笠に着る</div>
-                                    <div className="bg-slate-800 p-2 rounded">❄️ 皮肉を言う</div>
-                                    <div className="bg-slate-800 p-2 rounded">⚡ 誰かと比較する</div>
+                                    <div className="bg-slate-800 p-2 rounded text-white">☀️"晴天" 「数値」を含むと+20%</div>
+                                    <div className="bg-slate-800 p-2 rounded text-white">🌪"強風" 「比較」を含むと+20%</div>
+                                    <div className="bg-slate-800 p-2 rounded text-white">❄️"吹雪" 「皮肉」を含むと+20%</div>
                                 </div>
                             </div>
 
@@ -176,6 +182,7 @@ export default function HowToPage() {
                     </div>
                 </section>
 
+
                 {/* 5. Tips / Footer Link */}
                 <section className="text-center space-y-8 pt-8">
                     <div className="bg-blue-900/20 border border-blue-500/30 inline-block p-6 rounded-2xl text-left max-w-2xl mx-auto">
@@ -185,9 +192,9 @@ export default function HowToPage() {
                         </h3>
                         <ul className="list-disc list-inside text-slate-300 space-y-1 text-sm">
                             <li>AIは「具体的で」「鼻につく」表現を高く評価します。</li>
-                            <li>「年収」「学歴」「経験年数」などの数値は特に有効です（NUMERIC属性）。</li>
-                            <li>「普通は〜だよね？」「まだ〜してるの？」等の比較も強力です（COMPARISON属性）。</li>
-                            <li>RISKYルートは一発逆転のチャンスですが、滑落（2000m）のリスクを忘れずに。</li>
+                            <li>「年収」「学歴」「経験年数」などの数値は特に有効です。</li>
+                            <li>「普通は〜だよね？」「まだ〜してるの？」等の比較も強力です。</li>
+                            <li>RISKYルートは一発逆転のチャンスですが、滑落（確定2000m）のリスクを忘れずに。</li>
                         </ul>
                     </div>
 
@@ -200,9 +207,26 @@ export default function HowToPage() {
                             タイトルに戻る
                         </Link>
                     </div>
-                </section>
 
+                </section>
             </div>
+
+
+            {/* 🌄 山（ページ最下部・重なり版） */}
+            <div className="pointer-events-none mt-24 relative">
+
+                <div className="absolute bottom-0 w-full h-[80vh] bg-white/5
+                    [clip-path:polygon(0%_100%,8%_62%,18%_78%,28%_58%,38%_72%,50%_48%,62%_70%,74%_44%,86%_64%,100%_52%,100%_100%)]" />
+
+                <div className="absolute bottom-0 w-full h-[45vh] bg-white/10
+                    [clip-path:polygon(0%_100%,12%_55%,22%_70%,34%_42%,46%_60%,58%_34%,70%_52%,82%_26%,92%_46%,100%_38%,100%_100%)]" />
+
+                <div className="absolute bottom-0 w-full h-[30vh] bg-white/20
+                    [clip-path:polygon(0%_100%,18%_38%,34%_58%,50%_26%,66%_46%,82%_18%,100%_36%,100%_100%)]" />
+            </div>
+
+
+
         </main>
     );
 }
