@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect, useTransition, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { GameState, Round } from "@/types/game";
 import { PROMPTS } from "@/lib/prompts";
@@ -16,7 +16,9 @@ import { pickWeather, getWeather } from "@/lib/solo/weather";
 import { pickMission, evaluateMission, type Mission } from "@/lib/solo/missions";
 import { buildSoloSummary } from "@/lib/solo/summary";
 import { SoloGameSummary } from "@/components/SoloGameSummary";
+import { SoloInputArea } from "@/components/SoloInputArea";
 import { getLabelJa } from "@/lib/labels";
+import type { RouteId } from "@/lib/solo/routes";
 
 
 export default function SoloPage() {
@@ -86,32 +88,6 @@ export default function SoloPage() {
 
   // ミッション画面のデザインパターン（ランダム選択）
   const [missionTheme] = useState(() => Math.floor(Math.random() * 3) as 0 | 1 | 2);
-
-  // テキスト入力ハンドラをメモ化
-  const handleTextChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setText(e.target.value);
-  }, []);
-
-  // 天候に応じた背景グラデーションを取得
-  const getWeatherBackground = useMemo(() => {
-    if (!game?.weather) {
-      return "bg-gradient-to-b from-blue-200 via-white to-gray-100 dark:from-slate-900 dark:via-slate-950 dark:to-black";
-    }
-
-    switch (game.weather) {
-      case "SUNNY":
-        // 晴れ - 明るい青空
-        return "bg-gradient-to-b from-sky-300 via-blue-100 to-white dark:from-slate-900 dark:via-slate-950 dark:to-black";
-      case "WINDY":
-        // 風 - やや曇りがち
-        return "bg-gradient-to-b from-gray-300 via-gray-200 to-gray-100 dark:from-slate-700 dark:via-slate-800 dark:to-black";
-      case "BLIZZARD":
-        // 吹雪 - 白っぽい暗い雪空
-        return "bg-gradient-to-b from-slate-300 via-slate-200 to-blue-50 dark:from-slate-700 dark:via-slate-800 dark:to-black";
-      default:
-        return "bg-gradient-to-b from-blue-200 via-white to-gray-100 dark:from-slate-900 dark:via-slate-950 dark:to-black";
-    }
-  }, [game?.weather]);
 
   const submitRound = useCallback(async () => {
     if (!game) return;
@@ -326,6 +302,39 @@ export default function SoloPage() {
     setError(null);
     setShowingResult(false); // 結果表示モードをリセット
   }, []);
+
+  // ルート選択のコールバック
+  const handleRouteSelect = useCallback((routeId: RouteId) => {
+    setGame((prev) => {
+      if (!prev) return null;
+      const next = structuredClone(prev);
+      next.players[0].rounds[next.roundIndex].routeId = routeId;
+      return next;
+    });
+  }, []);
+
+  // テキスト入力のコールバック（最適化版）
+  const handleTextChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setText(e.target.value);
+  }, []);
+
+  // 天候に応じた背景グラデーションを取得（メモ化）
+  const getWeatherBackground = useMemo(() => {
+    if (!game?.weather) {
+      return "bg-gradient-to-b from-blue-200 via-white to-gray-100 dark:from-slate-900 dark:via-slate-950 dark:to-black";
+    }
+
+    switch (game.weather) {
+      case "SUNNY":
+        return "bg-gradient-to-b from-sky-300 via-blue-100 to-white dark:from-slate-900 dark:via-slate-950 dark:to-black";
+      case "WINDY":
+        return "bg-gradient-to-b from-gray-300 via-gray-200 to-gray-100 dark:from-slate-700 dark:via-slate-800 dark:to-black";
+      case "BLIZZARD":
+        return "bg-gradient-to-b from-slate-300 via-slate-200 to-blue-50 dark:from-slate-700 dark:via-slate-800 dark:to-black";
+      default:
+        return "bg-gradient-to-b from-blue-200 via-white to-gray-100 dark:from-slate-900 dark:via-slate-950 dark:to-black";
+    }
+  }, [game?.weather]);
 
   // gameがnullの場合は早期リターン
   if (!game) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
@@ -2030,99 +2039,17 @@ export default function SoloPage() {
 
                   {error && <div className="text-base md:text-lg text-red-600 bg-red-50 dark:bg-red-900/50 p-3 rounded mb-4">エラー: {error}</div>}
 
-                  {/* ルート選択 */}
-                  <div className="mb-6">
-                    <div className="text-sm md:text-base font-bold text-gray-500 mb-3 uppercase tracking-wide">Select Route</div>
-                    <div className="grid grid-cols-3 gap-4">
-                      {ROUTES.map((route) => {
-                        const isSelected = (currentRound.routeId || "NORMAL") === route.id;
-
-                        let activeClass = "";
-                        let borderClass = "border-gray-200 dark:border-zinc-700 opacity-70 hover:opacity-100";
-
-                        if (isSelected) {
-                          if (route.id === "SAFE") activeClass = "bg-green-100 border-green-500 text-green-900 dark:bg-green-900 dark:text-green-100";
-                          else if (route.id === "RISKY") activeClass = "bg-red-100 border-red-500 text-red-900 dark:bg-red-900 dark:text-red-100";
-                          else activeClass = "bg-yellow-100 border-yellow-500 text-yellow-900 dark:bg-yellow-900 dark:text-yellow-100";
-                          borderClass = "border-2 opacity-100 shadow-md transform scale-105";
-                        }
-
-                        return (
-                          <button
-                            key={route.id}
-                            onClick={() => {
-                              setGame((prev) => {
-                                if (!prev) return null;
-                                const next = structuredClone(prev);
-                                next.players[0].rounds[next.roundIndex].routeId = route.id;
-                                return next;
-                              });
-                            }}
-                            className={`relative py-4 md:py-5 px-3 rounded-lg border-2 transition-all duration-200 flex flex-col items-center justify-center gap-2 hover:scale-[1.02] ${borderClass} ${activeClass} ${isSelected ? "" : "hover:bg-gray-50 dark:hover:bg-zinc-800"}`}
-                          >
-                            <div className="text-3xl md:text-4xl">{route.emoji}</div>
-                            <div className="text-sm md:text-base font-bold">{route.label}</div>
-                            <div className="text-xs md:text-sm font-mono">x{route.multiplier}</div>
-
-                            {isSelected && (
-                              <div className="absolute -top-2 -right-2">
-                                <span className="flex h-5 w-5 relative">
-                                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                                  <span className="relative inline-flex rounded-full h-5 w-5 bg-blue-500"></span>
-                                </span>
-                              </div>
-                            )}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* 入力エリア */}
-                  <div className="space-y-4">
-                    <textarea
-                      className="w-full min-h-40 rounded-xl border-2 border-transparent bg-gray-50/50 dark:bg-black/50 p-5 text-xl md:text-2xl focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-black outline-none transition-all resize-y shadow-inner"
-                      placeholder="ここにマウント発言を入力... (例: 「まあ、俺なら3秒で終わるけどね」)"
-                      value={text}
-                      onChange={handleTextChange}
-                      disabled={showRoundCutin || loading}
-                    />
-
-                    <div className="flex gap-6">
-                      <button
-                        className="flex-1 group relative overflow-hidden rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 p-[2px] focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-transform hover:scale-[1.02]"
-                        disabled={!text.trim() || loading || showRoundCutin}
-                        onClick={submitRound}
-                      >
-                        <div className="relative h-full w-full rounded-[10px] bg-transparent transition-all group-hover:bg-white/10 px-8 py-4">
-                          <div className="flex items-center justify-center gap-3 text-white font-bold text-xl md:text-2xl">
-                            {loading ? (
-                              <>
-                                <svg className="animate-spin h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                                <span>判定中...</span>
-                              </>
-                            ) : (
-                              <>
-                                <span>マウントを取る!</span>
-                                <span className="text-2xl md:text-3xl">🏔️</span>
-                              </>
-                            )}
-                          </div>
-                        </div>
-                      </button>
-
-                      <button
-                        className="px-5 rounded-xl border-2 border-gray-200 dark:border-zinc-700 text-gray-500 hover:text-red-500 hover:border-red-200 hover:bg-red-50 hover:scale-[1.02] transition-all text-xl md:text-2xl flex-shrink-0"
-                        onClick={resetGame}
-                        title="最初からやり直す"
-                      >
-                        ↺
-                      </button>
-                    </div>
-                  </div>
+                  {/* 入力エリア - メモ化されたコンポーネント */}
+                  <SoloInputArea
+                    text={text}
+                    onTextChange={handleTextChange}
+                    onSubmit={submitRound}
+                    onReset={resetGame}
+                    loading={loading}
+                    disabled={showRoundCutin}
+                    selectedRoute={currentRound.routeId}
+                    onRouteSelect={handleRouteSelect}
+                  />
                 </div>
               </section>
             ) : (
