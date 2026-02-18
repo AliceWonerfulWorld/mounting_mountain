@@ -2150,7 +2150,7 @@ export default function SoloPage() {
                         </div>
 
                         {/* ボーナス表示 */}
-                        {lastResult.result.bonusAltitude && lastResult.result.bonusAltitude > 0 && (
+                        {(lastResult.result.bonusAltitude ?? 0) > 0 && (
                           <div className="flex items-center justify-center md:justify-start gap-3 text-base md:text-lg mt-2">
                             <span className="text-yellow-600 dark:text-yellow-400 font-bold flex items-center gap-2 animate-pulse">
                               <span className="text-xl">✨</span><span>+{lastResult.result.bonusAltitude}m Bonus!</span>
@@ -2326,9 +2326,9 @@ export default function SoloPage() {
                       <div className="font-black text-lg font-mono tracking-tight text-gray-900 dark:text-white">
                         {r.result?.altitude.toLocaleString()} m
                       </div>
-                      {r.result?.bonusAltitude && r.result.bonusAltitude > 0 && (
+                      {(r.result?.bonusAltitude ?? 0) > 0 && (
                         <div className="text-[10px] text-yellow-600 font-bold">
-                          (+{r.result.bonusAltitude})
+                          (+{r.result?.bonusAltitude})
                         </div>
                       )}
                     </div>
