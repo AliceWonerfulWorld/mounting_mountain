@@ -4,7 +4,6 @@ import Link from "next/link";
 import {
     Mountain,
     Brain,
-    TrendingUp,
     Trophy,
     Shield,
     Zap,

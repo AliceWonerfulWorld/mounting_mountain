@@ -16,7 +16,6 @@ export function MountainView({
   maxAltitude = 8848,
   size = 200,
   className,
-  animate = true,
 }: MountainViewProps) {
   // 0.0 ~ 1.0 に正規化 (最大値を超えたら1.0)
   const ratio = Math.min(Math.max(altitude / maxAltitude, 0), 1.0);
@@ -46,7 +45,7 @@ export function MountainView({
           d="M-20,100 L30,40 L80,100 Z"
           className="fill-stone-200 dark:fill-stone-800 opacity-50"
         />
-         <path
+        <path
           d="M40,100 L80,50 L120,100 Z"
           className="fill-stone-300 dark:fill-stone-700 opacity-50"
         />
@@ -71,15 +70,15 @@ export function MountainView({
             className="fill-white/90 animate-in fade-in duration-1000"
           />
         )}
-        
+
         {/* 8000m級以上で旗 */}
         {altitude >= 8000 && (
-            <text x="50" y={peakY - 5} textAnchor="middle" fontSize="10" className="animate-bounce">
-                🚩
-            </text>
+          <text x="50" y={peakY - 5} textAnchor="middle" fontSize="10" className="animate-bounce">
+            🚩
+          </text>
         )}
       </svg>
-      
+
       {/* 雲の演出 (ランダムな動き) */}
       <div className="absolute top-1/4 left-0 w-full h-1/2 pointer-events-none overflow-hidden opacity-30">
         <div className="absolute top-0 -left-10 text-2xl animate-[float_10s_linear_infinite]">☁️</div>

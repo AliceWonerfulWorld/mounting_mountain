@@ -62,7 +62,7 @@ export function computeFinalAltitude(input: ScoreInput): ScoreOutput {
         } else {
             // 保険なし、通常通り滑落
             return {
-                finalAltitude: 2000,
+                finalAltitude: 0,
                 didFall: true,
                 fallReason: "滑落！",
                 weatherApplied: false,

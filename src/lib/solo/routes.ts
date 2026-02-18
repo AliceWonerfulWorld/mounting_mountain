@@ -36,7 +36,7 @@ export const ROUTES: Route[] = [
         id: "RISKY",
         label: "危険ルート",
         multiplier: 1.3,
-        description: "50%の確率で滑落（標高2000m固定）。成功すれば高得点。8000m以上が狙える。",
+        description: "50%の確率で滑落（標高0m）。成功すれば高得点。8000m以上が狙える。",
         emoji: "⚡",
     },
 ];
