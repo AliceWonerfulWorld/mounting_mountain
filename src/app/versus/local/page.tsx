@@ -376,55 +376,206 @@ export default function VersusLocalPage() {
 
                         {isFinished ? (
                             // --- FINISHED SCREEN ---
-                            <div className="flex flex-col items-center justify-center h-full text-center space-y-8 animate-in fade-in zoom-in duration-500">
-                                <div>
-                                    <h2 className="text-4xl md:text-5xl font-black text-slate-800 dark:text-white mb-2">GAME SET!</h2>
-                                    <p className="text-slate-500 dark:text-slate-400">最終結果発表</p>
+                            <div className="flex flex-col items-center justify-center min-h-full py-8 space-y-6 animate-in fade-in zoom-in duration-500">
+                                {/* Title Section */}
+                                <div className="text-center space-y-2">
+                                    <motion.div
+                                        initial={{ scale: 0.5, opacity: 0 }}
+                                        animate={{ scale: 1, opacity: 1 }}
+                                        transition={{ duration: 0.5, type: "spring" }}
+                                    >
+                                        <h2 className="text-5xl md:text-6xl font-black bg-gradient-to-r from-blue-600 via-purple-600 to-red-600 bg-clip-text text-transparent mb-2 drop-shadow-lg">
+                                            GAME SET!
+                                        </h2>
+                                    </motion.div>
+                                    <p className="text-base text-slate-500 dark:text-slate-400 font-medium">最終結果発表</p>
                                 </div>
 
-                                <div className="flex items-end justify-center gap-8 w-full">
-                                    {/* P1 Result */}
-                                    <div className="text-center">
-                                        <div className="text-sm font-bold text-red-500 mb-2">Player 1</div>
-                                        <div className="text-4xl font-black text-slate-800 dark:text-slate-100">
-                                            {game.players[0].totalScore.toLocaleString()}m
-                                        </div>
-                                    </div>
-                                    <div className="text-2xl text-slate-300 dark:text-slate-600 font-light pb-2">vs</div>
-                                    {/* P2 Result */}
-                                    <div className="text-center">
-                                        <div className="text-sm font-bold text-blue-500 mb-2">Player 2</div>
-                                        <div className="text-4xl font-black text-slate-800 dark:text-slate-100">
-                                            {game.players[1].totalScore.toLocaleString()}m
+                                {/* Score Display */}
+                                <div className="w-full max-w-2xl">
+                                    <div className="relative">
+                                        {/* Background decoration */}
+                                        <div className="absolute inset-0 bg-gradient-to-r from-red-100 via-purple-100 to-blue-100 dark:from-red-950/20 dark:via-purple-950/20 dark:to-blue-950/20 rounded-3xl blur-2xl opacity-50"></div>
+                                        
+                                        <div className="relative grid grid-cols-2 gap-4 p-6 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-3xl border-2 border-slate-200 dark:border-slate-700 shadow-2xl">
+                                            {/* Player 1 */}
+                                            <div className={cn(
+                                                "p-6 rounded-2xl border-4 transition-all duration-500",
+                                                game.players[0].totalScore > game.players[1].totalScore
+                                                    ? "bg-gradient-to-br from-red-50 to-red-100 dark:from-red-950/40 dark:to-red-900/30 border-red-400 dark:border-red-600 shadow-lg shadow-red-200 dark:shadow-red-900/50 scale-[1.05]"
+                                                    : "bg-gradient-to-br from-red-50/50 to-red-100/50 dark:from-red-950/20 dark:to-red-900/10 border-red-200 dark:border-red-800/50"
+                                            )}>
+                                                <div className="space-y-2">
+                                                    <div className="text-xs font-bold text-red-600 dark:text-red-400 uppercase tracking-wider">Player 1</div>
+                                                    <div className="flex items-baseline gap-1">
+                                                        <span className="text-4xl md:text-5xl font-black text-red-600 dark:text-red-400">
+                                                            {game.players[0].totalScore.toLocaleString()}
+                                                        </span>
+                                                        <span className="text-xl text-slate-500 dark:text-slate-400">m</span>
+                                                    </div>
+                                                    {game.players[0].totalScore > game.players[1].totalScore && (
+                                                        <div className="flex items-center gap-1 text-yellow-600 dark:text-yellow-400 animate-pulse">
+                                                            <span className="text-2xl">👑</span>
+                                                            <span className="text-xs font-bold">WINNER</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            {/* Player 2 */}
+                                            <div className={cn(
+                                                "p-6 rounded-2xl border-4 transition-all duration-500",
+                                                game.players[1].totalScore > game.players[0].totalScore
+                                                    ? "bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/40 dark:to-blue-900/30 border-blue-400 dark:border-blue-600 shadow-lg shadow-blue-200 dark:shadow-blue-900/50 scale-[1.05]"
+                                                    : "bg-gradient-to-br from-blue-50/50 to-blue-100/50 dark:from-blue-950/20 dark:to-blue-900/10 border-blue-200 dark:border-blue-800/50"
+                                            )}>
+                                                <div className="space-y-2">
+                                                    <div className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">Player 2</div>
+                                                    <div className="flex items-baseline gap-1">
+                                                        <span className="text-4xl md:text-5xl font-black text-blue-600 dark:text-blue-400">
+                                                            {game.players[1].totalScore.toLocaleString()}
+                                                        </span>
+                                                        <span className="text-xl text-slate-500 dark:text-slate-400">m</span>
+                                                    </div>
+                                                    {game.players[1].totalScore > game.players[0].totalScore && (
+                                                        <div className="flex items-center gap-1 text-yellow-600 dark:text-yellow-400 animate-pulse">
+                                                            <span className="text-2xl">👑</span>
+                                                            <span className="text-xs font-bold">WINNER</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            {/* VS Badge in Center */}
+                                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-black text-sm shadow-xl border-4 border-white dark:border-slate-900">
+                                                VS
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div className="py-6">
+                                {/* Winner Announcement */}
+                                <div className="py-4">
                                     {game.players[0].totalScore > game.players[1].totalScore ? (
-                                        <div className="flex flex-col items-center animate-bounce">
-                                            <span className="text-6xl">🏆</span>
-                                            <span className="text-2xl font-black text-red-500 mt-2">Player 1 WINS!</span>
-                                        </div>
+                                        <motion.div
+                                            initial={{ scale: 0, rotate: -180 }}
+                                            animate={{ scale: 1, rotate: 0 }}
+                                            transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
+                                            className="flex flex-col items-center"
+                                        >
+                                            <div className="text-7xl mb-2 animate-bounce">🏆</div>
+                                            <div className="text-3xl font-black bg-gradient-to-r from-red-600 to-red-500 bg-clip-text text-transparent">
+                                                Player 1 WINS!
+                                            </div>
+                                        </motion.div>
                                     ) : game.players[1].totalScore > game.players[0].totalScore ? (
-                                        <div className="flex flex-col items-center animate-bounce">
-                                            <span className="text-6xl">🏆</span>
-                                            <span className="text-2xl font-black text-blue-500 mt-2">Player 2 WINS!</span>
-                                        </div>
+                                        <motion.div
+                                            initial={{ scale: 0, rotate: -180 }}
+                                            animate={{ scale: 1, rotate: 0 }}
+                                            transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
+                                            className="flex flex-col items-center"
+                                        >
+                                            <div className="text-7xl mb-2 animate-bounce">🏆</div>
+                                            <div className="text-3xl font-black bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent">
+                                                Player 2 WINS!
+                                            </div>
+                                        </motion.div>
                                     ) : (
-                                        <div className="flex flex-col items-center">
-                                            <span className="text-6xl">🤝</span>
-                                            <span className="text-2xl font-black text-slate-500 mt-2">DRAW</span>
-                                        </div>
+                                        <motion.div
+                                            initial={{ scale: 0 }}
+                                            animate={{ scale: 1 }}
+                                            transition={{ delay: 0.3, type: "spring" }}
+                                            className="flex flex-col items-center"
+                                        >
+                                            <div className="text-7xl mb-2">🤝</div>
+                                            <div className="text-3xl font-black bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
+                                                DRAW!
+                                            </div>
+                                        </motion.div>
                                     )}
                                 </div>
 
-                                <div className="flex flex-col w-full gap-3 max-w-sm">
-                                    <button onClick={resetGame} className="w-full py-4 bg-slate-900 text-white hover:bg-slate-800 rounded-xl font-bold shadow-lg transition-transform active:scale-95 flex items-center justify-center gap-2">
+                                {/* All Rounds Summary */}
+                                <div className="w-full max-w-lg">
+                                    <div className="bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800/50 dark:to-slate-900/50 rounded-2xl p-5 border border-slate-200 dark:border-slate-700 shadow-lg">
+                                        <h3 className="text-lg font-black text-slate-700 dark:text-slate-300 mb-4 text-center flex items-center justify-center gap-2">
+                                            <span>📊</span>
+                                            <span>全ラウンド結果</span>
+                                        </h3>
+                                        <div className="space-y-2.5">
+                                        {game.players[0].rounds.map((r1, idx) => {
+                                            const r2 = game.players[1].rounds[idx];
+                                            const p1Alt = r1?.result?.altitude || 0;
+                                            const p2Alt = r2?.result?.altitude || 0;
+                                            const p1Wins = p1Alt > p2Alt;
+                                            const p2Wins = p2Alt > p1Alt;
+                                            const isDraw = p1Alt === p2Alt;
+
+                                            return (
+                                                <motion.div 
+                                                    key={idx}
+                                                    initial={{ opacity: 0, y: 20 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    transition={{ delay: 0.5 + idx * 0.1 }}
+                                                    className="bg-white dark:bg-slate-800 rounded-xl p-3.5 border-2 border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow"
+                                                >
+                                                    <div className="flex items-center justify-center gap-2 mb-2.5">
+                                                        <div className="px-3 py-1 bg-gradient-to-r from-slate-600 to-slate-700 text-white text-xs font-black rounded-full">
+                                                            ROUND {idx + 1}
+                                                        </div>
+                                                    </div>
+                                                    <div className="grid grid-cols-2 gap-2.5">
+                                                        {/* P1 */}
+                                                        <div className={cn(
+                                                            "flex items-center justify-between rounded-xl px-3 py-2.5 border-2 transition-all",
+                                                            p1Wins 
+                                                                ? "bg-gradient-to-br from-red-100 to-red-200 dark:from-red-950/50 dark:to-red-900/40 border-red-400 dark:border-red-600 shadow-md" 
+                                                                : "bg-red-50/50 dark:bg-red-950/20 border-red-200 dark:border-red-900/50"
+                                                        )}>
+                                                            <div>
+                                                                <div className="text-[10px] font-bold text-red-600 dark:text-red-400 uppercase">P1</div>
+                                                                <div className="text-base font-black text-red-700 dark:text-red-300">{p1Alt.toLocaleString()}<span className="text-xs ml-0.5">m</span></div>
+                                                            </div>
+                                                            {p1Wins && <span className="text-xl">🏆</span>}
+                                                            {p2Wins && <span className="text-xs text-slate-400">—</span>}
+                                                            {isDraw && <span className="text-base">🤝</span>}
+                                                        </div>
+                                                        {/* P2 */}
+                                                        <div className={cn(
+                                                            "flex items-center justify-between rounded-xl px-3 py-2.5 border-2 transition-all",
+                                                            p2Wins 
+                                                                ? "bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-950/50 dark:to-blue-900/40 border-blue-400 dark:border-blue-600 shadow-md" 
+                                                                : "bg-blue-50/50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-900/50"
+                                                        )}>
+                                                            <div>
+                                                                <div className="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase">P2</div>
+                                                                <div className="text-base font-black text-blue-700 dark:text-blue-300">{p2Alt.toLocaleString()}<span className="text-xs ml-0.5">m</span></div>
+                                                            </div>
+                                                            {p2Wins && <span className="text-xl">🏆</span>}
+                                                            {p1Wins && <span className="text-xs text-slate-400">—</span>}
+                                                            {isDraw && <span className="text-base">🤝</span>}
+                                                        </div>
+                                                    </div>
+                                                </motion.div>
+                                            );
+                                        })}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Action Buttons */}
+                                <div className="flex flex-col w-full gap-3 max-w-md">
+                                    <button 
+                                        onClick={resetGame} 
+                                        className="w-full py-4 bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-700 hover:to-slate-800 text-white rounded-2xl font-bold shadow-xl transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-700"
+                                    >
                                         <RotateCcw className="w-5 h-5" />
-                                        再戦する
+                                        <span>再戦する</span>
                                     </button>
-                                    <Link href="/" className="w-full py-4 bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 rounded-xl font-bold transition-colors text-center">
+                                    <Link 
+                                        href="/" 
+                                        className="w-full py-4 bg-white hover:bg-slate-50 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-2xl font-bold transition-all text-center border-2 border-slate-200 dark:border-slate-700 shadow-md"
+                                    >
                                         タイトルに戻る
                                     </Link>
                                 </div>
