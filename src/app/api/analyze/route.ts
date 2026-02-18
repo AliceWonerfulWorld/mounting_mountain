@@ -14,9 +14,10 @@ const MAX_CONCURRENT = 1;
 
 export async function POST(req: Request) {
   try {
-    const { text, route = "NORMAL" } = (await req.json()) as {
+    const { text, route = "NORMAL", mode = "solo" } = (await req.json()) as {
       text: string;
       route?: RouteType;
+      mode?: "solo" | "versus";
     };
 
     if (!text || !text.trim()) {
@@ -36,7 +37,7 @@ export async function POST(req: Request) {
 
       inFlight++;
       try {
-        const rawResult = await analyzeWithGemini(text);
+        const rawResult = await analyzeWithGemini(text, mode);
         // バリデーションを通す（routeを渡す）
         const validated = validateAiOutput(rawResult, route);
         return NextResponse.json({ ...validated, source: "gemini" });

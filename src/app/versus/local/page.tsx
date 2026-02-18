@@ -122,7 +122,8 @@ export default function VersusLocalPage() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     text: text.trim(),
-                    route: game!.selectedRoute // 選択されたルートを使用
+                    route: game!.selectedRoute, // 選択されたルートを使用
+                    mode: "versus" // 辛辣モードを有効化
                 }),
             });
 
@@ -759,8 +760,10 @@ export default function VersusLocalPage() {
                                                 <span className="font-bold text-red-700 dark:text-red-300">Player 1</span>
                                             </div>
                                             <div className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
-                                                {/* TODO: 将来的にAIコメントをここに表示 */}
-                                                <span className="italic opacity-70">コメント機能は準備中です...</span>
+                                                <span className="font-bold text-slate-500 dark:text-slate-400">AIのツッコミ:</span>{" "}
+                                                <span className="italic">
+                                                    {game.players[0].rounds[game.roundIndex]?.result?.commentary || "..."}
+                                                </span>
                                             </div>
                                         </div>
 
@@ -773,8 +776,10 @@ export default function VersusLocalPage() {
                                                 <span className="font-bold text-blue-700 dark:text-blue-300">Player 2</span>
                                             </div>
                                             <div className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
-                                                {/* TODO: 将来的にAIコメントをここに表示 */}
-                                                <span className="italic opacity-70">コメント機能は準備中です...</span>
+                                                <span className="font-bold text-slate-500 dark:text-slate-400">AIのツッコミ:</span>{" "}
+                                                <span className="italic">
+                                                    {game.players[1].rounds[game.roundIndex]?.result?.commentary || "..."}
+                                                </span>
                                             </div>
                                         </div>
                                     </div>

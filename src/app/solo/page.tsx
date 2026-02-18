@@ -2149,17 +2149,14 @@ export default function SoloPage() {
                           <span className="text-2xl md:text-3xl font-bold text-gray-400">m</span>
                         </div>
 
-                        {/* スコア・ボーナス表示 */}
-                        <div className="flex items-center justify-center md:justify-start gap-3 text-base md:text-lg mt-2">
-                          <span className="bg-gray-100 dark:bg-zinc-800 px-3 py-2 rounded text-gray-600 dark:text-gray-300 font-mono">
-                            Score: {lastResult.result.mountScore.toFixed(2)}
-                          </span>
-                          {lastResult.result.bonusAltitude && lastResult.result.bonusAltitude > 0 && (
+                        {/* ボーナス表示 */}
+                        {(lastResult.result.bonusAltitude ?? 0) > 0 && (
+                          <div className="flex items-center justify-center md:justify-start gap-3 text-base md:text-lg mt-2">
                             <span className="text-yellow-600 dark:text-yellow-400 font-bold flex items-center gap-2 animate-pulse">
                               <span className="text-xl">✨</span><span>+{lastResult.result.bonusAltitude}m Bonus!</span>
                             </span>
-                          )}
-                        </div>
+                          </div>
+                        )}
                       </div>
 
                       <div className="h-px bg-gray-200 dark:bg-zinc-700 w-full" />
@@ -2329,9 +2326,9 @@ export default function SoloPage() {
                       <div className="font-black text-lg font-mono tracking-tight text-gray-900 dark:text-white">
                         {r.result?.altitude.toLocaleString()} m
                       </div>
-                      {r.result?.bonusAltitude && r.result.bonusAltitude > 0 && (
+                      {(r.result?.bonusAltitude ?? 0) > 0 && (
                         <div className="text-[10px] text-yellow-600 font-bold">
-                          (+{r.result.bonusAltitude})
+                          (+{r.result?.bonusAltitude})
                         </div>
                       )}
                     </div>
