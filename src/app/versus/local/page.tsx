@@ -535,7 +535,7 @@ export default function VersusLocalPage() {
                                     {/* Round Winner Banner */}
                                     <div className="w-full bg-gradient-to-r from-purple-500 to-indigo-600 text-white p-5 rounded-2xl shadow-lg">
                                         <div className="text-center">
-                                            {game.roundWinner === null ? (
+                                            {game.roundWinner == null ? (
                                                 <>
                                                     <div className="text-3xl mb-2">🤝</div>
                                                     <div className="font-bold text-2xl">DRAW</div>
