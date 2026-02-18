@@ -87,14 +87,37 @@ export default function SoloPage() {
   // ミッション画面のデザインパターン（ランダム選択）
   const [missionTheme] = useState(() => Math.floor(Math.random() * 3) as 0 | 1 | 2);
 
-  if (!game) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  // テキスト入力ハンドラをメモ化
+  const handleTextChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setText(e.target.value);
+  }, []);
 
-  const currentRound = game.players[0].rounds[game.roundIndex];
+  // 天候に応じた背景グラデーションを取得
+  const getWeatherBackground = useMemo(() => {
+    if (!game?.weather) {
+      return "bg-gradient-to-b from-blue-200 via-white to-gray-100 dark:from-slate-900 dark:via-slate-950 dark:to-black";
+    }
 
-  const isFinished = game.status === "finished";
-
+    switch (game.weather) {
+      case "SUNNY":
+        // 晴れ - 明るい青空
+        return "bg-gradient-to-b from-sky-300 via-blue-100 to-white dark:from-slate-900 dark:via-slate-950 dark:to-black";
+      case "WINDY":
+        // 風 - やや曇りがち
+        return "bg-gradient-to-b from-gray-300 via-gray-200 to-gray-100 dark:from-slate-700 dark:via-slate-800 dark:to-black";
+      case "BLIZZARD":
+        // 吹雪 - 白っぽい暗い雪空
+        return "bg-gradient-to-b from-slate-300 via-slate-200 to-blue-50 dark:from-slate-700 dark:via-slate-800 dark:to-black";
+      default:
+        return "bg-gradient-to-b from-blue-200 via-white to-gray-100 dark:from-slate-900 dark:via-slate-950 dark:to-black";
+    }
+  }, [game?.weather]);
 
   const submitRound = useCallback(async () => {
+    if (!game) return;
+    const currentRound = game.players[0].rounds[game.roundIndex];
+    const isFinished = game.status === "finished";
+    
     if (!text.trim() || isFinished || loading) return;
 
     setLoading(true);
@@ -236,7 +259,7 @@ export default function SoloPage() {
     } finally {
       setLoading(false);
     }
-  }, [text, isFinished, loading, currentRound, game?.weather, game?.insurance]);
+  }, [game, text, loading]);
 
   const proceedToNextRound = useCallback(() => {
     setGame((prev) => {
@@ -294,7 +317,7 @@ export default function SoloPage() {
       default:
         return '';
     }
-  }, [game]);
+  }, []);
 
   const resetGame = useCallback(() => {
     setGame(initializeSoloGameState());
@@ -304,31 +327,12 @@ export default function SoloPage() {
     setShowingResult(false); // 結果表示モードをリセット
   }, []);
 
-  // テキスト入力ハンドラをメモ化
-  const handleTextChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setText(e.target.value);
-  }, []);
+  // gameがnullの場合は早期リターン
+  if (!game) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
 
-  // 天候に応じた背景グラデーションを取得
-  const getWeatherBackground = useMemo(() => {
-    if (!game.weather) {
-      return "bg-gradient-to-b from-blue-200 via-white to-gray-100 dark:from-slate-900 dark:via-slate-950 dark:to-black";
-    }
-
-    switch (game.weather) {
-      case "SUNNY":
-        // 晴れ - 明るい青空
-        return "bg-gradient-to-b from-sky-300 via-blue-100 to-white dark:from-slate-900 dark:via-slate-950 dark:to-black";
-      case "WINDY":
-        // 風 - やや曇りがち
-        return "bg-gradient-to-b from-gray-300 via-gray-200 to-gray-100 dark:from-slate-700 dark:via-slate-800 dark:to-black";
-      case "BLIZZARD":
-        // 吹雪 - 白っぽい暗い雪空
-        return "bg-gradient-to-b from-slate-300 via-slate-200 to-blue-50 dark:from-slate-700 dark:via-slate-800 dark:to-black";
-      default:
-        return "bg-gradient-to-b from-blue-200 via-white to-gray-100 dark:from-slate-900 dark:via-slate-950 dark:to-black";
-    }
-  }, [game?.weather]);
+  // gameに依存する値を計算
+  const currentRound = game.players[0].rounds[game.roundIndex];
+  const isFinished = game.status === "finished";
 
   return (
     <main className="min-h-screen relative overflow-x-hidden text-gray-800 dark:text-gray-200 font-sans">
