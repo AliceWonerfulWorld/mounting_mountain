@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import clsx from "clsx";
+import { Home } from "lucide-react";
 import { useEffect, useState } from "react";
 import { ACHIEVEMENTS } from "@/lib/achievements";
 import { loadUnlocked } from "@/lib/achievementStore";
@@ -146,12 +147,17 @@ export default function AchievementsPage() {
                     })}
                 </section>
 
-                <Link
-                    href="/"
-                    className="block w-full py-3 text-center rounded-lg bg-white/90 hover:bg-white transition font-bold shadow"
-                >
-                    タイトルに戻る
-                </Link>
+                <div className="flex justify-center">
+                    <Link
+                        href="/"
+                        className="inline-flex items-center gap-2 bg-white text-slate-900 px-8 py-4 rounded-full font-bold text-lg hover:bg-blue-50 transition-colors shadow-[0_0_20px_rgba(255,255,255,0.3)]"
+                    >
+                        <Home className="w-5 h-5" />
+                        タイトルに戻る
+                    </Link>
+                </div>
+
+
             </div>
         </main>
     );
