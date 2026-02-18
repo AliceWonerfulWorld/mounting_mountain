@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { GameState, Round } from "@/types/game";
 import { PROMPTS } from "@/lib/prompts";
-import { MountainView } from "@/components/MountainView";
+import { DetailedMountain } from "@/components/DetailedMountain";
 import { pickN } from "@/lib/random";
 import { createRounds } from "@/lib/game";
 import { updateStats } from "@/lib/achievementStore";
@@ -16,7 +16,9 @@ import { pickWeather, getWeather } from "@/lib/solo/weather";
 import { pickMission, evaluateMission, type Mission } from "@/lib/solo/missions";
 import { buildSoloSummary } from "@/lib/solo/summary";
 import { SoloGameSummary } from "@/components/SoloGameSummary";
+import { SoloInputArea } from "@/components/SoloInputArea";
 import { getLabelJa } from "@/lib/labels";
+import type { RouteId } from "@/lib/solo/routes";
 
 
 export default function SoloPage() {
@@ -87,14 +89,11 @@ export default function SoloPage() {
   // ミッション画面のデザインパターン（ランダム選択）
   const [missionTheme] = useState(() => Math.floor(Math.random() * 3) as 0 | 1 | 2);
 
-  if (!game) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
-
-  const currentRound = game.players[0].rounds[game.roundIndex];
-
-  const isFinished = game.status === "finished";
-
-
-  async function submitRound() {
+  const submitRound = useCallback(async () => {
+    if (!game) return;
+    const currentRound = game.players[0].rounds[game.roundIndex];
+    const isFinished = game.status === "finished";
+    
     if (!text.trim() || isFinished || loading) return;
 
     setLoading(true);
@@ -236,9 +235,9 @@ export default function SoloPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [game, text, loading]);
 
-  function proceedToNextRound() {
+  const proceedToNextRound = useCallback(() => {
     setGame((prev) => {
       if (!prev) return null;
       const next = structuredClone(prev);
@@ -269,9 +268,9 @@ export default function SoloPage() {
     });
 
     setShowingResult(false);
-  }
+  }, []);
 
-  function startGame() {
+  const startGame = useCallback(() => {
     setShowMissionBriefing(false);
 
     // Round 1のカットインを表示
@@ -279,9 +278,9 @@ export default function SoloPage() {
     setCutinTheme(Math.floor(Math.random() * 3) as 0 | 1 | 2);
     setShowRoundCutin(true);
     setTimeout(() => setShowRoundCutin(false), 2300);
-  }
+  }, []);
 
-  function getMissionConditionText(mission: Mission | undefined): string {
+  const getMissionConditionText = useCallback((mission: Mission | undefined): string => {
     if (!mission) return '';
 
     switch (mission.id) {
@@ -294,36 +293,55 @@ export default function SoloPage() {
       default:
         return '';
     }
-  }
+  }, []);
 
-  function resetGame() {
+  const resetGame = useCallback(() => {
     setGame(initializeSoloGameState());
     setText("");
     setLastResult(null);
     setError(null);
     setShowingResult(false); // 結果表示モードをリセット
-  }
+  }, []);
 
-  // 天候に応じた背景グラデーションを取得
-  const getWeatherBackground = () => {
-    if (!game.weather) {
+  // ルート選択のコールバック
+  const handleRouteSelect = useCallback((routeId: RouteId) => {
+    setGame((prev) => {
+      if (!prev) return null;
+      const next = structuredClone(prev);
+      next.players[0].rounds[next.roundIndex].routeId = routeId;
+      return next;
+    });
+  }, []);
+
+  // テキスト入力のコールバック（最適化版）
+  const handleTextChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setText(e.target.value);
+  }, []);
+
+  // 天候に応じた背景グラデーションを取得（メモ化）
+  const getWeatherBackground = useMemo(() => {
+    if (!game?.weather) {
       return "bg-gradient-to-b from-blue-200 via-white to-gray-100 dark:from-slate-900 dark:via-slate-950 dark:to-black";
     }
 
     switch (game.weather) {
       case "SUNNY":
-        // 晴れ - 明るい青空
         return "bg-gradient-to-b from-sky-300 via-blue-100 to-white dark:from-slate-900 dark:via-slate-950 dark:to-black";
       case "WINDY":
-        // 風 - やや曇りがち
         return "bg-gradient-to-b from-gray-300 via-gray-200 to-gray-100 dark:from-slate-700 dark:via-slate-800 dark:to-black";
       case "BLIZZARD":
-        // 吹雪 - 白っぽい暗い雪空
         return "bg-gradient-to-b from-slate-300 via-slate-200 to-blue-50 dark:from-slate-700 dark:via-slate-800 dark:to-black";
       default:
         return "bg-gradient-to-b from-blue-200 via-white to-gray-100 dark:from-slate-900 dark:via-slate-950 dark:to-black";
     }
-  };
+  }, [game?.weather]);
+
+  // gameがnullの場合は早期リターン
+  if (!game) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+
+  // gameに依存する値を計算
+  const currentRound = game.players[0].rounds[game.roundIndex];
+  const isFinished = game.status === "finished";
 
   return (
     <main className="min-h-screen relative overflow-x-hidden text-gray-800 dark:text-gray-200 font-sans">
@@ -1838,7 +1856,7 @@ export default function SoloPage() {
       </AnimatePresence>
 
       {/* 天候に応じた背景 */}
-      <div className={`fixed inset-0 ${getWeatherBackground()} -z-20 transition-colors duration-1000`} />
+      <div className={`fixed inset-0 ${getWeatherBackground} -z-20 transition-colors duration-1000`} />
 
       {/* 吹雪エフェクト */}
       {game.weather === "BLIZZARD" && (
@@ -2021,99 +2039,17 @@ export default function SoloPage() {
 
                   {error && <div className="text-base md:text-lg text-red-600 bg-red-50 dark:bg-red-900/50 p-3 rounded mb-4">エラー: {error}</div>}
 
-                  {/* ルート選択 */}
-                  <div className="mb-6">
-                    <div className="text-sm md:text-base font-bold text-gray-500 mb-3 uppercase tracking-wide">Select Route</div>
-                    <div className="grid grid-cols-3 gap-4">
-                      {ROUTES.map((route) => {
-                        const isSelected = (currentRound.routeId || "NORMAL") === route.id;
-
-                        let activeClass = "";
-                        let borderClass = "border-gray-200 dark:border-zinc-700 opacity-70 hover:opacity-100";
-
-                        if (isSelected) {
-                          if (route.id === "SAFE") activeClass = "bg-green-100 border-green-500 text-green-900 dark:bg-green-900 dark:text-green-100";
-                          else if (route.id === "RISKY") activeClass = "bg-red-100 border-red-500 text-red-900 dark:bg-red-900 dark:text-red-100";
-                          else activeClass = "bg-yellow-100 border-yellow-500 text-yellow-900 dark:bg-yellow-900 dark:text-yellow-100";
-                          borderClass = "border-2 opacity-100 shadow-md transform scale-105";
-                        }
-
-                        return (
-                          <button
-                            key={route.id}
-                            onClick={() => {
-                              setGame((prev) => {
-                                if (!prev) return null;
-                                const next = structuredClone(prev);
-                                next.players[0].rounds[next.roundIndex].routeId = route.id;
-                                return next;
-                              });
-                            }}
-                            className={`relative py-4 md:py-5 px-3 rounded-lg border-2 transition-all duration-200 flex flex-col items-center justify-center gap-2 hover:scale-[1.02] ${borderClass} ${activeClass} ${isSelected ? "" : "hover:bg-gray-50 dark:hover:bg-zinc-800"}`}
-                          >
-                            <div className="text-3xl md:text-4xl">{route.emoji}</div>
-                            <div className="text-sm md:text-base font-bold">{route.label}</div>
-                            <div className="text-xs md:text-sm font-mono">x{route.multiplier}</div>
-
-                            {isSelected && (
-                              <div className="absolute -top-2 -right-2">
-                                <span className="flex h-5 w-5 relative">
-                                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                                  <span className="relative inline-flex rounded-full h-5 w-5 bg-blue-500"></span>
-                                </span>
-                              </div>
-                            )}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* 入力エリア */}
-                  <div className="space-y-4">
-                    <textarea
-                      className="w-full min-h-40 rounded-xl border-2 border-transparent bg-gray-50/50 dark:bg-black/50 p-5 text-xl md:text-2xl focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-black outline-none transition-all resize-y shadow-inner"
-                      placeholder="ここにマウント発言を入力... (例: 「まあ、俺なら3秒で終わるけどね」)"
-                      value={text}
-                      onChange={(e) => setText(e.target.value)}
-                      disabled={showRoundCutin || loading}
-                    />
-
-                    <div className="flex gap-6">
-                      <button
-                        className="flex-1 group relative overflow-hidden rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 p-[2px] focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-transform hover:scale-[1.02]"
-                        disabled={!text.trim() || loading || showRoundCutin}
-                        onClick={submitRound}
-                      >
-                        <div className="relative h-full w-full rounded-[10px] bg-transparent transition-all group-hover:bg-white/10 px-8 py-4">
-                          <div className="flex items-center justify-center gap-3 text-white font-bold text-xl md:text-2xl">
-                            {loading ? (
-                              <>
-                                <svg className="animate-spin h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                                <span>判定中...</span>
-                              </>
-                            ) : (
-                              <>
-                                <span>マウントを取る!</span>
-                                <span className="text-2xl md:text-3xl">🏔️</span>
-                              </>
-                            )}
-                          </div>
-                        </div>
-                      </button>
-
-                      <button
-                        className="px-5 rounded-xl border-2 border-gray-200 dark:border-zinc-700 text-gray-500 hover:text-red-500 hover:border-red-200 hover:bg-red-50 hover:scale-[1.02] transition-all text-xl md:text-2xl flex-shrink-0"
-                        onClick={resetGame}
-                        title="最初からやり直す"
-                      >
-                        ↺
-                      </button>
-                    </div>
-                  </div>
+                  {/* 入力エリア - メモ化されたコンポーネント */}
+                  <SoloInputArea
+                    text={text}
+                    onTextChange={handleTextChange}
+                    onSubmit={submitRound}
+                    onReset={resetGame}
+                    loading={loading}
+                    disabled={showRoundCutin}
+                    selectedRoute={currentRound.routeId}
+                    onRouteSelect={handleRouteSelect}
+                  />
                 </div>
               </section>
             ) : (
@@ -2134,7 +2070,7 @@ export default function SoloPage() {
                     {/* 左側: マウンテンビュー */}
                     <div className="flex-shrink-0 relative group">
                       <div className="absolute inset-0 bg-blue-500/20 blur-3xl rounded-full transform scale-75 group-hover:scale-110 transition-transform duration-700"></div>
-                      <MountainView altitude={lastResult.result.altitude} size={320} />
+                      <DetailedMountain altitude={lastResult.result.altitude} size={320} />
                     </div>
 
                     {/* 右側: 情報エリア */}
@@ -2272,24 +2208,266 @@ export default function SoloPage() {
             )}
           </>
         ) : (
-          <section className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-xl border-2 border-yellow-400 p-6 shadow-xl text-center space-y-6 animate-in zoom-in-95 duration-500">
-            <div className="text-4xl font-black mb-2 flex justify-center gap-2">
-              <span>🎉</span>
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-orange-500">
-                FINISH!
-              </span>
-              <span>🎉</span>
+          <motion.section 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="space-y-6"
+          >
+            {/* ヘッダー - 完走おめでとう */}
+            <div className="bg-gradient-to-br from-yellow-400 via-orange-400 to-red-400 rounded-2xl p-8 shadow-2xl text-center relative overflow-hidden">
+              {/* 背景装飾 */}
+              <div className="absolute inset-0 opacity-20">
+                {[...Array(20)].map((_, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ y: -20, opacity: 0 }}
+                    animate={{ 
+                      y: [null, 100],
+                      opacity: [0, 1, 0]
+                    }}
+                    transition={{
+                      duration: 2 + Math.random() * 2,
+                      delay: Math.random() * 2,
+                      repeat: Infinity,
+                      repeatDelay: Math.random() * 3
+                    }}
+                    className="absolute text-4xl"
+                    style={{
+                      left: `${Math.random() * 100}%`,
+                      top: `${Math.random() * 50}%`
+                    }}
+                  >
+                    ⭐
+                  </motion.div>
+                ))}
+              </div>
+
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
+                className="relative z-10"
+              >
+                <div className="text-6xl md:text-7xl font-black text-white mb-4 drop-shadow-2xl">
+                  SUMMIT!
+                </div>
+                <div className="text-2xl md:text-3xl font-bold text-white/90 mb-2">
+                  全{game.players[0].rounds.length}ラウンド 完走！
+                </div>
+                <div className="text-lg text-white/80">
+                  Total: <span className="font-black text-3xl">{game.players[0].totalScore.toLocaleString()}</span>m
+                </div>
+              </motion.div>
             </div>
 
-            <SoloGameSummary summary={buildSoloSummary(game)} onReset={resetGame} />
+            {/* ミッション結果 */}
+            {(() => {
+              const summary = buildSoloSummary(game);
+              return (
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.4 }}
+                  className={`rounded-2xl p-6 border-2 shadow-lg ${
+                    summary.mission.cleared
+                      ? 'bg-gradient-to-br from-green-50 to-emerald-50 border-green-400 dark:from-green-900/30 dark:to-emerald-900/30 dark:border-green-600'
+                      : 'bg-gradient-to-br from-gray-50 to-slate-50 border-gray-300 dark:from-gray-800/50 dark:to-slate-800/50 dark:border-gray-600'
+                  }`}
+                >
+                  <div className="flex items-center gap-3 mb-4">
+                    <span className="text-5xl">{summary.mission.cleared ? '🎯' : '😔'}</span>
+                    <div>
+                      <div className={`text-2xl font-black ${
+                        summary.mission.cleared 
+                          ? 'text-green-700 dark:text-green-300' 
+                          : 'text-gray-700 dark:text-gray-300'
+                      }`}>
+                        {summary.mission.cleared ? 'MISSION CLEAR!' : 'MISSION FAILED'}
+                      </div>
+                      <div className="text-sm font-bold text-gray-600 dark:text-gray-400">
+                        {summary.mission.title}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-white/50 dark:bg-black/20 rounded-lg p-4 space-y-2">
+                    <div className="text-sm text-gray-700 dark:text-gray-300">
+                      {summary.mission.description}
+                    </div>
+                    <div className="text-lg font-mono font-bold text-gray-900 dark:text-white">
+                      {summary.mission.progressText}
+                    </div>
+                  </div>
 
-            <Link
-              href="/"
-              className="block w-full py-4 text-center rounded-xl bg-gray-900 text-white font-bold hover:bg-gray-700 hover:scale-105 transition-all shadow-lg"
+                  {/* 星評価 */}
+                  <div className="mt-4 text-center">
+                    <div className="text-5xl mb-2">
+                      {"★".repeat(summary.stars)}{"☆".repeat(3 - summary.stars)}
+                    </div>
+                    <div className="text-lg font-bold text-gray-700 dark:text-gray-300">
+                      {summary.stars === 3 ? "完璧！" : summary.stars === 2 ? "惜しい！" : "次回に期待！"}
+                    </div>
+                  </div>
+                </motion.div>
+              );
+            })()}
+
+            {/* 各ラウンドの結果 */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-2xl p-6 shadow-lg"
             >
-              タイトルに戻る
-            </Link>
-          </section>
+              <div className="text-2xl font-black mb-6 text-center text-gray-800 dark:text-gray-100">
+                📊 ラウンド別結果
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-3">
+                {game.players[0].rounds.map((round, idx) => (
+                  <motion.div
+                    key={round.id}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.6 + idx * 0.1 }}
+                    className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl p-4 border-2 border-gray-200 dark:border-gray-700 shadow-md hover:shadow-xl transition-shadow"
+                  >
+                    <div className="text-center mb-3">
+                      <div className="text-xs font-bold text-gray-500 mb-1">ROUND {idx + 1}</div>
+                      <div className="flex justify-center mb-3">
+                        <DetailedMountain altitude={round.result?.altitude || 0} size={120} animate={false} />
+                      </div>
+                      <div className="text-3xl font-black text-gray-900 dark:text-white">
+                        {round.result?.altitude.toLocaleString() || 0}<span className="text-lg text-gray-500">m</span>
+                      </div>
+                    </div>
+                    
+                    {round.routeId && (
+                      <div className="flex justify-center mb-2">
+                        <span className="text-xs px-2 py-1 rounded-full bg-gray-200 dark:bg-gray-700 font-bold">
+                          {getRoute(round.routeId).emoji} {getRoute(round.routeId).label}
+                        </span>
+                      </div>
+                    )}
+
+                    {round.result?.didFall && (
+                      <div className="text-center">
+                        <span className="text-xs px-2 py-1 rounded bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300 font-bold">
+                          ⚠️ 滑落
+                        </span>
+                      </div>
+                    )}
+
+                    {round.result?.bonusAltitude && round.result.bonusAltitude > 0 && (
+                      <div className="text-center mt-2">
+                        <span className="text-xs px-2 py-1 rounded bg-yellow-100 dark:bg-yellow-900/50 text-yellow-700 dark:text-yellow-300 font-bold">
+                          ✨ +{round.result.bonusAltitude}m
+                        </span>
+                      </div>
+                    )}
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+
+            {/* 統計情報 */}
+            {(() => {
+              const summary = buildSoloSummary(game);
+              return (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.8 }}
+                  className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-2xl p-6 shadow-lg"
+                >
+                  <div className="text-xl font-black mb-4 text-gray-800 dark:text-gray-100">
+                    📈 統計データ
+                  </div>
+
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                    <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-xl">
+                      <div className="text-xs text-gray-600 dark:text-gray-400 mb-1">合計標高</div>
+                      <div className="text-2xl font-black text-blue-700 dark:text-blue-300">
+                        {summary.score.total.toLocaleString()}
+                      </div>
+                      <div className="text-xs text-gray-500">m</div>
+                    </div>
+                    <div className="text-center p-4 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl">
+                      <div className="text-xs text-gray-600 dark:text-gray-400 mb-1">最高標高</div>
+                      <div className="text-2xl font-black text-purple-700 dark:text-purple-300">
+                        {summary.score.max.toLocaleString()}
+                      </div>
+                      <div className="text-xs text-gray-500">m</div>
+                    </div>
+                    <div className="text-center p-4 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl">
+                      <div className="text-xs text-gray-600 dark:text-gray-400 mb-1">平均標高</div>
+                      <div className="text-2xl font-black text-green-700 dark:text-green-300">
+                        {summary.score.avg.toLocaleString()}
+                      </div>
+                      <div className="text-xs text-gray-500">m</div>
+                    </div>
+                    <div className="text-center p-4 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-xl">
+                      <div className="text-xs text-gray-600 dark:text-gray-400 mb-1">天候</div>
+                      <div className="text-3xl">
+                        {summary.weather.emoji}
+                      </div>
+                      <div className="text-xs font-bold text-gray-700 dark:text-gray-300">
+                        {summary.weather.label}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* ルート統計 */}
+                  <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4">
+                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3">ルート選択</div>
+                    <div className="flex gap-2 flex-wrap">
+                      <span className="px-3 py-2 bg-blue-100 dark:bg-blue-900/50 rounded-lg text-sm font-bold text-blue-800 dark:text-blue-200">
+                        🛡️ SAFE: {summary.routes.SAFE}回
+                      </span>
+                      <span className="px-3 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg text-sm font-bold text-gray-800 dark:text-gray-200">
+                        ⛰️ NORMAL: {summary.routes.NORMAL}回
+                      </span>
+                      <span className="px-3 py-2 bg-red-100 dark:bg-red-900/50 rounded-lg text-sm font-bold text-red-800 dark:text-red-200">
+                        🔥 RISKY: {summary.routes.RISKY}回
+                      </span>
+                    </div>
+                    
+                    {summary.falls > 0 && (
+                      <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                        <span className="text-sm text-red-600 dark:text-red-400 font-bold">
+                          ⚠️ 滑落: {summary.falls}回
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
+              );
+            })()}
+
+            {/* アクションボタン */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.9 }}
+              className="grid gap-4 md:grid-cols-2"
+            >
+              <button
+                onClick={resetGame}
+                className="py-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-lg hover:from-blue-700 hover:to-indigo-700 hover:scale-[1.02] transition-all shadow-lg flex items-center justify-center gap-2"
+              >
+                <span>🔄</span>
+                <span>もう一度挑戦する</span>
+              </button>
+
+              <Link
+                href="/"
+                className="py-4 rounded-xl bg-gradient-to-r from-gray-700 to-gray-900 text-white font-bold text-lg hover:from-gray-800 hover:to-black hover:scale-[1.02] transition-all shadow-lg flex items-center justify-center gap-2"
+              >
+                <span>🏠</span>
+                <span>タイトルに戻る</span>
+              </Link>
+            </motion.div>
+          </motion.section>
         )}
 
 
@@ -2339,7 +2517,7 @@ export default function SoloPage() {
                   </div>
 
                   <div className="absolute top-2 right-2 opacity-5 pointer-events-none group-hover:opacity-10 transition-opacity">
-                    <MountainView altitude={r.result?.altitude || 0} size={50} />
+                    <DetailedMountain altitude={r.result?.altitude || 0} size={50} animate={false} />
                   </div>
                 </div>
               ))}
