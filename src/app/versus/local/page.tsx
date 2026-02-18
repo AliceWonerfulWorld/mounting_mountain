@@ -626,24 +626,6 @@ export default function VersusLocalPage() {
                                                 <span className="italic opacity-70">コメント機能は準備中です...</span>
                                             </div>
                                         </div>
-
-                                        {/* Winner Indicator (smaller, less prominent) */}
-                                        {game.roundWinner != null && (
-                                            <div className="text-center py-2">
-                                                <span className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-100 to-yellow-100 dark:from-amber-900/30 dark:to-yellow-900/30 border border-amber-300 dark:border-amber-700 rounded-full text-sm font-bold text-amber-800 dark:text-amber-300">
-                                                    <span>🏆</span>
-                                                    <span>Player {game.roundWinner + 1} が勝利 (+1000m)</span>
-                                                </span>
-                                            </div>
-                                        )}
-                                        {game.roundWinner == null && (
-                                            <div className="text-center py-2">
-                                                <span className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 border border-slate-300 dark:border-slate-600 rounded-full text-sm font-bold text-slate-700 dark:text-slate-300">
-                                                    <span>🤝</span>
-                                                    <span>引き分け</span>
-                                                </span>
-                                            </div>
-                                        )}
                                     </div>
                                 </div>
 
