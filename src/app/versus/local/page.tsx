@@ -449,6 +449,30 @@ export default function VersusLocalPage() {
                                             return (
                                                 <div className="bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/10 border-2 border-red-200 dark:border-red-800 rounded-2xl p-4 space-y-3">
                                                     <div className="text-center">
+                                                        {/* WIN/LOSE/DRAW Badge */}
+                                                        {game.roundWinner === 0 ? (
+                                                            <div className="mb-3 inline-block">
+                                                                <div className="relative">
+                                                                    <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 to-amber-500 blur-md opacity-50"></div>
+                                                                    <div className="relative px-6 py-2 bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 text-white font-black text-2xl rounded-full shadow-lg border-2 border-yellow-300">
+                                                                        <span className="drop-shadow-md">✨ WIN ✨</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        ) : game.roundWinner === 1 ? (
+                                                            <div className="mb-3 inline-block">
+                                                                <div className="px-4 py-1.5 bg-slate-300 dark:bg-slate-700 text-slate-600 dark:text-slate-400 font-bold text-sm rounded-full border border-slate-400 dark:border-slate-600">
+                                                                    LOSE
+                                                                </div>
+                                                            </div>
+                                                        ) : (
+                                                            <div className="mb-3 inline-block">
+                                                                <div className="px-5 py-2 bg-gradient-to-r from-purple-400 to-indigo-500 text-white font-bold text-lg rounded-full shadow-md border border-purple-300">
+                                                                    🤝 DRAW
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                        
                                                         <div className="text-xs font-bold text-red-600 dark:text-red-400 uppercase tracking-wider mb-2">Player 1</div>
                                                         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/70 dark:bg-slate-800/70 text-slate-600 dark:text-slate-300 text-xs font-bold mb-3">
                                                             <span>{getRoute(p1Result?.routeId || "NORMAL").emoji}</span>
@@ -498,6 +522,30 @@ export default function VersusLocalPage() {
                                             return (
                                                 <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/10 border-2 border-blue-200 dark:border-blue-800 rounded-2xl p-4 space-y-3">
                                                     <div className="text-center">
+                                                        {/* WIN/LOSE/DRAW Badge */}
+                                                        {game.roundWinner === 1 ? (
+                                                            <div className="mb-3 inline-block">
+                                                                <div className="relative">
+                                                                    <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 to-amber-500 blur-md opacity-50"></div>
+                                                                    <div className="relative px-6 py-2 bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 text-white font-black text-2xl rounded-full shadow-lg border-2 border-yellow-300">
+                                                                        <span className="drop-shadow-md">✨ WIN ✨</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        ) : game.roundWinner === 0 ? (
+                                                            <div className="mb-3 inline-block">
+                                                                <div className="px-4 py-1.5 bg-slate-300 dark:bg-slate-700 text-slate-600 dark:text-slate-400 font-bold text-sm rounded-full border border-slate-400 dark:border-slate-600">
+                                                                    LOSE
+                                                                </div>
+                                                            </div>
+                                                        ) : (
+                                                            <div className="mb-3 inline-block">
+                                                                <div className="px-5 py-2 bg-gradient-to-r from-purple-400 to-indigo-500 text-white font-bold text-lg rounded-full shadow-md border border-purple-300">
+                                                                    🤝 DRAW
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                        
                                                         <div className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider mb-2">Player 2</div>
                                                         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/70 dark:bg-slate-800/70 text-slate-600 dark:text-slate-300 text-xs font-bold mb-3">
                                                             <span>{getRoute(p2Result?.routeId || "NORMAL").emoji}</span>
@@ -541,28 +589,61 @@ export default function VersusLocalPage() {
                                         })()}
                                     </div>
 
-                                    {/* Round Winner Banner */}
-                                    <div className="w-full bg-gradient-to-r from-purple-500 to-indigo-600 text-white p-5 rounded-2xl shadow-lg">
+                                    {/* AI Comments Section */}
+                                    <div className="w-full space-y-4">
+                                        {/* Title */}
                                         <div className="text-center">
-                                            {game.roundWinner == null ? (
-                                                <>
-                                                    <div className="text-3xl mb-2">🤝</div>
-                                                    <div className="font-bold text-2xl">DRAW</div>
-                                                    <div className="text-sm opacity-80 mt-1">このラウンドは引き分け！</div>
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <div className="text-3xl mb-2">🏆</div>
-                                                    <div className="text-sm opacity-80 mb-1">Round {game.roundIndex + 1} Winner</div>
-                                                    <div className="text-3xl font-black">
-                                                        Player {game.roundWinner + 1}
-                                                    </div>
-                                                    <div className="text-sm font-bold mt-2 bg-white/20 inline-block px-3 py-1 rounded-full">
-                                                        +1000m Bonus
-                                                    </div>
-                                                </>
-                                            )}
+                                            <h3 className="text-lg font-bold text-slate-700 dark:text-slate-300 flex items-center justify-center gap-2">
+                                                <span>💬</span>
+                                                <span>AI Judge Comments</span>
+                                            </h3>
                                         </div>
+
+                                        {/* Player 1 Comment */}
+                                        <div className="bg-gradient-to-br from-red-50 to-red-100 dark:from-red-950/30 dark:to-red-900/30 border-2 border-red-200 dark:border-red-800 rounded-xl p-4 space-y-2">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs font-bold">
+                                                    P1
+                                                </div>
+                                                <span className="font-bold text-red-700 dark:text-red-300">Player 1</span>
+                                            </div>
+                                            <div className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+                                                {/* TODO: 将来的にAIコメントをここに表示 */}
+                                                <span className="italic opacity-70">コメント機能は準備中です...</span>
+                                            </div>
+                                        </div>
+
+                                        {/* Player 2 Comment */}
+                                        <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/30 dark:to-blue-900/30 border-2 border-blue-200 dark:border-blue-800 rounded-xl p-4 space-y-2">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold">
+                                                    P2
+                                                </div>
+                                                <span className="font-bold text-blue-700 dark:text-blue-300">Player 2</span>
+                                            </div>
+                                            <div className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+                                                {/* TODO: 将来的にAIコメントをここに表示 */}
+                                                <span className="italic opacity-70">コメント機能は準備中です...</span>
+                                            </div>
+                                        </div>
+
+                                        {/* Winner Indicator (smaller, less prominent) */}
+                                        {game.roundWinner != null && (
+                                            <div className="text-center py-2">
+                                                <span className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-100 to-yellow-100 dark:from-amber-900/30 dark:to-yellow-900/30 border border-amber-300 dark:border-amber-700 rounded-full text-sm font-bold text-amber-800 dark:text-amber-300">
+                                                    <span>🏆</span>
+                                                    <span>Player {game.roundWinner + 1} が勝利 (+1000m)</span>
+                                                </span>
+                                            </div>
+                                        )}
+                                        {game.roundWinner == null && (
+                                            <div className="text-center py-2">
+                                                <span className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 border border-slate-300 dark:border-slate-600 rounded-full text-sm font-bold text-slate-700 dark:text-slate-300">
+                                                    <span>🤝</span>
+                                                    <span>引き分け</span>
+                                                </span>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
 
