@@ -1,5 +1,6 @@
 # 🏔 マウンティングマウンテン
-
+[![CI](https://github.com/YOUR_USERNAME/mounting-mountain/workflows/CI/badge.svg)](https://github.com/YOUR_USERNAME/mounting-mountain/actions)
+[![CodeRabbit](https://img.shields.io/badge/CodeRabbit-Enabled-brightgreen)](https://coderabbit.ai)
 「マウント」を“標高”で可視化するAIゲーム。
 
 入力された文章のマウンティング度をAIが判定し、
@@ -63,13 +64,42 @@ APIキーが無い環境でも動作する安全設計。
 - Next.js (App Router)
 - TypeScript
 - Tailwind CSS
-- OpenAI API（オプション）
+- Google Gemini API（オプション）
 - Fallbackルールベース判定
+
+---
+
+## 🔧 CI/CD
+
+- **GitHub Actions** - Lint/TypeCheck/Build
+- **CodeRabbit** - AIコードレビュー（日本語対応）
+- **Dependabot** - 依存関係自動更新
+- **Vercel** - 自動デプロイ
+
+詳細: [CI/CDセットアップガイド](./docs/ci-cd-setup.md)
 
 ---
 
 ## 🚀 セットアップ
 
+### 開発環境構築
+
 ```bash
+# 依存関係インストール
 npm install
+
+# 開発サーバー起動
 npm run dev
+
+# CI相当のチェックをローカルで実行
+npm run ci
+```
+
+### 環境変数
+
+`.env.local` を作成：
+
+```bash
+# オプション（なくてもフォールバック判定で動作）
+GEMINI_API_KEY=your_api_key_here
+```

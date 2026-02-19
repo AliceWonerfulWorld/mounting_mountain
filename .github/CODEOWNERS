@@ -1,0 +1,13 @@
+# Code Owners
+# https://docs.github.com/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# デフォルトオーナー
+* @gomaa
+
+# 特定のディレクトリオーナー
+/src/lib/analyze/ @gomaa
+/src/app/ @gomaa
+/docs/ @gomaa
+
+# CI/CD関連
+/.github/ @gomaa
