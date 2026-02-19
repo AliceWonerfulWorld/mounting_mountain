@@ -1,6 +1,8 @@
 # 🏔 マウンティングマウンテン
-[![CI](https://github.com/YOUR_USERNAME/mounting-mountain/workflows/CI/badge.svg)](https://github.com/YOUR_USERNAME/mounting-mountain/actions)
+
+[![CI](https://github.com/AliceWonerfulWorld/mounting-mountain/workflows/CI/badge.svg)](https://github.com/AliceWonerfulWorld/mounting-mountain/actions)
 [![CodeRabbit](https://img.shields.io/badge/CodeRabbit-Enabled-brightgreen)](https://coderabbit.ai)
+
 「マウント」を“標高”で可視化するAIゲーム。
 
 入力された文章のマウンティング度をAIが判定し、
