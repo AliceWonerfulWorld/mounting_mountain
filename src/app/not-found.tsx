@@ -2,31 +2,22 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 
 export default function NotFound() {
-  // Generate particle properties only on client side to prevent hydration errors
-  // Initialize particles on mount to prevent hydration errors
-  const [particles, setParticles] = useState<Array<{
-    left: string;
-    initialX: string;
-    blur: number;
-    duration: number;
-    delay: number;
-  }>>([]);
-
-  useEffect(() => {
-    // Generate particles only on client side
-    const generatedParticles = Array.from({ length: 20 }, () => ({
-      left: `${Math.random() * 100}%`,
-      initialX: `${Math.random() * 100}%`,
-      blur: Math.random() * 2,
-      duration: Math.random() * 10 + 10,
-      delay: Math.random() * 5,
-    }));
-    setParticles(generatedParticles);
-  }, []);
+  // Generate particle properties on initialization (client-side only)
+  const [particles] = useState(() => 
+    typeof window !== 'undefined'
+      ? Array.from({ length: 20 }, () => ({
+          left: `${Math.random() * 100}%`,
+          initialX: `${Math.random() * 100}%`,
+          blur: Math.random() * 2,
+          duration: Math.random() * 10 + 10,
+          delay: Math.random() * 5,
+        }))
+      : []
+  );
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-gradient-to-b from-zinc-900 via-slate-900 to-black text-white flex items-center justify-center">
