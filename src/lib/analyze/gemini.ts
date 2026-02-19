@@ -205,7 +205,7 @@ export async function analyzeWithGemini(
 
 // 🆕 新規: ソロモード用プロンプト生成
 function buildSoloPrompt(text: string): string {
-    return `git 
+    return `
 あなたは「マウンティング度」を客観的に評価し、辛辣にツッコむAIです。
 以下の文章を分析し、マウンティング度を0.0〜1.0で評価してください。
 
