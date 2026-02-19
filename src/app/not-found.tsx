@@ -3,11 +3,11 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
-import { a } from "framer-motion/client";
 
 
 export default function NotFound() {
   // Generate particle properties only on client side to prevent hydration errors
+  // Initialize particles on mount to prevent hydration errors
   const [particles, setParticles] = useState<Array<{
     left: string;
     initialX: string;
@@ -17,15 +17,15 @@ export default function NotFound() {
   }>>([]);
 
   useEffect(() => {
-    setParticles(
-      Array.from({ length: 20 }, () => ({
-        left: `${Math.random() * 100}%`,
-        initialX: `${Math.random() * 100}%`,
-        blur: Math.random() * 2,
-        duration: Math.random() * 10 + 10,
-        delay: Math.random() * 5,
-      }))
-    );
+    // Generate particles only on client side
+    const generatedParticles = Array.from({ length: 20 }, () => ({
+      left: `${Math.random() * 100}%`,
+      initialX: `${Math.random() * 100}%`,
+      blur: Math.random() * 2,
+      duration: Math.random() * 10 + 10,
+      delay: Math.random() * 5,
+    }));
+    setParticles(generatedParticles);
   }, []);
 
   return (

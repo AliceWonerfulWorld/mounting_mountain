@@ -139,9 +139,9 @@ export default function HowToPage() {
                                     天候に合ったマウントを取るとボーナス（+20%）が発生します。
                                 </p>
                                 <div className="grid grid-cols-2 gap-2 text-xs">
-                                    <div className="bg-slate-800 p-2 rounded text-white">☀️"晴天" 「数値」を含むと+20%</div>
-                                    <div className="bg-slate-800 p-2 rounded text-white">🌪"強風" 「比較」を含むと+20%</div>
-                                    <div className="bg-slate-800 p-2 rounded text-white">❄️"吹雪" 「皮肉」を含むと+20%</div>
+                                    <div className="bg-slate-800 p-2 rounded text-white">☀️&quot;晴天&quot; 「数値」を含むと+20%</div>
+                                    <div className="bg-slate-800 p-2 rounded text-white">🌪&quot;強風&quot; 「比較」を含むと+20%</div>
+                                    <div className="bg-slate-800 p-2 rounded text-white">❄️&quot;吹雪&quot; 「皮肉」を含むと+20%</div>
                                 </div>
                             </div>
 
