@@ -1,0 +1,13 @@
+# Code Owners
+# https://docs.github.com/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# デフォルトオーナー
+* @AliceWonerfulWorld
+
+# 特定のディレクトリオーナー
+/src/lib/analyze/ @AliceWonerfulWorld
+/src/app/ @AliceWonerfulWorld
+/docs/ @AliceWonerfulWorld
+
+# CI/CD関連
+/.github/ @AliceWonerfulWorld

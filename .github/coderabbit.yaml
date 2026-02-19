@@ -1,0 +1,67 @@
+# CodeRabbit Configuration
+# https://docs.coderabbit.ai/guides/configure-coderabbit
+
+language: ja # 日本語でレビュー
+
+reviews:
+  # レビューの詳細度
+  profile: "chill" # "chill" | "assertive" | "balanced"
+  
+  # レビュー対象
+  request_changes_workflow: true
+  high_level_summary: true
+  poem: false # レビューに詩を含めない
+  review_status: true
+  collapse_walkthrough: false
+  
+  # 自動レビューをトリガーするイベント
+  auto_review:
+    enabled: true
+    drafts: false # ドラフトPRは対象外
+    base_branches:
+      - main
+      - develop
+
+  # レビューから除外するパス
+  path_filters:
+    - "!**/*.md"
+    - "!**/*.json"
+    - "!**/package-lock.json"
+    - "!**/.next/**"
+    - "!**/node_modules/**"
+    - "!**/dist/**"
+    - "!**/build/**"
+
+  # 特定のルール
+  path_instructions:
+    - path: "src/lib/**/*.ts"
+      instructions: |
+        - 型安全性を重視してください
+        - any型の使用を避けるよう指摘してください
+        - 純粋関数であることを確認してください
+    
+    - path: "src/components/**/*.tsx"
+      instructions: |
+        - React のベストプラクティスに従っているか確認してください
+        - useCallback/useMemo の適切な使用を確認してください
+        - アクセシビリティ（a11y）の問題を指摘してください
+    
+    - path: "src/app/**/*.tsx"
+      instructions: |
+        - Next.js App Router の規約に従っているか確認してください
+        - クライアント/サーバーコンポーネントの適切な使い分けを確認してください
+        - パフォーマンスへの影響を考慮してください
+
+chat:
+  # AIとの対話機能
+  auto_reply: true
+
+# クイックレビュー（変更が小さい場合）
+early_access: false
+
+# 言語とトーン
+tone_instructions: |
+  - 日本語で丁寧に説明してください
+  - 建設的なフィードバックを心がけてください
+  - なぜその変更が必要なのか理由を説明してください
+  - コードの良い点も積極的に評価してください
