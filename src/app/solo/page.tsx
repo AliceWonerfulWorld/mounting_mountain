@@ -115,29 +115,40 @@ export default function SoloPage() {
 
       {/* メインゲーム画面 */}
       {!showMissionBriefing && !showingResult && (
-        <>
-          <SoloGameMain
-            game={gameHook.game}
-            currentRound={currentRound}
-            text={gameHook.text}
-            loading={gameHook.loading}
-            error={gameHook.error}
-            onTextChange={(e) => gameHook.setText(e.target.value)}
-            onRouteSelect={gameHook.handleRouteSelect}
-            onSubmit={handleSubmit}
-            onWeatherClick={() => setShowWeatherDetail(true)}
-            onHistoryToggle={() => setIsHistoryOpen(!isHistoryOpen)}
-            isHistoryOpen={isHistoryOpen}
-            weatherBackground={weatherBackground}
-            roundCount={gameHook.game.players[0].rounds.length}
-          />
+        <div className={`min-h-screen relative overflow-x-hidden ${weatherBackground}`}>
+          {/* 遠景の山シルエット (下層) */}
+          <div className="fixed bottom-0 left-0 w-full h-1/3 pointer-events-none -z-10 opacity-30 dark:opacity-20 transition-all duration-1000">
+            <svg viewBox="0 0 1200 320" preserveAspectRatio="none" className={`w-full h-full ${gameHook.game.weather === "SUNNY" ? "fill-green-600 dark:fill-green-700" : "fill-stone-400 dark:fill-stone-600"}`}>
+              <path d="M0,320 L200,160 L400,280 L600,100 L800,240 L1000,140 L1200,320 Z" />
+            </svg>
+          </div>
+          <div className="fixed bottom-0 left-0 w-full h-1/4 pointer-events-none -z-10 opacity-50 dark:opacity-40 transition-all duration-1000">
+            <svg viewBox="0 0 1200 320" preserveAspectRatio="none" className={`w-full h-full ${gameHook.game.weather === "SUNNY" ? "fill-green-700 dark:fill-green-800" : "fill-stone-500 dark:fill-stone-700"}`}>
+              <path d="M0,320 L150,200 L350,300 L550,150 L850,280 L1100,180 L1200,320 Z" />
+ </svg>
+          </div>
 
-          <SoloHistoryPanel
-            rounds={gameHook.game.players[0].rounds}
-            isOpen={isHistoryOpen}
-            onToggle={() => setIsHistoryOpen(!isHistoryOpen)}
-          />
-        </>
+          <div className="max-w-5xl mx-auto p-4 md:p-6 pb-24 space-y-6 relative z-10">
+            <SoloGameMain
+              game={gameHook.game}
+              currentRound={currentRound}
+              text={gameHook.text}
+              loading={gameHook.loading}
+              error={gameHook.error}
+              onTextChange={(e) => gameHook.setText(e.target.value)}
+              onRouteSelect={gameHook.handleRouteSelect}
+              onSubmit={handleSubmit}
+              onWeatherClick={() => setShowWeatherDetail(true)}
+              roundCount={gameHook.game.players[0].rounds.length}
+            />
+
+            <SoloHistoryPanel
+              rounds={gameHook.game.players[0].rounds}
+              isOpen={isHistoryOpen}
+              onToggle={() => setIsHistoryOpen(!isHistoryOpen)}
+            />
+          </div>
+        </div>
       )}
 
       {/* 結果表示画面 */}

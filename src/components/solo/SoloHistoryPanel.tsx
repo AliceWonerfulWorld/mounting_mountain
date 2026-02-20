@@ -1,6 +1,5 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
 import type { Round } from "@/types/game";
 import { DetailedMountain } from "@/components/DetailedMountain";
 import { getRoute } from "@/lib/solo/routes";
@@ -22,7 +21,7 @@ export function SoloHistoryPanel({ rounds, isOpen, onToggle }: SoloHistoryPanelP
         className="w-full flex items-center justify-between p-4 hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
       >
         <div className="flex items-center gap-2 font-bold text-gray-600 dark:text-gray-300">
-          <span>📜 登頂履歴</span>
+          <span>⛰️ 登頂履歴</span>
           <span className="text-xs bg-gray-200 dark:bg-gray-700 px-2 py-0.5 rounded-full">
             {completedRounds.length}
           </span>
@@ -35,16 +34,8 @@ export function SoloHistoryPanel({ rounds, isOpen, onToggle }: SoloHistoryPanelP
         </div>
       </button>
 
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="overflow-hidden"
-          >
-            <div className="p-4 space-y-3 border-t border-gray-100 dark:border-zinc-800">
+      {isOpen && (
+        <div className="p-4 space-y-3 animate-in slide-in-from-top-2 fade-in duration-300 border-t border-gray-100 dark:border-zinc-800">
               {completedRounds.map((r, i) => (
                 <div
                   key={r.id}
@@ -86,9 +77,7 @@ export function SoloHistoryPanel({ rounds, isOpen, onToggle }: SoloHistoryPanelP
                 <div className="text-center text-sm text-gray-400 py-4">まだ履歴はありません</div>
               )}
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          )}
     </section>
   );
 }

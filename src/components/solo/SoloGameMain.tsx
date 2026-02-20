@@ -18,10 +18,7 @@ interface SoloGameMainProps {
   onRouteSelect: (routeId: RouteId) => void;
   onSubmit: () => void;
   onWeatherClick?: () => void;
-  onHistoryToggle?: () => void;
-  isHistoryOpen?: boolean;
   showRoundCutin?: boolean;
-  weatherBackground: string;
   roundCount: number;
 }
 
@@ -35,29 +32,13 @@ export function SoloGameMain({
   onRouteSelect,
   onSubmit,
   onWeatherClick,
-  onHistoryToggle,
-  isHistoryOpen = false,
   showRoundCutin = false,
-  weatherBackground,
   roundCount,
 }: SoloGameMainProps) {
   return (
-    <main className={`min-h-screen relative overflow-x-hidden text-gray-800 dark:text-gray-200 font-sans ${weatherBackground}`}>
-      {/* 遠景の山シルエット (下層) */}
-      <div className="fixed bottom-0 left-0 w-full h-1/3 pointer-events-none -z-10 opacity-30 dark:opacity-20 transition-all duration-1000">
-        <svg viewBox="0 0 1200 320" preserveAspectRatio="none" className={`w-full h-full ${game.weather === "SUNNY" ? "fill-green-600 dark:fill-green-700" : "fill-stone-400 dark:fill-stone-600"}`}>
-          <path d="M0,320 L200,160 L400,280 L600,100 L800,240 L1000,140 L1200,320 Z" />
-        </svg>
-      </div>
-      <div className="fixed bottom-0 left-0 w-full h-1/4 pointer-events-none -z-10 opacity-50 dark:opacity-40 transition-all duration-1000">
-        <svg viewBox="0 0 1200 320" preserveAspectRatio="none" className={`w-full h-full ${game.weather === "SUNNY" ? "fill-green-700 dark:fill-green-800" : "fill-stone-500 dark:fill-stone-700"}`}>
-          <path d="M0,320 L150,200 L350,300 L550,150 L850,280 L1100,180 L1200,320 Z" />
-        </svg>
-      </div>
-
-      <div className="max-w-5xl mx-auto p-4 md:p-6 pb-24 space-y-6 relative z-10">
-        {/* コンパクトヘッダー */}
-        <header className="flex flex-wrap gap-3 justify-between items-start text-sm md:text-base font-bold font-mono text-gray-600 dark:text-gray-400">
+    <>
+      {/* コンパクトヘッダー */}
+      <header className="flex flex-wrap gap-3 justify-between items-start text-sm md:text-base font-bold font-mono text-gray-600 dark:text-gray-400">
           <div className="flex gap-3">
             {game.weather && (
               <button
@@ -120,27 +101,6 @@ export function SoloGameMain({
             />
           </div>
         </section>
-
-        {/* 履歴表示ボタン */}
-        {onHistoryToggle && (
-          <section className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl border border-white/20 shadow-sm overflow-hidden transition-all duration-300">
-            <button
-              onClick={onHistoryToggle}
-              className="w-full flex items-center justify-between p-4 hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
-            >
-              <div className="flex items-center gap-2 font-bold text-gray-600 dark:text-gray-300">
-                <span>📜 登頂履歴</span>
-                <span className="text-xs bg-gray-200 dark:bg-gray-700 px-2 py-0.5 rounded-full">
-                  {game.players[0].rounds.filter(r => r.result).length}
-                </span>
-              </div>
-              <div className="text-gray-400 transform transition-transform duration-300" style={{ transform: isHistoryOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
-                ▼
-              </div>
-            </button>
-          </section>
-        )}
-      </div>
-    </main>
+    </>
   );
 }
