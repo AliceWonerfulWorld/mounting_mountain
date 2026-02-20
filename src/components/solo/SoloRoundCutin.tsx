@@ -434,7 +434,7 @@ export default function SoloRoundCutin({
             <motion.div
               initial={{ x: -50, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: 0.2, duration: 0.5 }}
+              transition={{ delay: 0.3, duration: 0.5 }}
               className="flex justify-center mb-6"
             >
               <div
@@ -457,7 +457,7 @@ export default function SoloRoundCutin({
             <motion.div
               initial={{ x: -80, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: 0.3, duration: 0.6, ease: 'easeOut' }}
+              transition={{ delay: 0.4, duration: 0.6, ease: 'easeOut' }}
               className="text-center mb-8"
             >
               <div className="relative inline-block">
@@ -499,7 +499,7 @@ export default function SoloRoundCutin({
               <motion.div
                 initial={{ x: -60, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
-                transition={{ delay: 0.4, duration: 0.5 }}
+                transition={{ delay: 0.1, duration: 0.5 }}
                 className="text-center"
               >
                 <div
@@ -523,7 +523,7 @@ export default function SoloRoundCutin({
                         theme === 0 ? 'text-amber-400' : theme === 1 ? 'text-cyan-400' : 'text-green-400'
                       }`}
                     >
-                      MISSION
+                      お題
                     </div>
                     <div
                       className={`w-3 h-3 rounded-full ${

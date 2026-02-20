@@ -157,6 +157,11 @@ export default function SoloPage() {
         show={cutinHook.showRoundCutin}
         roundNumber={cutinHook.cutinRoundNumber}
         theme={cutinHook.cutinTheme}
+        mission={gameHook.game?.prompts[cutinHook.cutinRoundNumber - 1]}
+        onSkip={() => {
+          // カットインは自動で2.3秒後に閉じるため、スキップ機能は現在未実装
+          // 必要に応じて useSoloCutins に skipRoundCutin メソッドを追加可能
+        }}
       />
 
       {/* 滑落カットイン */}
