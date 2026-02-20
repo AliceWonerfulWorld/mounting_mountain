@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest';
 import { validateAiOutput } from './validator';
-import type { RouteType } from './altitude';
 
 describe('validateAiOutput', () => {
   describe('mountScore のバリデーション', () => {
