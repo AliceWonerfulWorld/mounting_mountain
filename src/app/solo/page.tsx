@@ -115,7 +115,75 @@ export default function SoloPage() {
 
       {/* メインゲーム画面 */}
       {!showMissionBriefing && !showingResult && (
-        <div className={`min-h-screen relative overflow-x-hidden ${weatherBackground}`}>
+        <>
+          {/* 天候に応じた背景 */}
+          <div className={`fixed inset-0 ${weatherBackground} -z-20 transition-colors duration-1000`} />
+
+          <div className="min-h-screen relative overflow-x-hidden">
+            {/* 吹雪エフェクト */}
+            {gameHook.game.weather === "BLIZZARD" && (
+            <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
+              {/* 雪のパーティクル */}
+              {Array.from({ length: 50 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="absolute text-white opacity-70"
+                  style={{
+                    left: `${Math.random() * 100}%`,
+                    top: `-${Math.random() * 20}%`,
+                    fontSize: `${Math.random() * 10 + 10}px`,
+                    animation: `snowfall ${Math.random() * 3 + 2}s linear infinite`,
+                    animationDelay: `${Math.random() * 5}s`,
+                  }}
+                >
+                  ❄
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* 強風エフェクト */}
+          {gameHook.game.weather === "WINDY" && (
+            <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
+              {/* 飛んでいく葉っぱ */}
+              {Array.from({ length: 20 }).map((_, i) => {
+                const leaves = ['🍁', '🌿'];
+                const leaf = leaves[Math.floor(Math.random() * leaves.length)];
+                return (
+                  <div
+                    key={`leaf-${i}`}
+                    className="absolute"
+                    style={{
+                      top: `${Math.random() * 80}%`,
+                      left: '-50px',
+                      fontSize: `${Math.random() * 20 + 15}px`,
+                      animation: `windLeaf ${Math.random() * 3 + 2}s linear infinite`,
+                      animationDelay: `${Math.random() * 4}s`,
+                    }}
+                  >
+                    {leaf}
+                  </div>
+                );
+              })}
+              {/* 強い風の線 */}
+              {Array.from({ length: 40 }).map((_, i) => (
+                <div
+                  key={`line-${i}`}
+                  className="absolute bg-white/40"
+                  style={{
+                    top: `${Math.random() * 100}%`,
+                    left: '-150px',
+                    width: `${Math.random() * 150 + 100}px`,
+                    height: '2px',
+                    animation: `windBlow ${Math.random() * 1.5 + 0.8}s linear infinite`,
+                    animationDelay: `${Math.random() * 3}s`,
+                    transform: 'rotate(-5deg)',
+                  }}
+                />
+              ))}
+            </div>
+          )}
+
           {/* 遠景の山シルエット (下層) */}
           <div className="fixed bottom-0 left-0 w-full h-1/3 pointer-events-none -z-10 opacity-30 dark:opacity-20 transition-all duration-1000">
             <svg viewBox="0 0 1200 320" preserveAspectRatio="none" className={`w-full h-full ${gameHook.game.weather === "SUNNY" ? "fill-green-600 dark:fill-green-700" : "fill-stone-400 dark:fill-stone-600"}`}>
@@ -149,6 +217,7 @@ export default function SoloPage() {
             />
           </div>
         </div>
+        </>
       )}
 
       {/* 結果表示画面 */}
