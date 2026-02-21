@@ -20,6 +20,30 @@ import { getRoute } from "@/lib/solo/routes";
 import { getWeather } from "@/lib/solo/weather";
 import { evaluateMission } from "@/lib/solo/missions";
 
+// Pre-generated weather effect particles (outside component to satisfy React purity rules)
+const SNOW_PARTICLES = Array.from({ length: 50 }, () => ({
+  left: Math.random() * 100,
+  top: Math.random() * 20,
+  fontSize: Math.random() * 10 + 10,
+  duration: Math.random() * 3 + 2,
+  delay: Math.random() * 5,
+}));
+
+const WIND_LEAVES = Array.from({ length: 20 }, () => ({
+  leaf: ['🍁', '🌿'][Math.floor(Math.random() * 2)],
+  top: Math.random() * 80,
+  fontSize: Math.random() * 20 + 15,
+  duration: Math.random() * 3 + 2,
+  delay: Math.random() * 4,
+}));
+
+const WIND_LINES = Array.from({ length: 40 }, () => ({
+  top: Math.random() * 100,
+  width: Math.random() * 150 + 100,
+  duration: Math.random() * 1.5 + 0.8,
+  delay: Math.random() * 3,
+}));
+
 export default function SoloPage() {
   const gameHook = useSoloGame();
   const cutinHook = useSoloCutins();
@@ -137,67 +161,63 @@ export default function SoloPage() {
           <div className="min-h-screen relative overflow-x-hidden">
             {/* 吹雪エフェクト */}
             {gameHook.game.weather === "BLIZZARD" && (
-            <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
-              {/* 雪のパーティクル */}
-              {Array.from({ length: 50 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="absolute text-white opacity-70"
-                  style={{
-                    left: `${Math.random() * 100}%`,
-                    top: `-${Math.random() * 20}%`,
-                    fontSize: `${Math.random() * 10 + 10}px`,
-                    animation: `snowfall ${Math.random() * 3 + 2}s linear infinite`,
-                    animationDelay: `${Math.random() * 5}s`,
-                  }}
-                >
-                  ❄
-                </div>
-              ))}
-            </div>
-          )}
+              <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
+                {/* 雪のパーティクル */}
+                {SNOW_PARTICLES.map((particle, i) => (
+                  <div
+                    key={i}
+                    className="absolute text-white opacity-70"
+                    style={{
+                      left: `${particle.left}%`,
+                      top: `-${particle.top}%`,
+                      fontSize: `${particle.fontSize}px`,
+                      animation: `snowfall ${particle.duration}s linear infinite`,
+                      animationDelay: `${particle.delay}s`,
+                    }}
+                  >
+                    ❄
+                  </div>
+                ))}
+              </div>
+            )}
 
-          {/* 強風エフェクト */}
-          {gameHook.game.weather === "WINDY" && (
-            <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
-              {/* 飛んでいく葉っぱ */}
-              {Array.from({ length: 20 }).map((_, i) => {
-                const leaves = ['🍁', '🌿'];
-                const leaf = leaves[Math.floor(Math.random() * leaves.length)];
-                return (
+            {/* 強風エフェクト */}
+            {gameHook.game.weather === "WINDY" && (
+              <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
+                {/* 飛んでいく葉っぱ */}
+                {WIND_LEAVES.map((leafData, i) => (
                   <div
                     key={`leaf-${i}`}
                     className="absolute"
                     style={{
-                      top: `${Math.random() * 80}%`,
+                      top: `${leafData.top}%`,
                       left: '-50px',
-                      fontSize: `${Math.random() * 20 + 15}px`,
-                      animation: `windLeaf ${Math.random() * 3 + 2}s linear infinite`,
-                      animationDelay: `${Math.random() * 4}s`,
+                      fontSize: `${leafData.fontSize}px`,
+                      animation: `windLeaf ${leafData.duration}s linear infinite`,
+                      animationDelay: `${leafData.delay}s`,
                     }}
                   >
-                    {leaf}
+                    {leafData.leaf}
                   </div>
-                );
-              })}
-              {/* 強い風の線 */}
-              {Array.from({ length: 40 }).map((_, i) => (
-                <div
-                  key={`line-${i}`}
-                  className="absolute bg-white/40"
-                  style={{
-                    top: `${Math.random() * 100}%`,
-                    left: '-150px',
-                    width: `${Math.random() * 150 + 100}px`,
-                    height: '2px',
-                    animation: `windBlow ${Math.random() * 1.5 + 0.8}s linear infinite`,
-                    animationDelay: `${Math.random() * 3}s`,
-                    transform: 'rotate(-5deg)',
-                  }}
-                />
-              ))}
-            </div>
-          )}
+                ))}
+                {/* 強い風の線 */}
+                {WIND_LINES.map((line, i) => (
+                  <div
+                    key={`line-${i}`}
+                    className="absolute bg-white/40"
+                    style={{
+                      top: `${line.top}%`,
+                      left: '-150px',
+                      width: `${line.width}px`,
+                      height: '2px',
+                      animation: `windBlow ${line.duration}s linear infinite`,
+                      animationDelay: `${line.delay}s`,
+                      transform: 'rotate(-5deg)',
+                    }}
+                  />
+                ))}
+              </div>
+            )}
 
           {/* 遠景の山シルエット (下層) */}
           <div className="fixed bottom-0 left-0 w-full h-1/3 pointer-events-none -z-10 opacity-30 dark:opacity-20 transition-all duration-1000">
@@ -265,11 +285,9 @@ export default function SoloPage() {
                 <>
                   <SoloResultView
                     round={gameHook.lastResult}
-                    totalScore={gameHook.game.players[0].totalScore}
                     isGameFinished={gameHook.game.roundIndex + 1 >= gameHook.game.players[0].rounds.length}
                     roundNumber={gameHook.game.roundIndex + 1}
                     onNext={handleNext}
-                    onReset={handleReset}
                   />
 
                   <SoloHistoryPanel
@@ -306,7 +324,6 @@ export default function SoloPage() {
       {/* 結果カットイン */}
       <ResultCutin
         show={cutinHook.showResultCutin}
-        altitude={gameHook.lastResult?.result?.finalAltitude || 0}
       />
 
       {/* 総合結果画面 */}

@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import type { Round } from "@/types/game";
 import { DetailedMountain } from "@/components/DetailedMountain";
 import { getLabelJa } from "@/lib/labels";
@@ -8,20 +7,16 @@ import { getRoute } from "@/lib/solo/routes";
 
 interface SoloResultViewProps {
   round: Round;
-  totalScore: number;
   isGameFinished: boolean;
   roundNumber: number;
   onNext: () => void;
-  onReset?: () => void;
 }
 
 export function SoloResultView({
   round,
-  totalScore,
   isGameFinished,
   roundNumber,
   onNext,
-  onReset,
 }: SoloResultViewProps) {
   if (!round.result) return null;
 

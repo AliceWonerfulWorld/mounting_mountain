@@ -2,6 +2,57 @@
 
 import { AnimatePresence, motion } from 'framer-motion';
 
+// Pre-generated star positions and animations (outside component to satisfy React purity rules)
+const generateStars = () => 
+  Array.from({ length: 40 }, () => ({
+    left: Math.random() * 100,
+    top: Math.random() * 40,
+    delay: Math.random() * 0.5,
+    repeatDelay: Math.random() * 2,
+  }));
+
+const STARS = generateStars();
+
+// Pre-generated particles for theme 1
+const generateParticles = () =>
+  Array.from({ length: 30 }, () => ({
+    left: Math.random() * 100,
+    bottom: Math.random() * 30,
+    delay: Math.random() * 2,
+    repeatDelay: Math.random() * 2,
+  }));
+
+const PARTICLES = generateParticles();
+
+// Pre-generated trees for theme 2
+const generateTrees = () =>
+  Array.from({ length: 15 }, () => ({
+    height: 30 + Math.random() * 50,
+    width: 15 + Math.random() * 10,
+    opacity: 0.7 + Math.random() * 0.3,
+  }));
+
+const TREES = generateTrees();
+
+// Pre-generated leaves for theme 2
+const generateLeaves = () =>
+  Array.from({ length: 15 }, () => ({
+    left: Math.random() * 100,
+    rotate: 360 + Math.random() * 180,
+    duration: 8 + Math.random() * 4,
+    delay: Math.random() * 3,
+  }));
+
+const LEAVES = generateLeaves();
+
+// Pre-generated birds for theme 2
+const generateBirds = () =>
+  Array.from({ length: 5 }, () => ({
+    yOffset: 20 + Math.random() * 30,
+  }));
+
+const BIRDS = generateBirds();
+
 interface SoloRoundCutinProps {
   show: boolean;
   roundNumber: number;
@@ -131,21 +182,21 @@ export default function SoloRoundCutin({
               </motion.div>
 
               {/* 星空 */}
-              {Array.from({ length: 40 }).map((_, i) => (
+              {STARS.map((star, i) => (
                 <motion.div
                   key={i}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: [0, 1, 0.5, 1] }}
                   transition={{
                     duration: 2,
-                    delay: Math.random() * 0.5,
+                    delay: star.delay,
                     repeat: Infinity,
-                    repeatDelay: Math.random() * 2
+                    repeatDelay: star.repeatDelay
                   }}
                   className="absolute w-1 h-1 bg-white rounded-full shadow-[0_0_4px_rgba(255,255,255,0.8)]"
                   style={{
-                    left: `${Math.random() * 100}%`,
-                    top: `${Math.random() * 40}%`
+                    left: `${star.left}%`,
+                    top: `${star.top}%`
                   }}
                 />
               ))}
@@ -239,7 +290,7 @@ export default function SoloRoundCutin({
               ))}
 
               {/* 光の粒子（朝日の光） */}
-              {Array.from({ length: 20 }).map((_, i) => (
+              {PARTICLES.slice(0, 20).map((particle, i) => (
                 <motion.div
                   key={`light-${i}`}
                   initial={{ opacity: 0, scale: 0 }}
@@ -250,14 +301,14 @@ export default function SoloRoundCutin({
                   }}
                   transition={{
                     duration: 3,
-                    delay: Math.random() * 2,
+                    delay: particle.delay,
                     repeat: Infinity,
-                    repeatDelay: Math.random() * 2
+                    repeatDelay: particle.repeatDelay
                   }}
                   className="absolute w-2 h-2 bg-cyan-300 rounded-full shadow-[0_0_8px_rgba(103,232,249,0.8)]"
                   style={{
-                    left: `${Math.random() * 100}%`,
-                    top: `${40 + Math.random() * 40}%`
+                    left: `${particle.left}%`,
+                    top: `${40 + particle.bottom}%`
                   }}
                 />
               ))}
@@ -340,59 +391,55 @@ export default function SoloRoundCutin({
                 transition={{ duration: 0.4, delay: 0.3 }}
                 className="absolute bottom-0 left-0 w-full h-2/5 flex items-end justify-around px-4"
               >
-                {Array.from({ length: 15 }).map((_, i) => {
-                  const height = 30 + Math.random() * 50;
-                  const width = 15 + Math.random() * 10;
-                  return (
+                {TREES.map((tree, i) => (
+                  <div
+                    key={`tree-${i}`}
+                    className="relative"
+                    style={{
+                      height: `${tree.height}%`,
+                      width: `${tree.width}px`
+                    }}
+                  >
+                    {/* 木の三角形 */}
                     <div
-                      key={`tree-${i}`}
-                      className="relative"
+                      className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0"
                       style={{
-                        height: `${height}%`,
-                        width: `${width}px`
+                        borderLeft: `${tree.width / 2}px solid transparent`,
+                        borderRight: `${tree.width / 2}px solid transparent`,
+                        borderBottom: `${tree.height * 2}px solid rgba(5, 150, 105, ${tree.opacity})`
                       }}
-                    >
-                      {/* 木の三角形 */}
-                      <div
-                        className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0"
-                        style={{
-                          borderLeft: `${width / 2}px solid transparent`,
-                          borderRight: `${width / 2}px solid transparent`,
-                          borderBottom: `${height * 2}px solid rgba(5, 150, 105, ${0.7 + Math.random() * 0.3})`
-                        }}
-                      />
-                      {/* 幹 */}
-                      <div
-                        className="absolute bottom-0 left-1/2 -translate-x-1/2 bg-amber-900"
-                        style={{
-                          width: `${width * 0.2}px`,
-                          height: `${height * 0.3}%`
-                        }}
-                      />
-                    </div>
-                  );
-                })}
+                    />
+                    {/* 幹 */}
+                    <div
+                      className="absolute bottom-0 left-1/2 -translate-x-1/2 bg-amber-900"
+                      style={{
+                        width: `${tree.width * 0.2}px`,
+                        height: `${tree.height * 0.3}%`
+                      }}
+                    />
+                  </div>
+                ))}
               </motion.div>
 
               {/* 葉っぱエフェクト */}
-              {Array.from({ length: 15 }).map((_, i) => (
+              {LEAVES.map((leaf, i) => (
                 <motion.div
                   key={`leaf-${i}`}
                   initial={{ y: -50, opacity: 0, rotate: 0 }}
                   animate={{
                     y: '110vh',
                     opacity: [0, 0.8, 0.8, 0],
-                    rotate: 360 + Math.random() * 180
+                    rotate: leaf.rotate
                   }}
                   transition={{
-                    duration: 8 + Math.random() * 4,
-                    delay: Math.random() * 3,
+                    duration: leaf.duration,
+                    delay: leaf.delay,
                     ease: 'linear',
                     repeat: Infinity
                   }}
                   className="absolute text-2xl"
                   style={{
-                    left: `${Math.random() * 100}%`
+                    left: `${leaf.left}%`
                   }}
                 >
                   🍃
@@ -400,13 +447,13 @@ export default function SoloRoundCutin({
               ))}
 
               {/* 鳥のシルエット */}
-              {Array.from({ length: 5 }).map((_, i) => (
+              {BIRDS.map((bird, i) => (
                 <motion.div
                   key={`bird-${i}`}
                   initial={{ x: '-10%', y: '30%' }}
                   animate={{
                     x: '110%',
-                    y: `${20 + Math.random() * 30}%`
+                    y: `${bird.yOffset}%`
                   }}
                   transition={{
                     duration: 15 + i * 3,

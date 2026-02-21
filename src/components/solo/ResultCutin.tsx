@@ -4,14 +4,13 @@ import { motion, AnimatePresence } from "framer-motion";
 
 interface ResultCutinProps {
   show: boolean;
-  altitude: number;
 }
 
 /**
  * 結果演出カットイン - Let's マウント！
  * ソロモードで各ラウンド終了時に標高測定中を表示
  */
-export function ResultCutin({ show, altitude }: ResultCutinProps) {
+export function ResultCutin({ show }: ResultCutinProps) {
   return (
     <AnimatePresence>
       {show && (

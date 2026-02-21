@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import type { GameState, Round } from "@/types/game";
 import type { RouteId } from "@/lib/solo/routes";
 import { SoloInputArea } from "@/components/SoloInputArea";
