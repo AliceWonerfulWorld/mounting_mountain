@@ -14,7 +14,6 @@ export function useTimeOfDay() {
     const [timeOfDay, setTimeOfDay] = useState<TimeOfDay>(() => getTimeOfDay());
 
     useEffect(() => {
-        setTimeOfDay(getTimeOfDay());
         const interval = setInterval(() => {
             setTimeOfDay(getTimeOfDay());
         }, 60000); // 1分ごとにチェック

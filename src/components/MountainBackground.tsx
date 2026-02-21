@@ -1,17 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useTimeOfDay } from "@/hooks/useTimeOfDay";
 
 type TimeOfDay = "morning" | "day" | "evening" | "night";
-
-function getTimeOfDay(): TimeOfDay {
-    const hour = new Date().getHours();
-    
-    if (hour >= 6 && hour < 11) return "morning";
-    if (hour >= 11 && hour < 16) return "day";
-    if (hour >= 16 && hour < 19) return "evening";
-    return "night";
-}
 
 const backgrounds = {
     morning: {
@@ -57,20 +49,37 @@ const backgrounds = {
 };
 
 export function MountainBackground() {
-    const [timeOfDay, setTimeOfDay] = useState<TimeOfDay>("day");
-
-    useEffect(() => {
-        setTimeOfDay(getTimeOfDay());
-        
-        // 1分ごとに時間帯をチェック
-        const interval = setInterval(() => {
-            setTimeOfDay(getTimeOfDay());
-        }, 60000);
-
-        return () => clearInterval(interval);
-    }, []);
-
+    const timeOfDay = useTimeOfDay();
     const theme = backgrounds[timeOfDay];
+
+    // ランダム値を初回マウント時に一度だけ計算（useStateの初期値として）
+    const [stars] = useState(() => 
+        [...Array(50)].map(() => ({
+            left: Math.random() * 100,
+            top: Math.random() * 60,
+            opacity: Math.random() * 0.8 + 0.2,
+            duration: 2 + Math.random() * 3
+        }))
+    );
+
+    const [shootingStars] = useState(() => 
+        [...Array(3)].map(() => ({
+            left: 20 + Math.random() * 60,
+            top: Math.random() * 30
+        }))
+    );
+
+    const [clouds] = useState(() => 
+        [...Array(6)].map(() => ({
+            fontSize: 2 + Math.random() * 2
+        }))
+    );
+
+    const [eveningClouds] = useState(() => 
+        [...Array(4)].map(() => ({
+            fontSize: 2.5 + Math.random() * 1.5
+        }))
+    );
 
     return (
         <>
@@ -147,27 +156,27 @@ export function MountainBackground() {
                     <>
                         {/* 星空 */}
                         <div className="absolute inset-0 animate-pulse" style={{ animationDuration: '4s' }}>
-                            {[...Array(50)].map((_, i) => (
+                            {stars.map((star, i) => (
                                 <div
                                     key={i}
                                     className="absolute w-1 h-1 bg-white rounded-full"
                                     style={{
-                                        left: `${Math.random() * 100}%`,
-                                        top: `${Math.random() * 60}%`,
-                                        opacity: Math.random() * 0.8 + 0.2,
-                                        animation: `twinkle ${2 + Math.random() * 3}s ease-in-out infinite`
+                                        left: `${star.left}%`,
+                                        top: `${star.top}%`,
+                                        opacity: star.opacity,
+                                        animation: `twinkle ${star.duration}s ease-in-out infinite`
                                     }}
                                 />
                             ))}
                         </div>
                         {/* 流れ星 */}
-                        {[...Array(3)].map((_, i) => (
+                        {shootingStars.map((star, i) => (
                             <div
                                 key={`shooting-${i}`}
                                 className="absolute w-1 h-1 bg-white rounded-full"
                                 style={{
-                                    left: `${20 + Math.random() * 60}%`,
-                                    top: `${Math.random() * 30}%`,
+                                    left: `${star.left}%`,
+                                    top: `${star.top}%`,
                                     boxShadow: '0 0 4px 2px rgba(255,255,255,0.8)',
                                     animation: `shootingStar ${3 + i * 2}s linear infinite`,
                                     animationDelay: `${i * 4}s`
@@ -215,12 +224,12 @@ export function MountainBackground() {
                 {/* 昼の場合は雲が流れる */}
                 {timeOfDay === "day" && (
                     <>
-                        {[...Array(6)].map((_, i) => (
+                        {clouds.map((cloud, i) => (
                             <div
                                 key={`cloud-${i}`}
                                 className="absolute opacity-70"
                                 style={{
-                                    fontSize: `${2 + Math.random() * 2}rem`,
+                                    fontSize: `${cloud.fontSize}rem`,
                                     left: `${-20 + i * 15}%`,
                                     top: `${10 + i * 10}%`,
                                     animation: `floatAcross ${25 + i * 8}s linear infinite`,
@@ -251,12 +260,12 @@ export function MountainBackground() {
                             />
                         ))}
                         {/* 夕焼け雲 */}
-                        {[...Array(4)].map((_, i) => (
+                        {eveningClouds.map((cloud, i) => (
                             <div
                                 key={`evening-cloud-${i}`}
                                 className="absolute opacity-50"
                                 style={{
-                                    fontSize: `${2.5 + Math.random() * 1.5}rem`,
+                                    fontSize: `${cloud.fontSize}rem`,
                                     left: `${-10 + i * 20}%`,
                                     top: `${15 + i * 12}%`,
                                     animation: `floatAcross ${30 + i * 10}s linear infinite`,
