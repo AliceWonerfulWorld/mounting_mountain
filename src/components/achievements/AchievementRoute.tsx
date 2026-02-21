@@ -1,0 +1,76 @@
+import { Achievement, AchievementCategory, CATEGORY_INFO } from "@/lib/achievements";
+import { AchievementStep } from "./AchievementStep";
+import { RouteConnector } from "./RouteConnector";
+
+type AchievementRouteProps = {
+    category: AchievementCategory;
+    achievements: Achievement[];
+    unlockedIds: string[];
+};
+
+/**
+ * 1つのカテゴリの実績ルート全体を表示するコンポーネント
+ * 実績を下から上に向かって登山ルートのように表示する
+ */
+export function AchievementRoute({ category, achievements, unlockedIds }: AchievementRouteProps) {
+    const categoryInfo = CATEGORY_INFO[category];
+    const unlockedCount = achievements.filter(a => unlockedIds.includes(a.id)).length;
+    const totalCount = achievements.length;
+    const progressPercentage = totalCount > 0 ? Math.round((unlockedCount / totalCount) * 100) : 0;
+
+    // 次に解除すべき実績を特定
+    const nextAchievementId = achievements.find(a => !unlockedIds.includes(a.id))?.id;
+
+    return (
+        <div className="space-y-4">
+            {/* ルートヘッダー */}
+            <div className="text-center space-y-2">
+                <div className="flex items-center justify-center gap-2">
+                    <span className="text-3xl">{categoryInfo.icon}</span>
+                    <h2 className="text-xl font-bold text-white drop-shadow-lg">
+                        {categoryInfo.label}
+                    </h2>
+                </div>
+                <div className="text-white/90 text-sm drop-shadow">
+                    {unlockedCount} / {totalCount} 達成
+                </div>
+                
+                {/* プログレスバー */}
+                <div className="w-full max-w-xs mx-auto bg-black/30 rounded-full h-2 overflow-hidden border border-white/20">
+                    <div
+                        className="bg-gradient-to-r from-yellow-400 to-yellow-600 h-2 transition-all duration-1000"
+                        style={{ width: `${progressPercentage}%` }}
+                    />
+                </div>
+            </div>
+
+            {/* ベースキャンプライン */}
+            <div className="flex justify-center">
+                <div className="w-32 h-1 bg-gradient-to-r from-transparent via-slate-400 to-transparent rounded-full" />
+            </div>
+
+            {/* 実績リスト（下から上へ） */}
+            <div className="space-y-0">
+                {achievements.map((achievement, index) => {
+                    const isUnlocked = unlockedIds.includes(achievement.id);
+                    const isNext = achievement.id === nextAchievementId;
+                    const status = isUnlocked ? "unlocked" : isNext ? "next" : "locked";
+                    const isLast = index === achievements.length - 1;
+
+                    return (
+                        <div key={achievement.id}>
+                            <AchievementStep
+                                achievement={achievement}
+                                status={status}
+                            />
+                            {/* 最後のステップ以外は接続線を表示 */}
+                            {!isLast && (
+                                <RouteConnector isUnlocked={isUnlocked} />
+                            )}
+                        </div>
+                    );
+                })}
+            </div>
+        </div>
+    );
+}
