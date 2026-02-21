@@ -4,8 +4,9 @@ import Link from "next/link";
 import clsx from "clsx";
 import { Home } from "lucide-react";
 import { useEffect, useState } from "react";
-import { ACHIEVEMENTS } from "@/lib/achievements";
+import { groupAchievementsByCategory } from "@/lib/achievements";
 import { loadUnlocked } from "@/lib/achievementStore";
+import { AchievementRoute } from "@/components/achievements/AchievementRoute";
 
 export default function AchievementsPage() {
     const [unlockedIds, setUnlockedIds] = useState<string[]>([]);
@@ -48,9 +49,7 @@ export default function AchievementsPage() {
         );
     }
 
-    const unlockedCount = unlockedIds.length;
-    const totalCount = ACHIEVEMENTS.length;
-    const progressPercentage = Math.round((unlockedCount / totalCount) * 100);
+    const groupedAchievements = groupAchievementsByCategory();
 
     return (
         <main className="relative min-h-screen w-full overflow-hidden">
@@ -97,70 +96,70 @@ export default function AchievementsPage() {
             </div>
 
             {/* UI */}
-            <div className="relative z-10 max-w-5xl mx-auto p-6 space-y-8">
+            <div className="relative z-10 max-w-7xl mx-auto p-6 space-y-8">
 
-                <header className="space-y-2 text-center text-white drop-shadow-lg">
-                    <h1 className="text-2xl font-bold">🏆 実績一覧</h1>
-                    <p className="text-sm opacity-80">
-                        あなたのマウンティングの記録です。
+                <header 
+                    className="space-y-2 text-center text-white drop-shadow-lg"
+                    style={{ animation: "fadeInUp 0.6s ease-out both" }}
+                >
+                    <h1 className="text-3xl md:text-4xl font-bold">🏆 実績一覧</h1>
+                    <p className="text-base md:text-lg opacity-90">
+                        あなたのマウンティングの記録です
                     </p>
                 </header>
 
-                {/* 進捗バー */}
-                <section className="bg-white/90 backdrop-blur p-6 rounded-xl shadow">
-                    <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-                        <div
-                            className="bg-gradient-to-r from-yellow-400 to-yellow-600 h-2 transition-all duration-1000"
-                            style={{ width: `${progressPercentage}%` }}
+                {/* 登山ルート表示（3列グリッド → モバイルでは1列） */}
+                <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-6">
+                    {/* 標高達成ルート */}
+                    <div 
+                        className="bg-black/20 backdrop-blur-sm p-6 rounded-2xl border border-white/10 hover:border-white/20 transition-all duration-300 hover:shadow-2xl hover:shadow-white/10"
+                        style={{ animation: "fadeInUp 0.6s ease-out 0.1s both" }}
+                    >
+                        <AchievementRoute
+                            category="altitude"
+                            achievements={groupedAchievements.altitude}
+                            unlockedIds={unlockedIds}
+                        />
+                    </div>
+
+                    {/* 対戦ルート */}
+                    <div 
+                        className="bg-black/20 backdrop-blur-sm p-6 rounded-2xl border border-white/10 hover:border-white/20 transition-all duration-300 hover:shadow-2xl hover:shadow-white/10"
+                        style={{ animation: "fadeInUp 0.6s ease-out 0.2s both" }}
+                    >
+                        <AchievementRoute
+                            category="versus"
+                            achievements={groupedAchievements.versus}
+                            unlockedIds={unlockedIds}
+                        />
+                    </div>
+
+                    {/* 特殊ルート */}
+                    <div 
+                        className="bg-black/20 backdrop-blur-sm p-6 rounded-2xl border border-white/10 hover:border-white/20 transition-all duration-300 hover:shadow-2xl hover:shadow-white/10"
+                        style={{ animation: "fadeInUp 0.6s ease-out 0.3s both" }}
+                    >
+                        <AchievementRoute
+                            category="special"
+                            achievements={groupedAchievements.special}
+                            unlockedIds={unlockedIds}
                         />
                     </div>
                 </section>
 
-                {/* ✅ 実績リスト（これが重要） */}
-                <section className="space-y-4">
-                    {ACHIEVEMENTS.map((achievement) => {
-                        const isUnlocked = unlockedIds.includes(achievement.id);
-
-                        return (
-                            <div
-                                key={achievement.id}
-                                className={clsx(
-                                    "p-4 rounded-xl backdrop-blur border transition",
-                                    isUnlocked
-                                        ? "bg-white/90 border-yellow-400 shadow"
-                                        : "bg-black/30 text-white border-white/20 opacity-60"
-                                )}
-                            >
-                                <div className="flex items-center gap-4">
-                                    <div className="text-3xl">
-                                        {isUnlocked ? achievement.icon || "🏆" : "🔒"}
-                                    </div>
-                                    <div>
-                                        <div className="font-bold">
-                                            {isUnlocked ? achievement.title : "???"}
-                                        </div>
-                                        <div className="text-sm opacity-70">
-                                            {isUnlocked
-                                                ? achievement.description
-                                                : "まだ解除されていません"}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        );
-                    })}
-                </section>
-
-                <div className="flex justify-center">
+                {/* ホームに戻るボタン */}
+                <div 
+                    className="flex justify-center pt-4"
+                    style={{ animation: "fadeInUp 0.6s ease-out 0.4s both" }}
+                >
                     <Link
                         href="/"
-                        className="inline-flex items-center gap-2 bg-white text-slate-900 px-8 py-4 rounded-full font-bold text-lg hover:bg-blue-50 transition-colors shadow-[0_0_20px_rgba(255,255,255,0.3)]"
+                        className="inline-flex items-center gap-2 bg-white text-slate-900 px-6 py-3 md:px-8 md:py-4 rounded-full font-bold text-base md:text-lg hover:bg-blue-50 hover:scale-105 transition-all duration-300 shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:shadow-[0_0_30px_rgba(255,255,255,0.5)]"
                     >
                         <Home className="w-5 h-5" />
                         タイトルに戻る
                     </Link>
                 </div>
-
 
             </div>
         </main>

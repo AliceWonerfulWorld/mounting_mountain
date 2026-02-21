@@ -26,27 +26,32 @@ export function AchievementRoute({ category, achievements, unlockedIds }: Achiev
             {/* ルートヘッダー */}
             <div className="text-center space-y-2">
                 <div className="flex items-center justify-center gap-2">
-                    <span className="text-3xl">{categoryInfo.icon}</span>
+                    <span className="text-3xl animate-bounce-slow">{categoryInfo.icon}</span>
                     <h2 className="text-xl font-bold text-white drop-shadow-lg">
                         {categoryInfo.label}
                     </h2>
                 </div>
-                <div className="text-white/90 text-sm drop-shadow">
+                <div className="text-white/90 text-sm drop-shadow font-semibold">
                     {unlockedCount} / {totalCount} 達成
                 </div>
                 
                 {/* プログレスバー */}
-                <div className="w-full max-w-xs mx-auto bg-black/30 rounded-full h-2 overflow-hidden border border-white/20">
+                <div className="w-full max-w-xs mx-auto bg-black/30 rounded-full h-2.5 overflow-hidden border border-white/20 shadow-inner">
                     <div
-                        className="bg-gradient-to-r from-yellow-400 to-yellow-600 h-2 transition-all duration-1000"
-                        style={{ width: `${progressPercentage}%` }}
+                        className="h-2.5 transition-all duration-1000 ease-out rounded-full"
+                        style={{ 
+                            width: `${progressPercentage}%`,
+                            background: progressPercentage === 100 
+                                ? "linear-gradient(to right, #fbbf24, #f59e0b, #f59e0b)"
+                                : "linear-gradient(to right, #3b82f6, #60a5fa)"
+                        }}
                     />
                 </div>
             </div>
 
             {/* ベースキャンプライン */}
             <div className="flex justify-center">
-                <div className="w-32 h-1 bg-gradient-to-r from-transparent via-slate-400 to-transparent rounded-full" />
+                <div className="w-32 h-1 bg-gradient-to-r from-transparent via-slate-300 to-transparent rounded-full shadow-lg" />
             </div>
 
             {/* 実績リスト（下から上へ） */}
@@ -62,10 +67,14 @@ export function AchievementRoute({ category, achievements, unlockedIds }: Achiev
                             <AchievementStep
                                 achievement={achievement}
                                 status={status}
+                                index={index}
                             />
                             {/* 最後のステップ以外は接続線を表示 */}
                             {!isLast && (
-                                <RouteConnector isUnlocked={isUnlocked} />
+                                <RouteConnector 
+                                    isUnlocked={isUnlocked}
+                                    index={index}
+                                />
                             )}
                         </div>
                     );
