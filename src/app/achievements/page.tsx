@@ -52,7 +52,7 @@ export default function AchievementsPage() {
     const groupedAchievements = groupAchievementsByCategory();
 
     return (
-        <main className="relative min-h-screen w-full overflow-hidden">
+        <main className="relative min-h-screen w-full overflow-hidden" role="main" aria-label="実績一覧ページ">
 
             {/* 空 */}
             <div
@@ -96,7 +96,7 @@ export default function AchievementsPage() {
             </div>
 
             {/* UI */}
-            <div className="relative z-10 max-w-7xl mx-auto p-6 space-y-8">
+            <div className="relative z-10 max-w-7xl mx-auto p-4 md:p-6 space-y-6 md:space-y-8">
 
                 <header 
                     className="space-y-2 text-center text-white drop-shadow-lg"
@@ -109,10 +109,10 @@ export default function AchievementsPage() {
                 </header>
 
                 {/* 登山ルート表示（3列グリッド → モバイルでは1列） */}
-                <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-6">
+                <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-6">
                     {/* 標高達成ルート */}
                     <div 
-                        className="bg-black/20 backdrop-blur-sm p-6 rounded-2xl border border-white/10 hover:border-white/20 transition-all duration-300 hover:shadow-2xl hover:shadow-white/10"
+                        className="bg-black/20 backdrop-blur-sm p-4 md:p-6 rounded-2xl border border-white/10 hover:border-white/20 transition-all duration-300 hover:shadow-2xl hover:shadow-white/10"
                         style={{ animation: "fadeInUp 0.6s ease-out 0.1s both" }}
                     >
                         <AchievementRoute
@@ -124,7 +124,7 @@ export default function AchievementsPage() {
 
                     {/* 対戦ルート */}
                     <div 
-                        className="bg-black/20 backdrop-blur-sm p-6 rounded-2xl border border-white/10 hover:border-white/20 transition-all duration-300 hover:shadow-2xl hover:shadow-white/10"
+                        className="bg-black/20 backdrop-blur-sm p-4 md:p-6 rounded-2xl border border-white/10 hover:border-white/20 transition-all duration-300 hover:shadow-2xl hover:shadow-white/10"
                         style={{ animation: "fadeInUp 0.6s ease-out 0.2s both" }}
                     >
                         <AchievementRoute
@@ -136,7 +136,7 @@ export default function AchievementsPage() {
 
                     {/* 特殊ルート */}
                     <div 
-                        className="bg-black/20 backdrop-blur-sm p-6 rounded-2xl border border-white/10 hover:border-white/20 transition-all duration-300 hover:shadow-2xl hover:shadow-white/10"
+                        className="bg-black/20 backdrop-blur-sm p-4 md:p-6 rounded-2xl border border-white/10 hover:border-white/20 transition-all duration-300 hover:shadow-2xl hover:shadow-white/10"
                         style={{ animation: "fadeInUp 0.6s ease-out 0.3s both" }}
                     >
                         <AchievementRoute

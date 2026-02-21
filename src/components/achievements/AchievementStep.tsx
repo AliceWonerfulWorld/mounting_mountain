@@ -14,18 +14,23 @@ type AchievementStepProps = {
  * 登山ルート上の1つの実績ステップを表示するコンポーネント
  */
 export function AchievementStep({ achievement, status, showConnector = true, index = 0 }: AchievementStepProps) {
+    const statusText = status === "unlocked" ? "解除済み" : status === "next" ? "次の目標" : "未解除";
+    const ariaLabel = `${achievement.title || "未知の実績"} - ${statusText}${status === "locked" ? "" : ` - ${achievement.description}`}`;
+    
     return (
         <div 
             className="relative"
             style={{
                 animation: `fadeInUp 0.5s ease-out ${index * 0.1}s both`
             }}
+            role="listitem"
+            aria-label={ariaLabel}
         >
             {/* ステップカード */}
             <div
                 className={clsx(
                     "relative p-3 md:p-4 rounded-xl backdrop-blur border transition-all duration-300",
-                    "hover:scale-[1.02] hover:shadow-2xl cursor-pointer",
+                    "hover:scale-[1.02] hover:shadow-2xl",
                     status === "unlocked" && [
                         "bg-white/95 border-yellow-400 shadow-lg",
                         "shadow-yellow-400/30",

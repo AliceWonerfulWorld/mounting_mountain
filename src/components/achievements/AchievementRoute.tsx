@@ -22,16 +22,16 @@ export function AchievementRoute({ category, achievements, unlockedIds }: Achiev
     const nextAchievementId = achievements.find(a => !unlockedIds.includes(a.id))?.id;
 
     return (
-        <div className="space-y-4">
+        <div className="space-y-3 md:space-y-4">
             {/* ルートヘッダー */}
-            <div className="text-center space-y-2">
+            <div className="text-center space-y-1.5 md:space-y-2">
                 <div className="flex items-center justify-center gap-2">
-                    <span className="text-3xl animate-bounce-slow">{categoryInfo.icon}</span>
-                    <h2 className="text-xl font-bold text-white drop-shadow-lg">
+                    <span className="text-2xl md:text-3xl animate-bounce-slow">{categoryInfo.icon}</span>
+                    <h2 className="text-lg md:text-xl font-bold text-white drop-shadow-lg">
                         {categoryInfo.label}
                     </h2>
                 </div>
-                <div className="text-white/90 text-sm drop-shadow font-semibold">
+                <div className="text-white/90 text-xs md:text-sm drop-shadow font-semibold">
                     {unlockedCount} / {totalCount} 達成
                 </div>
                 
@@ -51,11 +51,11 @@ export function AchievementRoute({ category, achievements, unlockedIds }: Achiev
 
             {/* ベースキャンプライン */}
             <div className="flex justify-center">
-                <div className="w-32 h-1 bg-gradient-to-r from-transparent via-slate-300 to-transparent rounded-full shadow-lg" />
+                <div className="w-24 md:w-32 h-0.5 md:h-1 bg-gradient-to-r from-transparent via-slate-300 to-transparent rounded-full shadow-lg" />
             </div>
 
             {/* 実績リスト（下から上へ） */}
-            <div className="space-y-0">
+            <div className="space-y-0" role="list" aria-label={`${categoryInfo.label}の実績`}>
                 {achievements.map((achievement, index) => {
                     const isUnlocked = unlockedIds.includes(achievement.id);
                     const isNext = achievement.id === nextAchievementId;
