@@ -2,10 +2,7 @@
 
 import { motion } from "framer-motion";
 import type { GameState, Round } from "@/types/game";
-import type { Mission } from "@/lib/solo/missions";
 import type { RouteId } from "@/lib/solo/routes";
-import { getWeather } from "@/lib/solo/weather";
-import { evaluateMission } from "@/lib/solo/missions";
 import { SoloInputArea } from "@/components/SoloInputArea";
 
 interface SoloGameMainProps {
@@ -17,7 +14,6 @@ interface SoloGameMainProps {
   onTextChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   onRouteSelect: (routeId: RouteId) => void;
   onSubmit: () => void;
-  onWeatherClick?: () => void;
   showRoundCutin?: boolean;
   roundCount: number;
 }
@@ -31,42 +27,13 @@ export function SoloGameMain({
   onTextChange,
   onRouteSelect,
   onSubmit,
-  onWeatherClick,
   showRoundCutin = false,
   roundCount,
 }: SoloGameMainProps) {
   return (
     <>
-      {/* コンパクトヘッダー */}
-      <header className="flex flex-wrap gap-3 justify-between items-start text-sm md:text-base font-bold font-mono text-gray-600 dark:text-gray-400">
-          <div className="flex gap-3">
-            {game.weather && (
-              <button
-                onClick={onWeatherClick}
-                className="flex items-center gap-2 bg-white/50 dark:bg-black/50 px-3 py-2 rounded backdrop-blur border border-gray-200 dark:border-zinc-800 hover:bg-white/70 dark:hover:bg-black/70 transition-all cursor-pointer hover:scale-105 active:scale-95"
-              >
-                <span className="text-lg">{getWeather(game.weather).emoji}</span>
-                <span>{getWeather(game.weather).label}</span>
-                <span className="text-xs opacity-60">ℹ️</span>
-              </button>
-            )}
-            <div className="flex items-center gap-2 bg-white/50 dark:bg-black/50 px-3 py-2 rounded backdrop-blur border border-gray-200 dark:border-zinc-800">
-              <span className="text-lg">🛟</span>
-              <span>保険: {game.insurance}/1</span>
-            </div>
-          </div>
-
-          {game.mission && (
-            <div className="bg-purple-100/80 dark:bg-purple-900/40 px-4 py-2 rounded-full border border-purple-200 dark:border-purple-800 text-purple-800 dark:text-purple-200 flex items-center gap-2 max-w-full overflow-hidden">
-              <span className="text-lg">🎯</span>
-              <span className="truncate">{game.mission.title}</span>
-              <span className="opacity-70 text-xs md:text-sm">{evaluateMission(game).progressText}</span>
-            </div>
-          )}
-        </header>
-
-        {/* メインゲーム画面 */}
-        <section className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-xl border border-white/20 shadow-lg p-6 space-y-6 relative overflow-hidden animate-in slide-in-from-bottom-2 fade-in duration-500">
+      {/* メインゲーム画面 */}
+      <section className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-xl border border-white/20 shadow-lg p-6 space-y-6 relative overflow-hidden animate-in slide-in-from-bottom-2 fade-in duration-500">
           {/* 背景装飾 */}
           <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
             <div className="text-8xl">⛰️</div>

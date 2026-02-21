@@ -17,6 +17,8 @@ import { ResultCutin } from "@/components/solo/ResultCutin";
 import { buildSoloSummary } from "@/lib/solo/summary";
 import { DetailedMountain } from "@/components/DetailedMountain";
 import { getRoute } from "@/lib/solo/routes";
+import { getWeather } from "@/lib/solo/weather";
+import { evaluateMission } from "@/lib/solo/missions";
 
 export default function SoloPage() {
   const gameHook = useSoloGame();
@@ -126,8 +128,8 @@ export default function SoloPage() {
         />
       )}
 
-      {/* メインゲーム画面 */}
-      {!showMissionBriefing && !showingResult && !isFinished && (
+      {/* メインゲーム画面・結果画面（ゲーム進行中） */}
+      {!showMissionBriefing && !isFinished && (
         <>
           {/* 天候に応じた背景 */}
           <div className={`fixed inset-0 ${weatherBackground} -z-20 transition-colors duration-1000`} />
@@ -210,39 +212,77 @@ export default function SoloPage() {
           </div>
 
           <div className="max-w-5xl mx-auto p-4 md:p-6 pb-24 space-y-6 relative z-10">
-            <SoloGameMain
-              game={gameHook.game}
-              currentRound={currentRound}
-              text={gameHook.text}
-              loading={gameHook.loading}
-              error={gameHook.error}
-              onTextChange={(e) => gameHook.setText(e.target.value)}
-              onRouteSelect={gameHook.handleRouteSelect}
-              onSubmit={handleSubmit}
-              onWeatherClick={() => setShowWeatherDetail(true)}
-              roundCount={gameHook.game.players[0].rounds.length}
-            />
+            {/* コンパクトヘッダー */}
+            <header className="flex flex-wrap gap-3 justify-between items-start text-sm md:text-base font-bold font-mono text-gray-600 dark:text-gray-400">
+              <div className="flex gap-3">
+                {gameHook.game.weather && (
+                  <button
+                    onClick={() => setShowWeatherDetail(true)}
+                    className="flex items-center gap-2 bg-white/50 dark:bg-black/50 px-3 py-2 rounded backdrop-blur border border-gray-200 dark:border-zinc-800 hover:bg-white/70 dark:hover:bg-black/70 transition-all cursor-pointer hover:scale-105 active:scale-95"
+                  >
+                    <span className="text-lg">{getWeather(gameHook.game.weather).emoji}</span>
+                    <span>{getWeather(gameHook.game.weather).label}</span>
+                    <span className="text-xs opacity-60">ℹ️</span>
+                  </button>
+                )}
+                <div className="flex items-center gap-2 bg-white/50 dark:bg-black/50 px-3 py-2 rounded backdrop-blur border border-gray-200 dark:border-zinc-800">
+                  <span className="text-lg">🛟</span>
+                  <span>保険: {gameHook.game.insurance}/1</span>
+                </div>
+              </div>
 
-            <SoloHistoryPanel
-              rounds={gameHook.game.players[0].rounds}
-              isOpen={isHistoryOpen}
-              onToggle={() => setIsHistoryOpen(!isHistoryOpen)}
-            />
+              {gameHook.game.mission && (
+                <div className="bg-purple-100/80 dark:bg-purple-900/40 px-4 py-2 rounded-full border border-purple-200 dark:border-purple-800 text-purple-800 dark:text-purple-200 flex items-center gap-2 max-w-full overflow-hidden">
+                  <span className="text-lg">🎯</span>
+                  <span className="truncate">{gameHook.game.mission.title}</span>
+                  <span className="opacity-70 text-xs md:text-sm">{evaluateMission(gameHook.game).progressText}</span>
+                </div>
+              )}
+            </header>
+
+            {!showingResult ? (
+              <>
+                <SoloGameMain
+                  game={gameHook.game}
+                  currentRound={currentRound}
+                  text={gameHook.text}
+                  loading={gameHook.loading}
+                  error={gameHook.error}
+                  onTextChange={(e) => gameHook.setText(e.target.value)}
+                  onRouteSelect={gameHook.handleRouteSelect}
+                  onSubmit={handleSubmit}
+                  roundCount={gameHook.game.players[0].rounds.length}
+                />
+
+                <SoloHistoryPanel
+                  rounds={gameHook.game.players[0].rounds}
+                  isOpen={isHistoryOpen}
+                  onToggle={() => setIsHistoryOpen(!isHistoryOpen)}
+                />
+              </>
+            ) : (
+              gameHook.lastResult && (
+                <>
+                  <SoloResultView
+                    round={gameHook.lastResult}
+                    totalScore={gameHook.game.players[0].totalScore}
+                    isGameFinished={gameHook.game.roundIndex + 1 >= gameHook.game.players[0].rounds.length}
+                    roundNumber={gameHook.game.roundIndex + 1}
+                    onNext={handleNext}
+                    onReset={handleReset}
+                  />
+
+                  <SoloHistoryPanel
+                    rounds={gameHook.game.players[0].rounds}
+                    isOpen={isHistoryOpen}
+                    onToggle={() => setIsHistoryOpen(!isHistoryOpen)}
+                  />
+                </>
+              )
+            )}
           </div>
         </div>
         </>
-      )}
-
-      {/* 結果表示画面 */}
-      {showingResult && gameHook.lastResult && (
-        <SoloResultView
-          round={gameHook.lastResult}
-          totalScore={gameHook.game.players[0].totalScore}
-          isGameFinished={gameHook.game.roundIndex + 1 >= gameHook.game.players[0].rounds.length}
-          roundNumber={gameHook.game.roundIndex + 1}
-          onNext={handleNext}
-          onReset={handleReset}
-        />
       )}
 
       {/* ラウンドカットイン */}
