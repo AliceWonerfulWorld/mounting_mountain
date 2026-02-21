@@ -313,7 +313,23 @@ export default function SoloPage() {
       {!showMissionBriefing && isFinished && (() => {
         const summary = buildSoloSummary(gameHook.game);
         return (
-          <div className="min-h-screen flex items-center justify-center p-4">
+          <>
+            {/* 天候に応じた背景 */}
+            <div className={`fixed inset-0 ${weatherBackground} -z-20 transition-colors duration-1000`} />
+
+            {/* 遠景の山シルエット (下層) */}
+            <div className="fixed bottom-0 left-0 w-full h-1/3 pointer-events-none -z-10 opacity-30 dark:opacity-20 transition-all duration-1000">
+              <svg viewBox="0 0 1200 320" preserveAspectRatio="none" className={`w-full h-full ${gameHook.game.weather === "SUNNY" ? "fill-green-600 dark:fill-green-700" : "fill-stone-400 dark:fill-stone-600"}`}>
+                <path d="M0,320 L200,160 L400,280 L600,100 L800,240 L1000,140 L1200,320 Z" />
+              </svg>
+            </div>
+            <div className="fixed bottom-0 left-0 w-full h-1/4 pointer-events-none -z-10 opacity-50 dark:opacity-40 transition-all duration-1000">
+              <svg viewBox="0 0 1200 320" preserveAspectRatio="none" className={`w-full h-full ${gameHook.game.weather === "SUNNY" ? "fill-green-700 dark:fill-green-800" : "fill-stone-500 dark:fill-stone-700"}`}>
+                <path d="M0,320 L150,200 L350,300 L550,150 L850,280 L1100,180 L1200,320 Z" />
+              </svg>
+            </div>
+
+            <div className="min-h-screen flex items-center justify-center p-4 relative z-10">
             <motion.section
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -486,6 +502,7 @@ export default function SoloPage() {
               </motion.div>
             </motion.section>
           </div>
+          </>
         );
       })()}
 
