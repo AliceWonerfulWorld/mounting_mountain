@@ -4,118 +4,87 @@ import Link from "next/link";
 import { useState } from "react";
 import {
     Mountain,
-    Brain,
-    Trophy,
-    Shield,
-    Zap,
-    Skull,
-    CloudSun,
-    Swords,
-    MessageSquare,
-    ArrowRight,
     Home,
     Users
 } from "lucide-react";
+import { MountainBackground } from "@/components/MountainBackground";
+import { useTimeOfDay } from "@/hooks/useTimeOfDay";
 
 type GameMode = "solo" | "versus";
 
 export default function HowToPage() {
     const [activeTab, setActiveTab] = useState<GameMode>("solo");
+    const timeOfDay = useTimeOfDay();
+
+    // 時間帯に応じた文字色のテーマ
+    const textColors = {
+        morning: {
+            primary: "text-amber-900",
+            secondary: "text-orange-800",
+            muted: "text-orange-700/80",
+            card: "text-slate-800",
+            cardMuted: "text-slate-600"
+        },
+        day: {
+            primary: "text-sky-900",
+            secondary: "text-cyan-800",
+            muted: "text-cyan-700/80",
+            card: "text-slate-800",
+            cardMuted: "text-slate-600"
+        },
+        evening: {
+            primary: "text-orange-950",
+            secondary: "text-red-900",
+            muted: "text-amber-800/80",
+            card: "text-slate-900",
+            cardMuted: "text-slate-700"
+        },
+        night: {
+            primary: "text-slate-100",
+            secondary: "text-indigo-200",
+            muted: "text-slate-300/80",
+            card: "text-slate-50",
+            cardMuted: "text-slate-300"
+        }
+    };
+
+    const colors = textColors[timeOfDay];
 
     return (
-        <main className="min-h-screen relative overflow-hidden bg-gradient-to-b from-sky-400 via-orange-200 to-amber-100">
+        <main className="min-h-screen relative overflow-hidden">
 
-            {/* 🏔️ 山の背景（CSS描画） */}
-            <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                {/* 遠景の山々（最も薄く、小さく） */}
-                <div className="absolute bottom-0 left-0 right-0 h-[500px] opacity-35">
-                    <div className="absolute bottom-0 w-full h-full bg-gradient-to-t from-slate-700 via-slate-600 to-transparent"
-                         style={{
-                             clipPath: 'polygon(0% 100%, 5% 50%, 12% 58%, 18% 42%, 25% 52%, 32% 38%, 40% 48%, 48% 32%, 55% 45%, 62% 28%, 70% 42%, 78% 25%, 85% 38%, 92% 22%, 100% 35%, 100% 100%)'
-                         }}>
-                    </div>
-                </div>
-
-                {/* 中景の山々（やや濃く、やや大きく） */}
-                <div className="absolute bottom-0 left-0 right-0 h-[400px] opacity-45">
-                    <div className="absolute bottom-0 w-full h-full bg-gradient-to-t from-slate-600 via-slate-500 to-transparent"
-                         style={{
-                             clipPath: 'polygon(0% 100%, 8% 42%, 15% 52%, 23% 35%, 32% 45%, 42% 28%, 52% 38%, 62% 25%, 72% 35%, 82% 22%, 90% 32%, 100% 20%, 100% 100%)'
-                         }}>
-                    </div>
-                </div>
-
-                {/* 近景の山々（最も濃く、大きく） */}
-                <div className="absolute bottom-0 left-0 right-0 h-[320px] opacity-55">
-                    <div className="absolute bottom-0 w-full h-full bg-gradient-to-t from-amber-800 via-amber-700 to-transparent"
-                         style={{
-                             clipPath: 'polygon(0% 100%, 10% 35%, 20% 45%, 30% 25%, 40% 38%, 50% 18%, 60% 32%, 70% 22%, 80% 35%, 90% 25%, 100% 32%, 100% 100%)'
-                         }}>
-                    </div>
-                    {/* 山の陰影 */}
-                    <div className="absolute bottom-0 w-full h-full bg-gradient-to-br from-transparent via-black/20 to-black/30"
-                         style={{
-                             clipPath: 'polygon(0% 100%, 10% 35%, 20% 45%, 30% 25%, 40% 38%, 50% 18%, 60% 32%, 70% 22%, 80% 35%, 90% 25%, 100% 32%, 100% 100%)'
-                         }}>
-                    </div>
-                </div>
-
-                {/* 最前景の山々（エッジがはっきり） */}
-                <div className="absolute bottom-0 left-0 right-0 h-[240px] opacity-65">
-                    <div className="absolute bottom-0 w-full h-full bg-gradient-to-t from-orange-900 via-orange-800 to-transparent"
-                         style={{
-                             clipPath: 'polygon(0% 100%, 15% 45%, 25% 55%, 35% 35%, 45% 48%, 55% 28%, 65% 42%, 75% 32%, 85% 45%, 95% 35%, 100% 42%, 100% 100%)'
-                         }}>
-                    </div>
-                    {/* 最前景の山の陰影 */}
-                    <div className="absolute bottom-0 w-full h-full bg-gradient-to-br from-transparent via-black/25 to-black/40"
-                         style={{
-                             clipPath: 'polygon(0% 100%, 15% 45%, 25% 55%, 35% 35%, 45% 48%, 55% 28%, 65% 42%, 75% 32%, 85% 45%, 95% 35%, 100% 42%, 100% 100%)'
-                         }}>
-                    </div>
-                </div>
-
-                {/* 雪を被った最高峰（アクセント） */}
-                <div className="absolute bottom-0 left-[40%] w-[20%] h-[280px] opacity-70">
-                    <div className="absolute bottom-0 w-full h-full bg-gradient-to-t from-slate-800 via-slate-700 to-white/80"
-                         style={{
-                             clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)'
-                         }}>
-                    </div>
-                    {/* 雪の輝き */}
-                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[60%] h-[40%] bg-gradient-to-b from-white/90 to-transparent blur-sm"
-                         style={{
-                             clipPath: 'polygon(50% 0%, 20% 100%, 80% 100%)'
-                         }}>
-                    </div>
-                </div>
-            </div>
+            {/* 時間帯に応じた背景 */}
+            <MountainBackground />
 
             <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12 space-y-6 sm:space-y-8 relative z-10">
 
                 {/* Header */}
                 <header className="text-center space-y-3 sm:space-y-4 mb-8">
                     <div className="inline-block">
-                        <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-amber-900 drop-shadow-sm px-2 relative">
+                        <h1 className={`text-4xl sm:text-5xl md:text-6xl font-black ${colors.primary} drop-shadow-sm px-2 relative transition-colors duration-1000`}>
                             🏔️ 遊び方ガイド
                         </h1>
-                        <div className="h-2 bg-amber-900/20 rounded-full mt-2"></div>
+                        <div className={`h-2 ${timeOfDay === 'night' ? 'bg-slate-300/30' : 'bg-amber-900/20'} rounded-full mt-2 transition-colors duration-1000`}></div>
                     </div>
-                    <p className="text-base sm:text-lg text-amber-800/90 font-medium px-2">
+                    <p className={`text-base sm:text-lg ${colors.secondary} font-medium px-2 transition-colors duration-1000`}>
                         マウントを標高で競おう！ エベレスト級の発言を目指せ 🎯
                     </p>
                 </header>
 
                 {/* 1. 概要: MountAIとは */}
-                <section className="bg-white/80 backdrop-blur-sm border-4 border-amber-900/30 rounded-3xl p-5 sm:p-8 shadow-lg hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 hover:border-amber-900/50">
+                <section className={`${
+                    timeOfDay === 'night' 
+                        ? 'bg-slate-800/80 border-slate-600' 
+                        : 'bg-white/80 border-amber-900/30 hover:border-amber-900/50'
+                } backdrop-blur-sm border-4 rounded-3xl p-5 sm:p-8 shadow-lg hover:shadow-2xl hover:scale-[1.02] transition-all duration-300`}>
                     <div className="flex flex-col md:flex-row items-center gap-4 sm:gap-6">
                         <div className="flex-1 space-y-3">
-                            <h2 className="text-2xl sm:text-3xl font-black text-amber-900 flex items-center gap-2 sm:gap-3">
+                            <h2 className={`text-2xl sm:text-3xl font-black ${colors.secondary} flex items-center gap-2 sm:gap-3 transition-colors duration-1000`}>
                                 🎮 このゲームについて
                             </h2>
-                            <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
-                                日常会話の<span className="font-bold text-orange-600 bg-orange-100 px-1 rounded">「マウント（自慢）」</span>を
-                                AIが判定して、<span className="font-bold text-blue-600 bg-blue-100 px-1 rounded">標高（0〜8848m）</span>で表示するゲームです！
+                            <p className={`text-sm sm:text-base ${colors.card} leading-relaxed transition-colors duration-1000`}>
+                                日常会話の<span className={`font-bold ${timeOfDay === 'night' ? 'text-orange-300 bg-orange-900/30' : 'text-orange-600 bg-orange-100'} px-1 rounded transition-colors duration-1000`}>「マウント（自慢）」</span>を
+                                AIが判定して、<span className={`font-bold ${timeOfDay === 'night' ? 'text-blue-300 bg-blue-900/30' : 'text-blue-600 bg-blue-100'} px-1 rounded transition-colors duration-1000`}>標高（0〜8848m）</span>で表示するゲームです！
                                 <br className="hidden md:block" />
                                 より高い山を目指して、戦略的にマウントを積み上げよう 🏔️
                             </p>
@@ -125,22 +94,26 @@ export default function HowToPage() {
 
                 {/* 2. 基本の流れ */}
                 <section className="space-y-4">
-                    <h2 className="text-2xl sm:text-3xl font-black text-amber-900 flex items-center gap-2 px-2">
+                    <h2 className={`text-2xl sm:text-3xl font-black ${colors.primary} flex items-center gap-2 px-2 transition-colors duration-1000`}>
                         📝 基本の流れ
                     </h2>
 
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4">
                         {[
-                            { emoji: "📋", label: "お題", desc: "出題される", color: "bg-blue-100 border-blue-300" },
-                            { emoji: "✍️", label: "入力", desc: "マウントを書く", color: "bg-green-100 border-green-300" },
-                            { emoji: "🤖", label: "AI判定", desc: "AIが解析", color: "bg-purple-100 border-purple-300" },
-                            { emoji: "⛰️", label: "成長", desc: "山が隆起", color: "bg-amber-100 border-amber-300" },
-                            { emoji: "🎯", label: "スコア", desc: "標高確定！", color: "bg-red-100 border-red-300" },
+                            { emoji: "📋", label: "お題", desc: "出題される", color: "blue", bgDay: "bg-blue-100", borderDay: "border-blue-300", bgNight: "bg-blue-900/30", borderNight: "border-blue-600" },
+                            { emoji: "✍️", label: "入力", desc: "マウントを書く", color: "green", bgDay: "bg-green-100", borderDay: "border-green-300", bgNight: "bg-green-900/30", borderNight: "border-green-600" },
+                            { emoji: "🤖", label: "AI判定", desc: "AIが解析", color: "purple", bgDay: "bg-purple-100", borderDay: "border-purple-300", bgNight: "bg-purple-900/30", borderNight: "border-purple-600" },
+                            { emoji: "⛰️", label: "成長", desc: "山が隆起", color: "amber", bgDay: "bg-amber-100", borderDay: "border-amber-300", bgNight: "bg-amber-900/30", borderNight: "border-amber-600" },
+                            { emoji: "🎯", label: "スコア", desc: "標高確定！", color: "red", bgDay: "bg-red-100", borderDay: "border-red-300", bgNight: "bg-red-900/30", borderNight: "border-red-600" },
                         ].map((step, i) => (
-                            <div key={i} className={`relative flex flex-col items-center text-center p-3 sm:p-4 ${step.color} border-2 rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-2 transition-all duration-300 cursor-default`}>
+                            <div key={i} className={`relative flex flex-col items-center text-center p-3 sm:p-4 ${
+                                timeOfDay === 'night' ? step.bgNight : step.bgDay
+                            } border-2 ${
+                                timeOfDay === 'night' ? step.borderNight : step.borderDay
+                            } rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-2 transition-all duration-300 cursor-default`}>
                                 <div className="text-3xl sm:text-4xl mb-2 transition-transform duration-300 hover:scale-125">{step.emoji}</div>
-                                <div className="font-bold text-gray-800 mb-1 text-sm sm:text-base">{step.label}</div>
-                                <div className="text-xs text-gray-600">{step.desc}</div>
+                                <div className={`font-bold ${colors.card} mb-1 text-sm sm:text-base transition-colors duration-1000`}>{step.label}</div>
+                                <div className={`text-xs ${colors.cardMuted} transition-colors duration-1000`}>{step.desc}</div>
 
                                 {i < 4 && (
                                     <div className="hidden md:block absolute top-1/2 -right-4 -translate-y-1/2 text-2xl z-10 animate-pulse">
@@ -160,6 +133,8 @@ export default function HowToPage() {
                             className={`relative flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-4 rounded-2xl font-bold text-base sm:text-lg transition-all duration-300 shadow-md overflow-hidden
                                 ${activeTab === "solo" 
                                     ? "bg-amber-500 text-white scale-105 shadow-xl" 
+                                    : timeOfDay === 'night'
+                                    ? "bg-slate-700/90 text-amber-200 hover:bg-slate-600 hover:scale-105 hover:shadow-lg active:scale-95"
                                     : "bg-white/90 text-amber-900 hover:bg-amber-100 hover:scale-105 hover:shadow-lg active:scale-95"
                                 }`}
                         >
@@ -174,6 +149,8 @@ export default function HowToPage() {
                             className={`relative flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-4 rounded-2xl font-bold text-base sm:text-lg transition-all duration-300 shadow-md overflow-hidden
                                 ${activeTab === "versus" 
                                     ? "bg-purple-500 text-white scale-105 shadow-xl" 
+                                    : timeOfDay === 'night'
+                                    ? "bg-slate-700/90 text-purple-200 hover:bg-slate-600 hover:scale-105 hover:shadow-lg active:scale-95"
                                     : "bg-white/90 text-purple-900 hover:bg-purple-100 hover:scale-105 hover:shadow-lg active:scale-95"
                                 }`}
                         >
@@ -188,42 +165,62 @@ export default function HowToPage() {
                     {/* ソロモードコンテンツ */}
                     {activeTab === "solo" && (
                         <div className="space-y-4 sm:space-y-6 animate-in slide-in-from-right-4 fade-in duration-500">
-                            <div className="bg-amber-100/80 backdrop-blur-sm border-3 border-amber-900/20 rounded-2xl p-4 sm:p-6 hover:shadow-xl transition-all duration-300 hover:border-amber-900/40">
-                                <h3 className="text-xl sm:text-2xl font-black text-amber-900 mb-4 flex items-center gap-2">
+                            <div className={`${
+                                timeOfDay === 'night' 
+                                    ? 'bg-slate-800/80 border-slate-600' 
+                                    : 'bg-amber-100/80 border-amber-900/20 hover:border-amber-900/40'
+                            } backdrop-blur-sm border-3 rounded-2xl p-4 sm:p-6 hover:shadow-xl transition-all duration-300`}>
+                                <h3 className={`text-xl sm:text-2xl font-black ${colors.secondary} mb-4 flex items-center gap-2 transition-colors duration-1000`}>
                                     ⛰️ ソロモードの遊び方
                                 </h3>
-                                <p className="text-sm sm:text-base text-gray-700 mb-4">
+                                <p className={`text-sm sm:text-base ${colors.card} mb-4 transition-colors duration-1000`}>
                                     3ラウンド制で、ルート選択や天候、ミッションなど戦略要素が満載！
                                 </p>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     {/* ルート選択 */}
-                                    <div className="bg-white/90 border-2 border-amber-900/20 rounded-xl p-4 sm:p-5 hover:shadow-lg hover:scale-[1.02] transition-all duration-300">
-                                        <h4 className="text-base sm:text-lg font-bold text-amber-900 mb-3 flex items-center gap-2">
+                                    <div className={`${
+                                        timeOfDay === 'night' 
+                                            ? 'bg-slate-700/90 border-slate-500' 
+                                            : 'bg-white/90 border-amber-900/20'
+                                    } border-2 rounded-xl p-4 sm:p-5 hover:shadow-lg hover:scale-[1.02] transition-all duration-300`}>
+                                        <h4 className={`text-base sm:text-lg font-bold ${colors.secondary} mb-3 flex items-center gap-2 transition-colors duration-1000`}>
                                             🛣️ ルート選択
                                         </h4>
                                         <div className="space-y-2">
-                                            <div className="flex items-start gap-2 p-2 sm:p-3 bg-green-50 border-2 border-green-400 rounded-lg hover:bg-green-100 hover:border-green-500 transition-all duration-200 cursor-pointer">
+                                            <div className={`flex items-start gap-2 p-2 sm:p-3 ${
+                                                timeOfDay === 'night'
+                                                    ? 'bg-green-900/30 border-green-600 hover:bg-green-900/40'
+                                                    : 'bg-green-50 border-green-400 hover:bg-green-100 hover:border-green-500'
+                                            } border-2 rounded-lg transition-all duration-200 cursor-pointer`}>
                                                 <div className="text-2xl">🛡️</div>
                                                 <div>
-                                                    <div className="font-bold text-green-700 text-sm sm:text-base">SAFE (×0.7)</div>
-                                                    <div className="text-xs sm:text-sm text-gray-600">安全第一！保険も回復するよ</div>
+                                                    <div className={`font-bold ${timeOfDay === 'night' ? 'text-green-300' : 'text-green-700'} text-sm sm:text-base transition-colors duration-1000`}>SAFE (×0.7)</div>
+                                                    <div className={`text-xs sm:text-sm ${colors.cardMuted} transition-colors duration-1000`}>安全第一！保険も回復するよ</div>
                                                 </div>
                                             </div>
-                                            <div className="flex items-start gap-2 p-2 sm:p-3 bg-blue-50 border-2 border-blue-400 rounded-lg hover:bg-blue-100 hover:border-blue-500 transition-all duration-200 cursor-pointer">
+                                            <div className={`flex items-start gap-2 p-2 sm:p-3 ${
+                                                timeOfDay === 'night'
+                                                    ? 'bg-blue-900/30 border-blue-600 hover:bg-blue-900/40'
+                                                    : 'bg-blue-50 border-blue-400 hover:bg-blue-100 hover:border-blue-500'
+                                            } border-2 rounded-lg transition-all duration-200 cursor-pointer`}>
                                                 <div className="text-2xl">⛰️</div>
                                                 <div>
-                                                    <div className="font-bold text-blue-700 text-sm sm:text-base">NORMAL (×1.0)</div>
-                                                    <div className="text-xs sm:text-sm text-gray-600">バランス重視の王道</div>
+                                                    <div className={`font-bold ${timeOfDay === 'night' ? 'text-blue-300' : 'text-blue-700'} text-sm sm:text-base transition-colors duration-1000`}>NORMAL (×1.0)</div>
+                                                    <div className={`text-xs sm:text-sm ${colors.cardMuted} transition-colors duration-1000`}>バランス重視の王道</div>
                                                 </div>
                                             </div>
-                                            <div className="flex items-start gap-2 p-2 sm:p-3 bg-red-50 border-2 border-red-400 rounded-lg hover:bg-red-100 hover:border-red-500 transition-all duration-200 cursor-pointer">
+                                            <div className={`flex items-start gap-2 p-2 sm:p-3 ${
+                                                timeOfDay === 'night'
+                                                    ? 'bg-red-900/30 border-red-600 hover:bg-red-900/40'
+                                                    : 'bg-red-50 border-red-400 hover:bg-red-100 hover:border-red-500'
+                                            } border-2 rounded-lg transition-all duration-200 cursor-pointer`}>
                                                 <div className="text-2xl">💀</div>
                                                 <div>
-                                                    <div className="font-bold text-red-700 text-sm sm:text-base">RISKY (×1.3)</div>
-                                                    <div className="text-xs sm:text-sm text-gray-600">
+                                                    <div className={`font-bold ${timeOfDay === 'night' ? 'text-red-300' : 'text-red-700'} text-sm sm:text-base transition-colors duration-1000`}>RISKY (×1.3)</div>
+                                                    <div className={`text-xs sm:text-sm ${colors.cardMuted} transition-colors duration-1000`}>
                                                         ハイリスク・ハイリターン！
-                                                        <span className="block text-red-600 font-medium mt-1">※評価が低いと滑落して2000m固定</span>
+                                                        <span className={`block ${timeOfDay === 'night' ? 'text-red-400' : 'text-red-600'} font-medium mt-1 transition-colors duration-1000`}>※評価が低いと滑落して2000m固定</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -232,26 +229,46 @@ export default function HowToPage() {
 
                                     <div className="space-y-4">
                                         {/* 天候 */}
-                                        <div className="bg-white/90 border-2 border-amber-900/20 rounded-xl p-4 sm:p-5 hover:shadow-lg hover:scale-[1.02] transition-all duration-300">
-                                            <h4 className="text-base sm:text-lg font-bold text-amber-900 mb-2 flex items-center gap-2">
+                                        <div className={`${
+                                            timeOfDay === 'night' 
+                                                ? 'bg-slate-700/90 border-slate-500' 
+                                                : 'bg-white/90 border-amber-900/20'
+                                        } border-2 rounded-xl p-4 sm:p-5 hover:shadow-lg hover:scale-[1.02] transition-all duration-300`}>
+                                            <h4 className={`text-base sm:text-lg font-bold ${colors.secondary} mb-2 flex items-center gap-2 transition-colors duration-1000`}>
                                                 🌤️ 天候ボーナス
                                             </h4>
-                                            <p className="text-xs sm:text-sm text-gray-600 mb-3">
+                                            <p className={`text-xs sm:text-sm ${colors.cardMuted} mb-3 transition-colors duration-1000`}>
                                                 天候に合わせたマウントで+20%！
                                             </p>
                                             <div className="space-y-1.5 text-xs sm:text-sm">
-                                                <div className="bg-yellow-50 p-2 rounded border border-yellow-300 text-gray-700 hover:bg-yellow-100 transition-colors duration-200">☀️ <span className="font-bold">晴天</span> →「数値」で+20%</div>
-                                                <div className="bg-cyan-50 p-2 rounded border border-cyan-300 text-gray-700 hover:bg-cyan-100 transition-colors duration-200">💨 <span className="font-bold">強風</span> →「比較」で+20%</div>
-                                                <div className="bg-blue-50 p-2 rounded border border-blue-300 text-gray-700 hover:bg-blue-100 transition-colors duration-200">❄️ <span className="font-bold">吹雪</span> →「皮肉」で+20%</div>
+                                                <div className={`p-2 rounded border ${
+                                                    timeOfDay === 'night'
+                                                        ? 'bg-yellow-900/30 border-yellow-600 text-yellow-200 hover:bg-yellow-900/40'
+                                                        : 'bg-yellow-50 border-yellow-300 text-gray-700 hover:bg-yellow-100'
+                                                } transition-colors duration-200`}>☀️ <span className="font-bold">晴天</span> →「数値」で+20%</div>
+                                                <div className={`p-2 rounded border ${
+                                                    timeOfDay === 'night'
+                                                        ? 'bg-cyan-900/30 border-cyan-600 text-cyan-200 hover:bg-cyan-900/40'
+                                                        : 'bg-cyan-50 border-cyan-300 text-gray-700 hover:bg-cyan-100'
+                                                } transition-colors duration-200`}>💨 <span className="font-bold">強風</span> →「比較」で+20%</div>
+                                                <div className={`p-2 rounded border ${
+                                                    timeOfDay === 'night'
+                                                        ? 'bg-blue-900/30 border-blue-600 text-blue-200 hover:bg-blue-900/40'
+                                                        : 'bg-blue-50 border-blue-300 text-gray-700 hover:bg-blue-100'
+                                                } transition-colors duration-200`}>❄️ <span className="font-bold">吹雪</span> →「皮肉」で+20%</div>
                                             </div>
                                         </div>
 
                                         {/* ミッション */}
-                                        <div className="bg-white/90 border-2 border-amber-900/20 rounded-xl p-4 sm:p-5 hover:shadow-lg hover:scale-[1.02] transition-all duration-300">
-                                            <h4 className="text-base sm:text-lg font-bold text-amber-900 mb-2 flex items-center gap-2">
+                                        <div className={`${
+                                            timeOfDay === 'night' 
+                                                ? 'bg-slate-700/90 border-slate-500' 
+                                                : 'bg-white/90 border-amber-900/20'
+                                        } border-2 rounded-xl p-4 sm:p-5 hover:shadow-lg hover:scale-[1.02] transition-all duration-300`}>
+                                            <h4 className={`text-base sm:text-lg font-bold ${colors.secondary} mb-2 flex items-center gap-2 transition-colors duration-1000`}>
                                                 🎯 ミッション
                                             </h4>
-                                            <p className="text-xs sm:text-sm text-gray-600">
+                                            <p className={`text-xs sm:text-sm ${colors.cardMuted} transition-colors duration-1000`}>
                                                 「合計15000m登れ」などのミッションが発生！
                                                 クリアすると★★★評価GET 🌟
                                             </p>
@@ -265,38 +282,58 @@ export default function HowToPage() {
                     {/* ローカル対戦モードコンテンツ */}
                     {activeTab === "versus" && (
                         <div className="space-y-4 animate-in slide-in-from-left-4 fade-in duration-500">
-                            <div className="bg-purple-100/80 backdrop-blur-sm border-3 border-purple-900/20 rounded-2xl p-4 sm:p-6 hover:shadow-xl transition-all duration-300 hover:border-purple-900/40">
-                                <h3 className="text-xl sm:text-2xl font-black text-purple-900 mb-4 flex items-center gap-2">
+                            <div className={`${
+                                timeOfDay === 'night' 
+                                    ? 'bg-slate-800/80 border-slate-600' 
+                                    : 'bg-purple-100/80 border-purple-900/20 hover:border-purple-900/40'
+                            } backdrop-blur-sm border-3 rounded-2xl p-4 sm:p-6 hover:shadow-xl transition-all duration-300`}>
+                                <h3 className={`text-xl sm:text-2xl font-black ${colors.secondary} mb-4 flex items-center gap-2 transition-colors duration-1000`}>
                                     ⚔️ ローカル対戦の遊び方
                                 </h3>
-                                <p className="text-sm sm:text-base text-gray-700 mb-4">
+                                <p className={`text-sm sm:text-base ${colors.card} mb-4 transition-colors duration-1000`}>
                                     友達と同じ画面で交代しながらプレイ！誰が一番マウント取れるかな？
                                 </p>
 
                                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-center">
-                                    <div className="bg-white/90 p-4 rounded-xl border-2 border-purple-300 shadow-md hover:shadow-xl hover:-translate-y-2 transition-all duration-300 cursor-pointer">
+                                    <div className={`${
+                                        timeOfDay === 'night'
+                                            ? 'bg-slate-700/90 border-slate-500'
+                                            : 'bg-white/90 border-purple-300'
+                                    } p-4 rounded-xl border-2 shadow-md hover:shadow-xl hover:-translate-y-2 transition-all duration-300 cursor-pointer`}>
                                         <div className="text-4xl mb-2 transition-transform duration-300 hover:scale-125">🔄</div>
-                                        <div className="font-bold text-purple-700 mb-1 text-sm sm:text-base">1. 交互にプレイ</div>
-                                        <div className="text-xs sm:text-sm text-gray-600">プレイヤー1と2で交代しながらマウントを入力！</div>
+                                        <div className={`font-bold ${timeOfDay === 'night' ? 'text-purple-300' : 'text-purple-700'} mb-1 text-sm sm:text-base transition-colors duration-1000`}>1. 交互にプレイ</div>
+                                        <div className={`text-xs sm:text-sm ${colors.cardMuted} transition-colors duration-1000`}>プレイヤー1と2で交代しながらマウントを入力！</div>
                                     </div>
-                                    <div className="bg-white/90 p-4 rounded-xl border-2 border-purple-300 shadow-md hover:shadow-xl hover:-translate-y-2 transition-all duration-300 cursor-pointer">
+                                    <div className={`${
+                                        timeOfDay === 'night'
+                                            ? 'bg-slate-700/90 border-slate-500'
+                                            : 'bg-white/90 border-purple-300'
+                                    } p-4 rounded-xl border-2 shadow-md hover:shadow-xl hover:-translate-y-2 transition-all duration-300 cursor-pointer`}>
                                         <div className="text-4xl mb-2 transition-transform duration-300 hover:scale-125">🏆</div>
-                                        <div className="font-bold text-purple-700 mb-1 text-sm sm:text-base">2. ラウンド勝者</div>
-                                        <div className="text-xs sm:text-sm text-gray-600">各ラウンドで標高が高い方に<span className="text-yellow-600 font-bold">+1000m</span>ボーナス！</div>
+                                        <div className={`font-bold ${timeOfDay === 'night' ? 'text-purple-300' : 'text-purple-700'} mb-1 text-sm sm:text-base transition-colors duration-1000`}>2. ラウンド勝者</div>
+                                        <div className={`text-xs sm:text-sm ${colors.cardMuted} transition-colors duration-1000`}>各ラウンドで標高が高い方に<span className="text-yellow-500 font-bold">+1000m</span>ボーナス！</div>
                                     </div>
-                                    <div className="bg-white/90 p-4 rounded-xl border-2 border-purple-300 shadow-md hover:shadow-xl hover:-translate-y-2 transition-all duration-300 cursor-pointer sm:col-span-2 md:col-span-1">
+                                    <div className={`${
+                                        timeOfDay === 'night'
+                                            ? 'bg-slate-700/90 border-slate-500'
+                                            : 'bg-white/90 border-purple-300'
+                                    } p-4 rounded-xl border-2 shadow-md hover:shadow-xl hover:-translate-y-2 transition-all duration-300 cursor-pointer sm:col-span-2 md:col-span-1`}>
                                         <div className="text-4xl mb-2 transition-transform duration-300 hover:scale-125">👑</div>
-                                        <div className="font-bold text-purple-700 mb-1 text-sm sm:text-base">3. 合計勝負</div>
-                                        <div className="text-xs sm:text-sm text-gray-600">最終的な合計標高で勝敗が決定！</div>
+                                        <div className={`font-bold ${timeOfDay === 'night' ? 'text-purple-300' : 'text-purple-700'} mb-1 text-sm sm:text-base transition-colors duration-1000`}>3. 合計勝負</div>
+                                        <div className={`text-xs sm:text-sm ${colors.cardMuted} transition-colors duration-1000`}>最終的な合計標高で勝敗が決定！</div>
                                     </div>
                                 </div>
 
-                                <div className="mt-6 bg-yellow-50 border-2 border-yellow-400 rounded-xl p-4 hover:bg-yellow-100 transition-colors duration-300">
+                                <div className={`mt-6 ${
+                                    timeOfDay === 'night'
+                                        ? 'bg-yellow-900/40 border-yellow-600 hover:bg-yellow-900/50'
+                                        : 'bg-yellow-50 border-yellow-400 hover:bg-yellow-100'
+                                } border-2 rounded-xl p-4 transition-colors duration-300`}>
                                     <div className="flex items-start gap-2">
                                         <div className="text-2xl">💡</div>
                                         <div>
-                                            <div className="font-bold text-amber-900 mb-1">ヒント</div>
-                                            <p className="text-sm text-gray-700">
+                                            <div className={`font-bold ${timeOfDay === 'night' ? 'text-yellow-300' : 'text-amber-900'} mb-1 transition-colors duration-1000`}>ヒント</div>
+                                            <p className={`text-sm ${colors.card} transition-colors duration-1000`}>
                                                 現在はシンプルな対戦モードです。ルート選択や天候システムはソロモード限定！
                                             </p>
                                         </div>
@@ -308,30 +345,50 @@ export default function HowToPage() {
                 </section>
 
                 {/* 4. 攻略のヒント */}
-                <section className="bg-gradient-to-br from-green-100 to-emerald-100 border-4 border-green-900/30 rounded-3xl p-5 sm:p-8 shadow-lg hover:shadow-2xl hover:scale-[1.01] transition-all duration-300">
-                    <h3 className="text-xl sm:text-2xl font-black text-green-900 mb-4 flex items-center gap-2">
+                <section className={`${
+                    timeOfDay === 'night'
+                        ? 'bg-gradient-to-br from-slate-700 to-slate-800 border-slate-600'
+                        : 'bg-gradient-to-br from-green-100 to-emerald-100 border-green-900/30'
+                } border-4 rounded-3xl p-5 sm:p-8 shadow-lg hover:shadow-2xl hover:scale-[1.01] transition-all duration-300`}>
+                    <h3 className={`text-xl sm:text-2xl font-black ${timeOfDay === 'night' ? 'text-green-300' : 'text-green-900'} mb-4 flex items-center gap-2 transition-colors duration-1000`}>
                         💡 攻略のヒント
                     </h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                        <div className="bg-white/80 p-4 rounded-xl border-2 border-green-300 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer">
+                        <div className={`${
+                            timeOfDay === 'night' 
+                                ? 'bg-slate-700/80 border-slate-500' 
+                                : 'bg-white/80 border-green-300'
+                        } p-4 rounded-xl border-2 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer`}>
                             <div className="text-3xl mb-2 transition-transform duration-300 hover:scale-110">🎯</div>
-                            <div className="font-bold text-gray-800 mb-1">具体的な数値が強い</div>
-                            <div className="text-sm text-gray-600">「年収」「学歴」「経験年数」など数字を入れるとAIの評価UP！</div>
+                            <div className={`font-bold ${colors.card} mb-1 transition-colors duration-1000`}>具体的な数値が強い</div>
+                            <div className={`text-sm ${colors.cardMuted} transition-colors duration-1000`}>「年収」「学歴」「経験年数」など数字を入れるとAIの評価UP！</div>
                         </div>
-                        <div className="bg-white/80 p-4 rounded-xl border-2 border-green-300 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer">
+                        <div className={`${
+                            timeOfDay === 'night' 
+                                ? 'bg-slate-700/80 border-slate-500' 
+                                : 'bg-white/80 border-green-300'
+                        } p-4 rounded-xl border-2 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer`}>
                             <div className="text-3xl mb-2 transition-transform duration-300 hover:scale-110">🔍</div>
-                            <div className="font-bold text-gray-800 mb-1">比較表現を使おう</div>
-                            <div className="text-sm text-gray-600">「普通は〜」「まだ〜してるの？」などの比較が効果的！</div>
+                            <div className={`font-bold ${colors.card} mb-1 transition-colors duration-1000`}>比較表現を使おう</div>
+                            <div className={`text-sm ${colors.cardMuted} transition-colors duration-1000`}>「普通は〜」「まだ〜してるの？」などの比較が効果的！</div>
                         </div>
-                        <div className="bg-white/80 p-4 rounded-xl border-2 border-green-300 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer">
+                        <div className={`${
+                            timeOfDay === 'night' 
+                                ? 'bg-slate-700/80 border-slate-500' 
+                                : 'bg-white/80 border-green-300'
+                        } p-4 rounded-xl border-2 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer`}>
                             <div className="text-3xl mb-2 transition-transform duration-300 hover:scale-110">😏</div>
-                            <div className="font-bold text-gray-800 mb-1">鼻につく表現</div>
-                            <div className="text-sm text-gray-600">AIは「具体的で鼻につく」表現を高く評価する傾向あり</div>
+                            <div className={`font-bold ${colors.card} mb-1 transition-colors duration-1000`}>鼻につく表現</div>
+                            <div className={`text-sm ${colors.cardMuted} transition-colors duration-1000`}>AIは「具体的で鼻につく」表現を高く評価する傾向あり</div>
                         </div>
-                        <div className="bg-white/80 p-4 rounded-xl border-2 border-green-300 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer">
+                        <div className={`${
+                            timeOfDay === 'night' 
+                                ? 'bg-slate-700/80 border-slate-500' 
+                                : 'bg-white/80 border-green-300'
+                        } p-4 rounded-xl border-2 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer`}>
                             <div className="text-3xl mb-2 transition-transform duration-300 hover:scale-110">🎲</div>
-                            <div className="font-bold text-gray-800 mb-1">RISKYルートは慎重に</div>
-                            <div className="text-sm text-gray-600">一発逆転のチャンスだけど、滑落のリスクも忘れずに！</div>
+                            <div className={`font-bold ${colors.card} mb-1 transition-colors duration-1000`}>RISKYルートは慎重に</div>
+                            <div className={`text-sm ${colors.cardMuted} transition-colors duration-1000`}>一発逆転のチャンスだけど、滑落のリスクも忘れずに！</div>
                         </div>
                     </div>
                 </section>

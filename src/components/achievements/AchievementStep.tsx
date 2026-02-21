@@ -6,14 +6,13 @@ type StepStatus = "unlocked" | "next" | "locked";
 type AchievementStepProps = {
     achievement: Achievement;
     status: StepStatus;
-    showConnector?: boolean;
     index?: number; // アニメーション用のインデックス
 };
 
 /**
  * 登山ルート上の1つの実績ステップを表示するコンポーネント
  */
-export function AchievementStep({ achievement, status, showConnector = true, index = 0 }: AchievementStepProps) {
+export function AchievementStep({ achievement, status, index = 0 }: AchievementStepProps) {
     const statusText = status === "unlocked" ? "解除済み" : status === "next" ? "次の目標" : "未解除";
     const ariaLabel = `${achievement.title || "未知の実績"} - ${statusText}${status === "locked" ? "" : ` - ${achievement.description}`}`;
     
