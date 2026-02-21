@@ -1017,6 +1017,220 @@ test('complete user journey', async ({ page }) => {
 
 ---
 
+## データベースセットアップ手順
+
+### 1. Supabaseプロジェクト作成
+
+1. [https://supabase.com/dashboard](https://supabase.com/dashboard) にアクセス
+2. "New Project" をクリック
+3. プロジェクト名を入力（例: mounting-mountain）
+4. データベースパスワードを設定
+5. リージョンを選択（推奨: Northeast Asia (Tokyo)）
+6. "Create new project" をクリック
+
+### 2. 環境変数の設定
+
+プロジェクト作成後、Settings > API から以下の情報をコピーし、`.env.local` に追加：
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key-here
+```
+
+### 3. データベーステーブルの作成
+
+SQL Editorで以下のSQLを実行：
+
+```sql
+-- 1. profilesテーブル
+CREATE TABLE profiles (
+  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  username TEXT UNIQUE,
+  display_name TEXT,
+  avatar_url TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view own profile"
+  ON profiles FOR SELECT
+  USING (auth.uid() = id);
+
+CREATE POLICY "Users can update own profile"
+  ON profiles FOR UPDATE
+  USING (auth.uid() = id);
+
+-- 2. solo_game_historyテーブル
+CREATE TABLE solo_game_history (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+  total_score INTEGER NOT NULL,
+  weather_id TEXT NOT NULL,
+  mission_id TEXT,
+  rounds_data JSONB NOT NULL,
+  completed BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE INDEX idx_solo_game_history_user_id ON solo_game_history(user_id);
+CREATE INDEX idx_solo_game_history_total_score ON solo_game_history(total_score DESC);
+CREATE INDEX idx_solo_game_history_created_at ON solo_game_history(created_at DESC);
+
+ALTER TABLE solo_game_history ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view own game history"
+  ON solo_game_history FOR SELECT
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert own game history"
+  ON solo_game_history FOR INSERT
+  WITH CHECK (auth.uid() = user_id);
+
+-- 3. versus_game_historyテーブル（今後の拡張用）
+CREATE TABLE versus_game_history (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+  player1_name TEXT NOT NULL,
+  player2_name TEXT NOT NULL,
+  winner TEXT,
+  player1_score INTEGER NOT NULL,
+  player2_score INTEGER NOT NULL,
+  rounds_data JSONB NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE INDEX idx_versus_game_history_user_id ON versus_game_history(user_id);
+
+ALTER TABLE versus_game_history ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view own versus history"
+  ON versus_game_history FOR SELECT
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert own versus history"
+  ON versus_game_history FOR INSERT
+  WITH CHECK (auth.uid() = user_id);
+
+-- 4. user_achievementsテーブル（今後の拡張用）
+CREATE TABLE user_achievements (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+  achievement_id TEXT NOT NULL,
+  unlocked_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(user_id, achievement_id)
+);
+
+CREATE INDEX idx_user_achievements_user_id ON user_achievements(user_id);
+
+ALTER TABLE user_achievements ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view own achievements"
+  ON user_achievements FOR SELECT
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert own achievements"
+  ON user_achievements FOR INSERT
+  WITH CHECK (auth.uid() = user_id);
+
+-- 5. リーダーボードビュー
+CREATE OR REPLACE VIEW leaderboard AS
+SELECT 
+  p.id,
+  p.username,
+  p.display_name,
+  p.avatar_url,
+  MAX(sgh.total_score) as best_score,
+  COUNT(sgh.id) as total_games,
+  SUM(CASE WHEN sgh.completed THEN 1 ELSE 0 END) as completed_games
+FROM profiles p
+LEFT JOIN solo_game_history sgh ON p.id = sgh.user_id
+GROUP BY p.id, p.username, p.display_name, p.avatar_url
+ORDER BY best_score DESC NULLS LAST;
+```
+
+### 4. 認証設定
+
+#### Email認証
+
+1. Authentication > Providers に移動
+2. Email Provider を有効化（デフォルトで有効）
+3. Email Templates でメール文面をカスタマイズ（オプション）
+
+#### OAuth認証（X / Google）
+
+1. Authentication > Providers に移動
+
+**Google OAuth設定**:
+1. Google Providerを選択
+2. "Enable Sign in with Google" をON
+3. Google Cloud Consoleで以下を設定：
+   - [Google Cloud Console](https://console.cloud.google.com/) にアクセス
+   - プロジェクトを作成または選択
+   - APIs & Services > Credentials へ移動
+   - "Create Credentials" > "OAuth 2.0 Client ID"
+   - Application type: Web application
+   - Authorized redirect URIs: `https://your-project-id.supabase.co/auth/v1/callback`
+   - Client IDとClient Secretをコピー
+4. SupabaseのGoogle Provider設定にClient IDとClient Secretを貼り付け
+5. "Save" をクリック
+
+**X (Twitter) OAuth設定**:
+1. X Providerを選択
+2. "Enable Sign in with X" をON
+3. [X Developer Portal](https://developer.twitter.com/en/portal/dashboard) で以下を設定：
+   - プロジェクトを作成または選択
+   - User authentication settings を設定
+   - OAuth 2.0を有効化
+   - Callback URL: `https://your-project-id.supabase.co/auth/v1/callback`
+   - Client IDとClient Secretをコピー
+4. SupabaseのX Provider設定にClient IDとClient Secretを貼り付け
+5. "Save" をクリック
+
+#### URL Configuration
+
+URL Configuration で以下を設定：
+- Site URL: `http://localhost:3000` (開発時) / `https://your-domain.com` (本番時)
+- Redirect URLs: 
+  - `http://localhost:3000/auth/callback`
+  - `https://your-domain.com/auth/callback` (本番時)
+
+### 5. ストレージ設定（アバター画像用・今後の拡張）
+
+1. Storage に移動
+2. "Create bucket" をクリック
+3. Bucket名: `avatars`
+4. Public bucket: チェック
+5. RLSポリシー設定：
+
+```sql
+-- ユーザーは自分のアバターをアップロード可能
+CREATE POLICY "Users can upload own avatar"
+ON storage.objects FOR INSERT
+WITH CHECK (
+  bucket_id = 'avatars' AND
+  auth.uid()::text = (storage.foldername(name))[1]
+);
+
+-- 誰でもアバターを閲覧可能
+CREATE POLICY "Avatar images are publicly accessible"
+ON storage.objects FOR SELECT
+USING (bucket_id = 'avatars');
+```
+
+### 6. 動作確認
+
+1. 開発サーバー起動: `npm run dev`
+2. [http://localhost:3000](http://localhost:3000) にアクセス
+3. 新規登録フォームからユーザー作成
+4. メールボックスで認証リンクをクリック
+5. ログイン後、ソロモードをプレイ
+6. プロフィールページで履歴が保存されているか確認
+
+---
+
 ## 参考リンク
 
 - [Supabase Documentation](https://supabase.com/docs)
@@ -1031,4 +1245,4 @@ test('complete user journey', async ({ page }) => {
 | 日付 | バージョン | 変更内容 |
 |------|-----------|---------|
 | 2026-02-21 | 1.0.0 | 初版作成 |
-
+| 2026-02-21 | 1.1.0 | データベースセットアップ手順を追加 |
