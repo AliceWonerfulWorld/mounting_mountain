@@ -66,13 +66,14 @@ export function useSoloGame() {
 
   /**
    * ラウンド送信とAPI通信
+   * @returns 送信完了したRoundオブジェクト、または失敗時はundefined
    */
-  const submitRound = useCallback(async () => {
-    if (!game) return;
+  const submitRound = useCallback(async (): Promise<Round | undefined> => {
+    if (!game) return undefined;
     const currentRound = game.players[0].rounds[game.roundIndex];
     const isFinished = game.status === "finished";
 
-    if (!text.trim() || isFinished || loading) return;
+    if (!text.trim() || isFinished || loading) return undefined;
 
     setLoading(true);
     setError(null);
@@ -94,53 +95,44 @@ export function useSoloGame() {
 
       const result = await res.json();
 
-      setGame((prev) => {
-        if (!prev) return null;
-        const next = structuredClone(prev);
+      // 完了したラウンドデータを事前に構築
+      const route = getRoute(currentRound.routeId);
+      const routeMultiplier = route.multiplier;
+      const bonus = computeBonus(result.labels);
+      const baseAltitude = result.altitude;
+      const bonusAltitude = bonus.bonusAltitude;
 
-        const player = next.players[0];
-        const round = player.rounds[next.roundIndex];
+      const scoreResult = computeFinalAltitude({
+        baseAltitude,
+        routeId: currentRound.routeId || "NORMAL",
+        routeMultiplier,
+        bonusAltitude,
+        weatherId: game.weather,
+        labels: result.labels,
+        insurance: game.insurance,
+      });
 
-        round.inputText = text.trim();
+      const {
+        finalAltitude,
+        didFall,
+        fallReason,
+        weatherApplied,
+        weatherMultiplier,
+        weatherBoostLabel,
+        insuranceUsed,
+      } = scoreResult;
 
-        // ルート取得
-        const route = getRoute(round.routeId);
-        const routeMultiplier = route.multiplier;
-
-        // ボーナス計算
-        const bonus = computeBonus(result.labels);
-        const baseAltitude = result.altitude;
-        const bonusAltitude = bonus.bonusAltitude;
-
-        // 最終標高計算（滑落判定・天候を含む）
-        const scoreResult = computeFinalAltitude({
-          baseAltitude,
-          routeId: round.routeId || "NORMAL",
-          routeMultiplier,
-          bonusAltitude,
-          weatherId: prev.weather,
-          labels: result.labels,
-          insurance: prev.insurance,
-        });
-
-        const {
-          finalAltitude,
-          didFall,
-          fallReason,
-          weatherApplied,
-          weatherMultiplier,
-          weatherBoostLabel,
-          insuranceUsed,
-        } = scoreResult;
-
-        // 結果オブジェクトを拡張更新
-        round.result = {
+      // 完了したラウンドオブジェクトを構築
+      const completedRound: Round = {
+        ...currentRound,
+        inputText: text.trim(),
+        result: {
           ...result,
           baseAltitude,
           bonusAltitude,
           finalAltitude,
           bonusReasons: bonus.reasons,
-          routeId: round.routeId,
+          routeId: currentRound.routeId,
           routeMultiplier,
           didFall,
           fallReason,
@@ -148,7 +140,20 @@ export function useSoloGame() {
           weatherMultiplier,
           weatherBoostLabel,
           altitude: finalAltitude,
-        };
+        },
+      };
+
+      // ゲーム状態を更新
+      setGame((prev) => {
+        if (!prev) return null;
+        const next = structuredClone(prev);
+
+        const player = next.players[0];
+        const round = player.rounds[next.roundIndex];
+
+        // 結果を反映
+        round.inputText = text.trim();
+        round.result = completedRound.result;
 
         // 保険消費処理
         if (insuranceUsed) {
@@ -162,22 +167,24 @@ export function useSoloGame() {
 
         player.totalScore += finalAltitude;
 
-        // 実績更新
-        updateStats({
-          highestAltitude: finalAltitude,
-          snowCount: finalAltitude >= 6000 ? 1 : 0,
-          everestCount: finalAltitude >= 8000 ? 1 : 0,
-        });
-
-        // 直近の結果を保存
-        setLastResult(structuredClone(round));
-
         return next;
       });
 
+      // 実績更新
+      updateStats({
+        highestAltitude: finalAltitude,
+        snowCount: finalAltitude >= 6000 ? 1 : 0,
+        everestCount: finalAltitude >= 8000 ? 1 : 0,
+      });
+
+      setLastResult(completedRound);
       setText("");
+      
+      // 完了したラウンドを返す（state更新を待たずに使用可能）
+      return completedRound;
     } catch (e) {
       setError(e instanceof Error ? e.message : "Unknown error");
+      return undefined;
     } finally {
       setLoading(false);
     }

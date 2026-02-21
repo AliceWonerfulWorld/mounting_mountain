@@ -37,11 +37,11 @@ export default function SoloPage() {
   const handleSubmit = useCallback(async () => {
     if (!gameHook.game) return;
 
-    await gameHook.submitRound();
+    const completedRound = await gameHook.submitRound();
 
-    // submitRound完了後、lastResultが更新されているのでそれを使う
-    if (gameHook.lastResult) {
-      cutinHook.triggerResultCutin(gameHook.lastResult, () => {
+    // submitRoundから返された結果を直接使用（state更新を待たない）
+    if (completedRound) {
+      cutinHook.triggerResultCutin(completedRound, () => {
         setShowingResult(true);
         setIsHistoryOpen(false);
       });
