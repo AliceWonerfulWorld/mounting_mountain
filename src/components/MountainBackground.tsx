@@ -3,8 +3,6 @@
 import { useState } from "react";
 import { useTimeOfDay } from "@/hooks/useTimeOfDay";
 
-type TimeOfDay = "morning" | "day" | "evening" | "night";
-
 const backgrounds = {
     morning: {
         gradient: "from-orange-300 via-pink-200 to-sky-300",
