@@ -23,63 +23,73 @@ export default function HowToPage() {
     const [activeTab, setActiveTab] = useState<GameMode>("solo");
 
     return (
-        <main className="min-h-screen relative overflow-hidden bg-gradient-to-b from-sky-200 via-orange-100 to-amber-50">
+        <main className="min-h-screen relative overflow-hidden bg-gradient-to-b from-sky-400 via-orange-200 to-amber-100">
 
-            {/* 🏔️ 山の背景レイヤー（層状に配置） */}
-            <div className="absolute inset-0 pointer-events-none">
-                {/* 遠景の山々（薄く、小さく） */}
-                <div className="absolute top-0 left-0 w-full h-full opacity-20">
-                    <div className="absolute top-10 left-[5%] text-5xl animate-pulse" style={{ animationDuration: '8s' }}>⛰️</div>
-                    <div className="absolute top-16 right-[8%] text-4xl animate-pulse" style={{ animationDuration: '10s' }}>🗻</div>
-                    <div className="absolute top-24 left-[60%] text-6xl animate-pulse" style={{ animationDuration: '12s' }}>🏔️</div>
-                    <div className="absolute top-32 left-[30%] text-4xl animate-pulse" style={{ animationDuration: '9s' }}>⛰️</div>
-                    <div className="absolute top-20 right-[40%] text-5xl animate-pulse" style={{ animationDuration: '11s' }}>🗻</div>
-                </div>
-                
-                {/* 中景の山々（やや濃く） */}
-                <div className="absolute top-0 left-0 w-full h-full opacity-30">
-                    <div className="absolute top-32 left-[15%] text-7xl">🏔️</div>
-                    <div className="absolute top-40 right-[20%] text-6xl">⛰️</div>
-                    <div className="absolute top-48 left-[70%] text-5xl">🗻</div>
-                </div>
-
-                {/* 近景の要素（木や雲） */}
-                <div className="absolute top-0 left-0 w-full h-full opacity-40">
-                    <div className="absolute top-[60%] left-[10%] text-4xl">🌲</div>
-                    <div className="absolute top-[55%] right-[15%] text-4xl">🌲</div>
-                    <div className="absolute top-[65%] left-[80%] text-3xl">🌲</div>
-                    <div className="absolute top-[70%] right-[70%] text-3xl">🌲</div>
-                    <div className="absolute top-[20%] right-[30%] text-6xl animate-float">☁️</div>
-                    <div className="absolute top-[35%] left-[20%] text-5xl animate-float" style={{ animationDelay: '2s' }}>☁️</div>
-                </div>
-
-                {/* 山のシルエット（CSS） */}
-                <div className="absolute bottom-0 left-0 right-0 h-64 opacity-20">
-                    <div className="absolute bottom-0 w-full h-full bg-gradient-to-t from-amber-900/30 to-transparent"
+            {/* 🏔️ 山の背景（CSS描画） */}
+            <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                {/* 遠景の山々（最も薄く、小さく） */}
+                <div className="absolute bottom-0 left-0 right-0 h-[500px] opacity-35">
+                    <div className="absolute bottom-0 w-full h-full bg-gradient-to-t from-slate-700 via-slate-600 to-transparent"
                          style={{
-                             clipPath: 'polygon(0% 100%, 0% 70%, 10% 50%, 20% 60%, 30% 40%, 40% 55%, 50% 30%, 60% 50%, 70% 35%, 80% 55%, 90% 45%, 100% 60%, 100% 100%)'
+                             clipPath: 'polygon(0% 100%, 5% 50%, 12% 58%, 18% 42%, 25% 52%, 32% 38%, 40% 48%, 48% 32%, 55% 45%, 62% 28%, 70% 42%, 78% 25%, 85% 38%, 92% 22%, 100% 35%, 100% 100%)'
                          }}>
                     </div>
                 </div>
-                <div className="absolute bottom-0 left-0 right-0 h-48 opacity-30">
-                    <div className="absolute bottom-0 w-full h-full bg-gradient-to-t from-amber-800/40 to-transparent"
+
+                {/* 中景の山々（やや濃く、やや大きく） */}
+                <div className="absolute bottom-0 left-0 right-0 h-[400px] opacity-45">
+                    <div className="absolute bottom-0 w-full h-full bg-gradient-to-t from-slate-600 via-slate-500 to-transparent"
                          style={{
-                             clipPath: 'polygon(0% 100%, 0% 80%, 15% 60%, 25% 70%, 35% 50%, 50% 40%, 65% 55%, 75% 45%, 85% 65%, 100% 50%, 100% 100%)'
+                             clipPath: 'polygon(0% 100%, 8% 42%, 15% 52%, 23% 35%, 32% 45%, 42% 28%, 52% 38%, 62% 25%, 72% 35%, 82% 22%, 90% 32%, 100% 20%, 100% 100%)'
+                         }}>
+                    </div>
+                </div>
+
+                {/* 近景の山々（最も濃く、大きく） */}
+                <div className="absolute bottom-0 left-0 right-0 h-[320px] opacity-55">
+                    <div className="absolute bottom-0 w-full h-full bg-gradient-to-t from-amber-800 via-amber-700 to-transparent"
+                         style={{
+                             clipPath: 'polygon(0% 100%, 10% 35%, 20% 45%, 30% 25%, 40% 38%, 50% 18%, 60% 32%, 70% 22%, 80% 35%, 90% 25%, 100% 32%, 100% 100%)'
+                         }}>
+                    </div>
+                    {/* 山の陰影 */}
+                    <div className="absolute bottom-0 w-full h-full bg-gradient-to-br from-transparent via-black/20 to-black/30"
+                         style={{
+                             clipPath: 'polygon(0% 100%, 10% 35%, 20% 45%, 30% 25%, 40% 38%, 50% 18%, 60% 32%, 70% 22%, 80% 35%, 90% 25%, 100% 32%, 100% 100%)'
+                         }}>
+                    </div>
+                </div>
+
+                {/* 最前景の山々（エッジがはっきり） */}
+                <div className="absolute bottom-0 left-0 right-0 h-[240px] opacity-65">
+                    <div className="absolute bottom-0 w-full h-full bg-gradient-to-t from-orange-900 via-orange-800 to-transparent"
+                         style={{
+                             clipPath: 'polygon(0% 100%, 15% 45%, 25% 55%, 35% 35%, 45% 48%, 55% 28%, 65% 42%, 75% 32%, 85% 45%, 95% 35%, 100% 42%, 100% 100%)'
+                         }}>
+                    </div>
+                    {/* 最前景の山の陰影 */}
+                    <div className="absolute bottom-0 w-full h-full bg-gradient-to-br from-transparent via-black/25 to-black/40"
+                         style={{
+                             clipPath: 'polygon(0% 100%, 15% 45%, 25% 55%, 35% 35%, 45% 48%, 55% 28%, 65% 42%, 75% 32%, 85% 45%, 95% 35%, 100% 42%, 100% 100%)'
+                         }}>
+                    </div>
+                </div>
+
+                {/* 雪を被った最高峰（アクセント） */}
+                <div className="absolute bottom-0 left-[40%] w-[20%] h-[280px] opacity-70">
+                    <div className="absolute bottom-0 w-full h-full bg-gradient-to-t from-slate-800 via-slate-700 to-white/80"
+                         style={{
+                             clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)'
+                         }}>
+                    </div>
+                    {/* 雪の輝き */}
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[60%] h-[40%] bg-gradient-to-b from-white/90 to-transparent blur-sm"
+                         style={{
+                             clipPath: 'polygon(50% 0%, 20% 100%, 80% 100%)'
                          }}>
                     </div>
                 </div>
             </div>
-
-            {/* フローティングアニメーションのCSS */}
-            <style jsx>{`
-                @keyframes float {
-                    0%, 100% { transform: translateY(0px); }
-                    50% { transform: translateY(-20px); }
-                }
-                .animate-float {
-                    animation: float 6s ease-in-out infinite;
-                }
-            `}</style>
 
             <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12 space-y-6 sm:space-y-8 relative z-10">
 
@@ -337,15 +347,6 @@ export default function HowToPage() {
                         <span className="relative z-10">タイトルに戻る</span>
                     </Link>
                 </section>
-            </div>
-
-            {/* 🌄 山の装飾（下部） - より立体的に */}
-            <div className="fixed bottom-0 left-0 right-0 pointer-events-none z-0">
-                <div className="relative h-32 opacity-30">
-                    <div className="absolute bottom-0 text-8xl left-[5%] animate-pulse" style={{ animationDuration: '6s' }}>🏔️</div>
-                    <div className="absolute bottom-0 text-7xl right-[10%] animate-pulse" style={{ animationDuration: '7s', animationDelay: '1s' }}>⛰️</div>
-                    <div className="absolute bottom-0 text-9xl left-[45%] animate-pulse" style={{ animationDuration: '8s', animationDelay: '0.5s' }}>🗻</div>
-                </div>
             </div>
 
         </main>
