@@ -39,12 +39,13 @@ export default function SoloPage() {
 
     await gameHook.submitRound();
 
-    // 結果カットインを表示
-    const currentRound = gameHook.game.players[0].rounds[gameHook.game.roundIndex];
-    cutinHook.triggerResultCutin(currentRound, () => {
-      setShowingResult(true);
-      setIsHistoryOpen(false);
-    });
+    // submitRound完了後、lastResultが更新されているのでそれを使う
+    if (gameHook.lastResult) {
+      cutinHook.triggerResultCutin(gameHook.lastResult, () => {
+        setShowingResult(true);
+        setIsHistoryOpen(false);
+      });
+    }
   }, [gameHook, cutinHook]);
 
   /**
