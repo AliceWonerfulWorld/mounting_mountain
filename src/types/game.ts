@@ -35,6 +35,7 @@ export type Player = {
 export type GameMode = "solo" | "versus_local" | "versus_online";
 
 export type GameState = {
+    id?: string; // ゲーム識別子（重複保存防止用）
     mode: GameMode;
     roundIndex: number; // 現在のラウンド（0-based）
     prompts: string[]; // お題リスト（元データ）

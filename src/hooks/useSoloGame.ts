@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import type { GameState, Round } from "@/types/game";
 import type { RouteId } from "@/lib/solo/routes";
 import { pickN } from "@/lib/random";
@@ -26,6 +26,7 @@ export function useSoloGame() {
   const [lastResult, setLastResult] = useState<Round | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const savedGameRef = useRef<Set<string>>(new Set()); // 保存済みゲームのIDを記録
 
   /**
    * ソロゲームの状態を初期化するヘルパー関数
@@ -37,6 +38,7 @@ export function useSoloGame() {
     const mission = pickMission();
 
     return {
+      id: `game-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, // ユニークなID生成
       mode: "solo",
       status: "playing",
       roundIndex: 0,
@@ -197,6 +199,12 @@ export function useSoloGame() {
    */
   const saveGameHistory = useCallback(async (gameState: GameState) => {
     try {
+      // ゲームIDで重複チェック
+      if (!gameState.id || savedGameRef.current.has(gameState.id)) {
+        console.log('Game already saved, skipping...', gameState.id);
+        return;
+      }
+
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
 
@@ -222,6 +230,10 @@ export function useSoloGame() {
         rounds_data: roundsData,
         completed: gameState.status === 'finished',
       });
+
+      // 保存成功したらIDを記録
+      savedGameRef.current.add(gameState.id);
+      console.log('Game saved successfully:', gameState.id);
     } catch (err) {
       console.error('Failed to save game history:', err);
       // エラーが発生してもゲームプレイには影響させない
