@@ -144,21 +144,173 @@ export function MountainBackground() {
 
                 {/* 夜の場合は星を追加 */}
                 {timeOfDay === "night" && (
-                    <div className="absolute inset-0 animate-pulse" style={{ animationDuration: '4s' }}>
-                        {[...Array(30)].map((_, i) => (
+                    <>
+                        {/* 星空 */}
+                        <div className="absolute inset-0 animate-pulse" style={{ animationDuration: '4s' }}>
+                            {[...Array(50)].map((_, i) => (
+                                <div
+                                    key={i}
+                                    className="absolute w-1 h-1 bg-white rounded-full"
+                                    style={{
+                                        left: `${Math.random() * 100}%`,
+                                        top: `${Math.random() * 60}%`,
+                                        opacity: Math.random() * 0.8 + 0.2,
+                                        animation: `twinkle ${2 + Math.random() * 3}s ease-in-out infinite`
+                                    }}
+                                />
+                            ))}
+                        </div>
+                        {/* 流れ星 */}
+                        {[...Array(3)].map((_, i) => (
                             <div
-                                key={i}
+                                key={`shooting-${i}`}
                                 className="absolute w-1 h-1 bg-white rounded-full"
                                 style={{
-                                    left: `${Math.random() * 100}%`,
-                                    top: `${Math.random() * 60}%`,
-                                    opacity: Math.random() * 0.8 + 0.2
+                                    left: `${20 + Math.random() * 60}%`,
+                                    top: `${Math.random() * 30}%`,
+                                    boxShadow: '0 0 4px 2px rgba(255,255,255,0.8)',
+                                    animation: `shootingStar ${3 + i * 2}s linear infinite`,
+                                    animationDelay: `${i * 4}s`
                                 }}
                             />
                         ))}
-                    </div>
+                    </>
+                )}
+
+                {/* 朝の場合は太陽光線と鳥 */}
+                {timeOfDay === "morning" && (
+                    <>
+                        {/* 太陽光線 */}
+                        {[...Array(8)].map((_, i) => (
+                            <div
+                                key={`ray-${i}`}
+                                className="absolute top-0 right-[20%] origin-bottom-right bg-gradient-to-b from-yellow-300/20 to-transparent"
+                                style={{
+                                    width: '2px',
+                                    height: '40%',
+                                    transform: `rotate(${-30 + i * 10}deg)`,
+                                    animation: `fadeInOut ${4 + i * 0.5}s ease-in-out infinite`,
+                                    animationDelay: `${i * 0.3}s`
+                                }}
+                            />
+                        ))}
+                        {/* 鳥のシルエット */}
+                        {[...Array(5)].map((_, i) => (
+                            <div
+                                key={`bird-${i}`}
+                                className="absolute text-xl opacity-60"
+                                style={{
+                                    left: `${-10 + i * 5}%`,
+                                    top: `${15 + i * 8}%`,
+                                    animation: `flyAcross ${15 + i * 5}s linear infinite`,
+                                    animationDelay: `${i * 3}s`
+                                }}
+                            >
+                                🦅
+                            </div>
+                        ))}
+                    </>
+                )}
+
+                {/* 昼の場合は雲が流れる */}
+                {timeOfDay === "day" && (
+                    <>
+                        {[...Array(6)].map((_, i) => (
+                            <div
+                                key={`cloud-${i}`}
+                                className="absolute opacity-70"
+                                style={{
+                                    fontSize: `${2 + Math.random() * 2}rem`,
+                                    left: `${-20 + i * 15}%`,
+                                    top: `${10 + i * 10}%`,
+                                    animation: `floatAcross ${25 + i * 8}s linear infinite`,
+                                    animationDelay: `${i * 4}s`
+                                }}
+                            >
+                                ☁️
+                            </div>
+                        ))}
+                    </>
+                )}
+
+                {/* 夕方の場合は夕日の光線 */}
+                {timeOfDay === "evening" && (
+                    <>
+                        {/* 夕日の光線 */}
+                        {[...Array(10)].map((_, i) => (
+                            <div
+                                key={`sunset-ray-${i}`}
+                                className="absolute top-[20%] left-[15%] origin-bottom-left bg-gradient-to-b from-orange-400/25 to-transparent"
+                                style={{
+                                    width: '3px',
+                                    height: '50%',
+                                    transform: `rotate(${-20 + i * 8}deg)`,
+                                    animation: `fadeInOut ${3 + i * 0.4}s ease-in-out infinite`,
+                                    animationDelay: `${i * 0.2}s`
+                                }}
+                            />
+                        ))}
+                        {/* 夕焼け雲 */}
+                        {[...Array(4)].map((_, i) => (
+                            <div
+                                key={`evening-cloud-${i}`}
+                                className="absolute opacity-50"
+                                style={{
+                                    fontSize: `${2.5 + Math.random() * 1.5}rem`,
+                                    left: `${-10 + i * 20}%`,
+                                    top: `${15 + i * 12}%`,
+                                    animation: `floatAcross ${30 + i * 10}s linear infinite`,
+                                    animationDelay: `${i * 5}s`,
+                                    filter: 'hue-rotate(330deg)'
+                                }}
+                            >
+                                ☁️
+                            </div>
+                        ))}
+                    </>
                 )}
             </div>
+
+            {/* アニメーション用のスタイル */}
+            <style jsx>{`
+                @keyframes twinkle {
+                    0%, 100% { opacity: 0.2; }
+                    50% { opacity: 1; }
+                }
+                @keyframes shootingStar {
+                    0% {
+                        transform: translate(0, 0);
+                        opacity: 1;
+                    }
+                    70% {
+                        opacity: 1;
+                    }
+                    100% {
+                        transform: translate(-300px, 300px);
+                        opacity: 0;
+                    }
+                }
+                @keyframes fadeInOut {
+                    0%, 100% { opacity: 0; }
+                    50% { opacity: 0.3; }
+                }
+                @keyframes flyAcross {
+                    0% {
+                        transform: translateX(0) translateY(0);
+                    }
+                    100% {
+                        transform: translateX(120vw) translateY(-30px);
+                    }
+                }
+                @keyframes floatAcross {
+                    0% {
+                        transform: translateX(0);
+                    }
+                    100% {
+                        transform: translateX(120vw);
+                    }
+                }
+            `}</style>
         </>
     );
 }
