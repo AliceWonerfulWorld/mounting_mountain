@@ -1,7 +1,6 @@
-// @ts-nocheck
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
@@ -27,18 +26,7 @@ export default function ProfilePage() {
   const router = useRouter();
   const supabase = createClient();
 
-  useEffect(() => {
-    if (authLoading) return;
-    
-    if (!user) {
-      router.push('/auth/login');
-      return;
-    }
-
-    fetchProfile();
-  }, [user, authLoading]);
-
-  const fetchProfile = async () => {
+  const fetchProfile = useCallback(async () => {
     if (!user) return;
 
     try {
@@ -65,7 +53,18 @@ export default function ProfilePage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, supabase]);
+
+  useEffect(() => {
+    if (authLoading) return;
+    
+    if (!user) {
+      router.push('/auth/login');
+      return;
+    }
+
+    fetchProfile();
+  }, [user, authLoading, router, fetchProfile]);
 
   const createProfile = async () => {
     if (!user) return;
@@ -73,7 +72,7 @@ export default function ProfilePage() {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        // @ts-ignore - Supabase SSR type issue
+        // @ts-expect-error - Supabase SSR type issue
         .insert({
           id: user.id,
           username: user.email?.split('@')[0] || null,
@@ -94,7 +93,7 @@ export default function ProfilePage() {
       }
     } catch (err) {
       console.error('Error creating profile:', err);
-      setError(err.message || 'プロフィールの作成に失敗しました。データベースが正しくセットアップされているか確認してください。');
+      setError(err instanceof Error ? err.message : 'プロフィールの作成に失敗しました。データベースが正しくセットアップされているか確認してください。');
     }
   };
 
@@ -108,7 +107,7 @@ export default function ProfilePage() {
     try {
       const { error } = await supabase
         .from('profiles')
-        // @ts-ignore - Supabase SSR type issue
+        // @ts-expect-error - Supabase SSR type issue
         .update({
           username: editedProfile.username,
           display_name: editedProfile.display_name,
@@ -123,9 +122,9 @@ export default function ProfilePage() {
       setSuccess('プロフィールを更新しました');
       
       setTimeout(() => setSuccess(''), 3000);
-    } catch (err: any) {
+    } catch (err) {
       console.error('Error updating profile:', err);
-      setError(err.message || 'プロフィールの更新に失敗しました');
+      setError(err instanceof Error ? err.message : 'プロフィールの更新に失敗しました');
     } finally {
       setSaving(false);
     }

@@ -1,12 +1,11 @@
-// @ts-nocheck
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { History, Home, Trophy, Calendar, MapPin, CloudRain, Target, ArrowUp } from 'lucide-react';
+import { History, Home, Trophy, Calendar, CloudRain, Target, ArrowUp } from 'lucide-react';
 
 type GameHistory = {
   id: string;
@@ -32,18 +31,7 @@ export default function HistoryPage() {
   const router = useRouter();
   const supabase = createClient();
 
-  useEffect(() => {
-    if (authLoading) return;
-
-    if (!user) {
-      router.push('/auth/login');
-      return;
-    }
-
-    fetchHistory();
-  }, [user, authLoading]);
-
-  const fetchHistory = async () => {
+  const fetchHistory = useCallback(async () => {
     if (!user) return;
 
     try {
@@ -63,7 +51,18 @@ export default function HistoryPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, supabase]);
+
+  useEffect(() => {
+    if (authLoading) return;
+
+    if (!user) {
+      router.push('/auth/login');
+      return;
+    }
+
+    fetchHistory();
+  }, [user, authLoading, router, fetchHistory]);
 
   if (authLoading || loading) {
     return (

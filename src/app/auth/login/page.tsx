@@ -1,4 +1,3 @@
-// @ts-nocheck
 'use client';
 
 import { useState } from 'react';
@@ -26,7 +25,7 @@ export default function LoginPage() {
     try {
       await signIn(email, password);
       router.push('/');
-    } catch (err) {
+    } catch {
       setError('ログインに失敗しました。メールアドレスとパスワードを確認してください。');
     } finally {
       setLoading(false);
@@ -46,15 +45,6 @@ export default function LoginPage() {
       setError(`${provider === 'google' ? 'Google' : 'X'}ログインに失敗しました。`);
     }
   };
-
-  const textColors = {
-    morning: 'text-amber-900',
-    day: 'text-sky-900',
-    evening: 'text-orange-950',
-    night: 'text-slate-100',
-  };
-
-  const colors = textColors[timeOfDay];
 
   return (
     <main className="min-h-screen relative overflow-hidden flex items-center justify-center">

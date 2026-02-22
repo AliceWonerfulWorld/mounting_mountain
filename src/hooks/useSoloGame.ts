@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState, useCallback, useEffect, useRef } from "react";
 import type { GameState, Round } from "@/types/game";
 import type { RouteId } from "@/lib/solo/routes";
@@ -221,7 +220,7 @@ export function useSoloGame() {
         didFall: round.result?.didFall || false,
       }));
 
-      // @ts-ignore - Supabase SSR type issue
+      // @ts-expect-error - Supabase SSR type issue
       await supabase.from('solo_game_history').insert({
         user_id: user.id,
         total_score: totalScore,

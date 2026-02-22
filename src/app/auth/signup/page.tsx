@@ -1,4 +1,3 @@
-// @ts-nocheck
 'use client';
 
 import { useState } from 'react';
@@ -6,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
-import { useTimeOfDay } from '@/hooks/useTimeOfDay';
 import { MountainBackground } from '@/components/MountainBackground';
 
 export default function SignUpPage() {
@@ -17,7 +15,6 @@ export default function SignUpPage() {
   const [loading, setLoading] = useState(false);
   const { signUp } = useAuth();
   const router = useRouter();
-  const timeOfDay = useTimeOfDay();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,8 +35,8 @@ export default function SignUpPage() {
     try {
       await signUp(email, password);
       router.push('/auth/verify-email');
-    } catch (err: any) {
-      if (err.message?.includes('already registered')) {
+    } catch (err) {
+      if (err instanceof Error && err.message?.includes('already registered')) {
         setError('このメールアドレスは既に登録されています');
       } else {
         setError('登録に失敗しました。もう一度お試しください。');
