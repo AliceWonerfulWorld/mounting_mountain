@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import type { GameState, Round } from "@/types/game";
 import type { RouteId } from "@/lib/solo/routes";
 import { pickN } from "@/lib/random";
@@ -10,6 +10,7 @@ import { computeBonus } from "@/lib/solo/bonus";
 import { getRoute } from "@/lib/solo/routes";
 import { computeFinalAltitude } from "@/lib/solo/score";
 import { updateStats } from "@/lib/achievementStore";
+import { createClient } from "@/lib/supabase/client";
 
 const ROUND_COUNT = 3;
 const MAX_INSURANCE = 1;
@@ -24,6 +25,7 @@ export function useSoloGame() {
   const [lastResult, setLastResult] = useState<Round | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const savedGameRef = useRef<Set<string>>(new Set()); // 保存済みゲームのIDを記録
 
   /**
    * ソロゲームの状態を初期化するヘルパー関数
@@ -35,6 +37,7 @@ export function useSoloGame() {
     const mission = pickMission();
 
     return {
+      id: `game-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, // ユニークなID生成
       mode: "solo",
       status: "playing",
       roundIndex: 0,
@@ -191,6 +194,52 @@ export function useSoloGame() {
   }, [game, text, loading]);
 
   /**
+   * ゲーム履歴をSupabaseに保存
+   */
+  const saveGameHistory = useCallback(async (gameState: GameState) => {
+    try {
+      // ゲームIDで重複チェック
+      if (!gameState.id || savedGameRef.current.has(gameState.id)) {
+        console.log('Game already saved, skipping...', gameState.id);
+        return;
+      }
+
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+
+      // ユーザーがログインしていない場合は保存しない
+      if (!user) return;
+
+      const player = gameState.players[0];
+      const totalScore = player.totalScore;
+      const roundsData = player.rounds.map(round => ({
+        prompt: round.prompt,
+        routeId: round.routeId,
+        inputText: round.inputText,
+        finalAltitude: round.result?.finalAltitude || 0,
+        didFall: round.result?.didFall || false,
+      }));
+
+      // @ts-expect-error - Supabase SSR type issue
+      await supabase.from('solo_game_history').insert({
+        user_id: user.id,
+        total_score: totalScore,
+        weather_id: gameState.weather,
+        mission_id: gameState.mission?.id || null,
+        rounds_data: roundsData,
+        completed: gameState.status === 'finished',
+      });
+
+      // 保存成功したらIDを記録
+      savedGameRef.current.add(gameState.id);
+      console.log('Game saved successfully:', gameState.id);
+    } catch (err) {
+      console.error('Failed to save game history:', err);
+      // エラーが発生してもゲームプレイには影響させない
+    }
+  }, []);
+
+  /**
    * 次のラウンドへ進む
    */
   const proceedToNextRound = useCallback(() => {
@@ -206,13 +255,16 @@ export function useSoloGame() {
           soloPlays: 1,
           highestTotalAltitude: next.players[0].totalScore,
         });
+
+        // ゲーム履歴を保存
+        saveGameHistory(next);
       } else {
         next.roundIndex += 1;
       }
 
       return next;
     });
-  }, []);
+  }, [saveGameHistory]);
 
   /**
    * ゲームリセット

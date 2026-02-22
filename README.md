@@ -46,6 +46,13 @@ AIがスコアリングし、標高（m）として表示します。
 - 合計標高を算出
 - 履歴表示
 
+### ✅ ユーザー認証
+- Supabaseを使用したメール認証
+- プロフィール管理（ユーザー名・表示名）
+- ゲーム履歴の永続化
+- クラウドベースのデータ保存
+- マルチデバイス対応
+
 ### ✅ フォールバック判定
 APIキーが無い環境でも動作する安全設計。
 
@@ -66,6 +73,7 @@ APIキーが無い環境でも動作する安全設計。
 - Next.js (App Router)
 - TypeScript
 - Tailwind CSS
+- Supabase (認証・データベース)
 - Google Gemini API（オプション）
 - Fallbackルールベース判定
 - Vitest + Testing Library（テスト）

@@ -3,11 +3,65 @@
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { Mountain, Trophy, BookOpen, Zap, Target, Brain, TrendingUp } from "lucide-react";
+import { Mountain, Trophy, BookOpen, Zap, Target, Brain, TrendingUp, User, LogOut, LogIn, UserPlus, History } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Home() {
+  const { user, loading, signOut } = useAuth();
+
   return (
     <main className="relative min-h-screen overflow-hidden bg-gradient-to-b from-zinc-900 to-black text-white">
+      {/* Header - Auth Status */}
+      <header className="relative z-20 flex items-center justify-end px-6 py-4 gap-4">
+        {loading ? (
+          <div className="text-sm text-blue-300">読み込み中...</div>
+        ) : user ? (
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 rounded-full border border-blue-400/30 bg-blue-900/30 px-4 py-2 backdrop-blur-sm">
+              <User className="h-4 w-4 text-blue-300" />
+              <span className="text-sm font-semibold text-blue-100">{user.email}</span>
+            </div>
+            <Link
+              href="/history"
+              className="flex items-center gap-2 rounded-lg border border-green-400/50 bg-green-900/30 px-4 py-2 text-sm font-semibold text-green-100 backdrop-blur-sm transition-all hover:bg-green-800/50 hover:shadow-lg hover:shadow-green-500/20"
+            >
+              <History className="h-4 w-4" />
+              履歴
+            </Link>
+            <Link
+              href="/profile"
+              className="rounded-lg border border-purple-400/50 bg-purple-900/30 px-4 py-2 text-sm font-semibold text-purple-100 backdrop-blur-sm transition-all hover:bg-purple-800/50 hover:shadow-lg hover:shadow-purple-500/20"
+            >
+              プロフィール
+            </Link>
+            <button
+              onClick={() => signOut()}
+              className="flex items-center gap-2 rounded-lg border border-red-400/50 bg-red-900/30 px-4 py-2 text-sm font-semibold text-red-100 backdrop-blur-sm transition-all hover:bg-red-800/50 hover:shadow-lg hover:shadow-red-500/20"
+            >
+              <LogOut className="h-4 w-4" />
+              ログアウト
+            </button>
+          </div>
+        ) : (
+          <div className="flex items-center gap-3">
+            <Link
+              href="/auth/login"
+              className="flex items-center gap-2 rounded-lg border border-blue-400/50 bg-blue-900/30 px-4 py-2 text-sm font-semibold text-blue-100 backdrop-blur-sm transition-all hover:bg-blue-800/50 hover:shadow-lg hover:shadow-blue-500/20"
+            >
+              <LogIn className="h-4 w-4" />
+              ログイン
+            </Link>
+            <Link
+              href="/auth/signup"
+              className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 px-4 py-2 text-sm font-bold text-white shadow-lg shadow-orange-500/30 transition-all hover:from-amber-600 hover:to-orange-600 hover:shadow-orange-500/50"
+            >
+              <UserPlus className="h-4 w-4" />
+              新規登録
+            </Link>
+          </div>
+        )}
+      </header>
+
       {/* Background Elements (Stars) */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-zinc-800/20 via-transparent to-transparent" />
