@@ -24,11 +24,11 @@ export default function ProfilePage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const router = useRouter();
-  const supabase = createClient();
 
   const createProfile = useCallback(async () => {
     if (!user) return;
 
+    const supabase = createClient();
     try {
       const { data, error } = await supabase
         .from('profiles')
@@ -55,11 +55,12 @@ export default function ProfilePage() {
       console.error('Error creating profile:', err);
       setError(err instanceof Error ? err.message : 'プロフィールの作成に失敗しました。データベースが正しくセットアップされているか確認してください。');
     }
-  }, [user, supabase]);
+  }, [user]);
 
   const fetchProfile = useCallback(async () => {
     if (!user) return;
 
+    const supabase = createClient();
     try {
       const { data, error } = await supabase
         .from('profiles')
@@ -84,7 +85,7 @@ export default function ProfilePage() {
     } finally {
       setLoading(false);
     }
-  }, [user, supabase, createProfile]);
+  }, [user, createProfile]);
 
   useEffect(() => {
     if (authLoading) return;
@@ -104,6 +105,7 @@ export default function ProfilePage() {
     setError('');
     setSuccess('');
 
+    const supabase = createClient();
     try {
       const { error } = await supabase
         .from('profiles')

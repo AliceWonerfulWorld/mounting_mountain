@@ -29,11 +29,11 @@ export default function HistoryPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const router = useRouter();
-  const supabase = createClient();
 
   const fetchHistory = useCallback(async () => {
     if (!user) return;
 
+    const supabase = createClient();
     try {
       const { data, error } = await supabase
         .from('solo_game_history')
@@ -51,7 +51,7 @@ export default function HistoryPage() {
     } finally {
       setLoading(false);
     }
-  }, [user, supabase]);
+  }, [user]);
 
   useEffect(() => {
     if (authLoading) return;
