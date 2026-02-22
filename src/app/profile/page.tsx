@@ -26,47 +26,7 @@ export default function ProfilePage() {
   const router = useRouter();
   const supabase = createClient();
 
-  const fetchProfile = useCallback(async () => {
-    if (!user) return;
-
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single();
-
-      if (error) {
-        // プロフィールが存在しない場合は作成
-        if (error.code === 'PGRST116') {
-          await createProfile();
-        } else {
-          throw error;
-        }
-      } else if (data) {
-        setProfile(data);
-        setEditedProfile(data);
-      }
-    } catch (err) {
-      console.error('Error fetching profile:', err);
-      setError('プロフィールの取得に失敗しました');
-    } finally {
-      setLoading(false);
-    }
-  }, [user, supabase]);
-
-  useEffect(() => {
-    if (authLoading) return;
-    
-    if (!user) {
-      router.push('/auth/login');
-      return;
-    }
-
-    fetchProfile();
-  }, [user, authLoading, router, fetchProfile]);
-
-  const createProfile = async () => {
+  const createProfile = useCallback(async () => {
     if (!user) return;
 
     try {
@@ -95,7 +55,47 @@ export default function ProfilePage() {
       console.error('Error creating profile:', err);
       setError(err instanceof Error ? err.message : 'プロフィールの作成に失敗しました。データベースが正しくセットアップされているか確認してください。');
     }
-  };
+  }, [user, supabase]);
+
+  const fetchProfile = useCallback(async () => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      if (error) {
+        // プロフィールが存在しない場合は作成
+        if (error.code === 'PGRST116') {
+          await createProfile();
+        } else {
+          throw error;
+        }
+      } else if (data) {
+        setProfile(data);
+        setEditedProfile(data);
+      }
+    } catch (err) {
+      console.error('Error fetching profile:', err);
+      setError('プロフィールの取得に失敗しました');
+    } finally {
+      setLoading(false);
+    }
+  }, [user, supabase, createProfile]);
+
+  useEffect(() => {
+    if (authLoading) return;
+    
+    if (!user) {
+      router.push('/auth/login');
+      return;
+    }
+
+    fetchProfile();
+  }, [user, authLoading, router, fetchProfile]);
 
   const handleUpdate = async () => {
     if (!user || !editedProfile) return;

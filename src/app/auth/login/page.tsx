@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
-import { useTimeOfDay } from '@/hooks/useTimeOfDay';
 import { MountainBackground } from '@/components/MountainBackground';
 
 export default function LoginPage() {
@@ -15,7 +14,6 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const { signIn } = useAuth();
   const router = useRouter();
-  const timeOfDay = useTimeOfDay();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
