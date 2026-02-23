@@ -22,6 +22,13 @@ export default function Home() {
               <span className="text-sm font-semibold text-blue-100">{user.email}</span>
             </div>
             <Link
+              href="/ranking"
+              className="flex items-center gap-2 rounded-lg border border-yellow-400/50 bg-yellow-900/30 px-4 py-2 text-sm font-semibold text-yellow-100 backdrop-blur-sm transition-all hover:bg-yellow-800/50 hover:shadow-lg hover:shadow-yellow-500/20"
+            >
+              <Trophy className="h-4 w-4" />
+              ランキング
+            </Link>
+            <Link
               href="/history"
               className="flex items-center gap-2 rounded-lg border border-green-400/50 bg-green-900/30 px-4 py-2 text-sm font-semibold text-green-100 backdrop-blur-sm transition-all hover:bg-green-800/50 hover:shadow-lg hover:shadow-green-500/20"
             >
@@ -44,6 +51,13 @@ export default function Home() {
           </div>
         ) : (
           <div className="flex items-center gap-3">
+            <Link
+              href="/ranking"
+              className="flex items-center gap-2 rounded-lg border border-yellow-400/50 bg-yellow-900/30 px-4 py-2 text-sm font-semibold text-yellow-100 backdrop-blur-sm transition-all hover:bg-yellow-800/50 hover:shadow-lg hover:shadow-yellow-500/20"
+            >
+              <Trophy className="h-4 w-4" />
+              ランキング
+            </Link>
             <Link
               href="/auth/login"
               className="flex items-center gap-2 rounded-lg border border-blue-400/50 bg-blue-900/30 px-4 py-2 text-sm font-semibold text-blue-100 backdrop-blur-sm transition-all hover:bg-blue-800/50 hover:shadow-lg hover:shadow-blue-500/20"

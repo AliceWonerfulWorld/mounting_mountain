@@ -15,6 +15,7 @@ export interface Database {
           username: string | null
           display_name: string | null
           avatar_url: string | null
+          show_in_ranking: boolean
           created_at: string
           updated_at: string
         }
@@ -23,6 +24,7 @@ export interface Database {
           username?: string | null
           display_name?: string | null
           avatar_url?: string | null
+          show_in_ranking?: boolean
           created_at?: string
           updated_at?: string
         }
@@ -31,6 +33,7 @@ export interface Database {
           username?: string | null
           display_name?: string | null
           avatar_url?: string | null
+          show_in_ranking?: boolean
           created_at?: string
           updated_at?: string
         }
@@ -124,7 +127,18 @@ export interface Database {
       }
     }
     Views: {
-      [_ in never]: never
+      leaderboard: {
+        Row: {
+          id: string
+          username: string | null
+          display_name: string | null
+          avatar_url: string | null
+          show_in_ranking: boolean
+          best_score: number
+          total_games: number
+          completed_games: number
+        }
+      }
     }
     Functions: {
       [_ in never]: never

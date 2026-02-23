@@ -11,6 +11,7 @@ type Profile = {
   username: string | null;
   display_name: string | null;
   avatar_url: string | null;
+  show_in_ranking: boolean;
   created_at: string;
 };
 
@@ -38,6 +39,7 @@ export default function ProfilePage() {
           username: user.email?.split('@')[0] || null,
           display_name: null,
           avatar_url: null,
+          show_in_ranking: true,
         })
         .select()
         .single();
@@ -113,6 +115,7 @@ export default function ProfilePage() {
         .update({
           username: editedProfile.username,
           display_name: editedProfile.display_name,
+          show_in_ranking: editedProfile.show_in_ranking,
           updated_at: new Date().toISOString(),
         })
         .eq('id', user.id);
@@ -247,6 +250,39 @@ export default function ProfilePage() {
                   {profile?.display_name || '未設定'}
                 </div>
               )}
+            </div>
+
+            {/* Ranking Display Setting */}
+            <div>
+              <label className="text-sm font-bold text-blue-300 mb-3 block">
+                ランキング設定
+              </label>
+              <div className="bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-3">
+                {editing ? (
+                  <label className="flex items-center gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={editedProfile.show_in_ranking ?? true}
+                      onChange={(e) =>
+                        setEditedProfile({ ...editedProfile, show_in_ranking: e.target.checked })
+                      }
+                      className="w-5 h-5 rounded border-slate-600 text-blue-600 focus:ring-blue-500 focus:ring-offset-0 bg-slate-800 cursor-pointer"
+                    />
+                    <span className="text-white">
+                      ランキングに表示する
+                    </span>
+                  </label>
+                ) : (
+                  <div className="text-slate-300">
+                    {profile?.show_in_ranking ? '✓ ランキングに表示中' : '✗ ランキングに非表示'}
+                  </div>
+                )}
+                {editing && (
+                  <p className="mt-2 text-xs text-slate-400">
+                    OFFにすると、ランキングページに表示されなくなります
+                  </p>
+                )}
+              </div>
             </div>
 
             {/* Created At */}
