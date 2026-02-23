@@ -182,11 +182,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="relative z-10 border-t border-blue-400/20 bg-slate-950/80 px-6 py-8 text-center backdrop-blur-sm">
-        <p className="text-sm text-blue-300/80">© 2026 マウンティングマウンテン - 頂点を目指せ 🏔️</p>
-      </footer>
     </main>
   );
 }

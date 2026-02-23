@@ -25,6 +25,16 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/* Hide scrollbar for all browsers */
+* {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+*::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
 /* Weather animations */
 @keyframes snowfall {
   0% {
