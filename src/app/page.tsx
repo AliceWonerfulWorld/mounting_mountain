@@ -22,13 +22,6 @@ export default function Home() {
               <span className="text-sm font-semibold text-blue-100">{user.email}</span>
             </div>
             <Link
-              href="/ranking"
-              className="flex items-center gap-2 rounded-lg border border-yellow-400/50 bg-yellow-900/30 px-4 py-2 text-sm font-semibold text-yellow-100 backdrop-blur-sm transition-all hover:bg-yellow-800/50 hover:shadow-lg hover:shadow-yellow-500/20"
-            >
-              <Trophy className="h-4 w-4" />
-              ランキング
-            </Link>
-            <Link
               href="/history"
               className="flex items-center gap-2 rounded-lg border border-green-400/50 bg-green-900/30 px-4 py-2 text-sm font-semibold text-green-100 backdrop-blur-sm transition-all hover:bg-green-800/50 hover:shadow-lg hover:shadow-green-500/20"
             >
@@ -51,13 +44,6 @@ export default function Home() {
           </div>
         ) : (
           <div className="flex items-center gap-3">
-            <Link
-              href="/ranking"
-              className="flex items-center gap-2 rounded-lg border border-yellow-400/50 bg-yellow-900/30 px-4 py-2 text-sm font-semibold text-yellow-100 backdrop-blur-sm transition-all hover:bg-yellow-800/50 hover:shadow-lg hover:shadow-yellow-500/20"
-            >
-              <Trophy className="h-4 w-4" />
-              ランキング
-            </Link>
             <Link
               href="/auth/login"
               className="flex items-center gap-2 rounded-lg border border-blue-400/50 bg-blue-900/30 px-4 py-2 text-sm font-semibold text-blue-100 backdrop-blur-sm transition-all hover:bg-blue-800/50 hover:shadow-lg hover:shadow-blue-500/20"
@@ -166,7 +152,7 @@ export default function Home() {
             </Link>
           </div>
 
-          {/* Row 2: Achievements and HowTo */}
+          {/* Row 2: Achievements, Ranking and HowTo */}
           <div className="flex flex-col md:flex-row items-center justify-center gap-4 w-full">
             <Link
               href="/achievements"
@@ -177,6 +163,19 @@ export default function Home() {
                 実績一覧
               </span>
               <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 via-blue-500 to-teal-500 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+              {/* Shine Effect */}
+              <div className="absolute inset-0 -translate-x-full transform bg-gradient-to-r from-transparent via-white/30 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+            </Link>
+
+            <Link
+              href="/ranking"
+              className="group relative overflow-hidden rounded-xl bg-gradient-to-r from-yellow-600 via-amber-600 to-orange-600 px-8 py-4 text-lg font-bold text-white shadow-xl shadow-yellow-500/40 transition-all duration-300 hover:scale-105 hover:shadow-yellow-500/80 w-full md:flex-1 flex items-center justify-center gap-2"
+            >
+              <span className="relative z-10 flex items-center gap-2">
+                <Trophy className="h-5 w-5" />
+                ランキング
+              </span>
+              <div className="absolute inset-0 bg-gradient-to-r from-amber-400 via-yellow-500 to-orange-500 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
               {/* Shine Effect */}
               <div className="absolute inset-0 -translate-x-full transform bg-gradient-to-r from-transparent via-white/30 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
             </Link>
