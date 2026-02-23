@@ -16,6 +16,8 @@ export default function NotFound() {
   }>>([]);
 
   useEffect(() => {
+    // Generate particles only on client-side to avoid hydration mismatch
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setParticles(Array.from({ length: 20 }, () => ({
       left: `${Math.random() * 100}%`,
       blur: Math.random() * 2,
