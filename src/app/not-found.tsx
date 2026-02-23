@@ -1,23 +1,30 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 
 export default function NotFound() {
-  // Generate particle properties on initialization (client-side only)
-  const [particles] = useState(() => 
-    typeof window !== 'undefined'
-      ? Array.from({ length: 20 }, () => ({
-          left: `${Math.random() * 100}%`,
-          initialX: `${Math.random() * 100}%`,
-          blur: Math.random() * 2,
-          duration: Math.random() * 10 + 10,
-          delay: Math.random() * 5,
-        }))
-      : []
-  );
+  // Generate particle properties on client-side only
+  const [particles, setParticles] = useState<Array<{
+    left: string;
+    blur: number;
+    duration: number;
+    delay: number;
+  }>>([]);
+
+  useEffect(() => {
+    // Generate particles only on client-side to avoid hydration mismatch
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setParticles(Array.from({ length: 20 }, () => ({
+      left: `${Math.random() * 100}%`,
+      blur: Math.random() * 2,
+      duration: Math.random() * 10 + 10,
+      delay: Math.random() * 5,
+    })));
+  }, []);
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-gradient-to-b from-zinc-900 via-slate-900 to-black text-white flex items-center justify-center">
@@ -79,13 +86,29 @@ export default function NotFound() {
           </p>
         </motion.div>
 
-
+        {/* Back to Home Button */}
+        <motion.div
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.5, delay: 1.2, ease: [0.34, 1.56, 0.64, 1] }}
+        >
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-bold text-lg rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+            style={{ boxShadow: '0 4px 20px rgba(59, 130, 246, 0.6), 0 0 40px rgba(59, 130, 246, 0.3)' }}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            </svg>
+            ホームに戻る
+          </Link>
+        </motion.div>
 
         {/* Flavor text */}
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 1.5 }}
+          transition={{ duration: 1, delay: 1.8 }}
           className="mt-12 text-sm text-blue-300/70 font-medium"
           style={{ textShadow: '0 2px 6px rgba(0,0,0,0.8), 0 4px 12px rgba(0,0,0,0.5)' }}
         >
@@ -99,7 +122,6 @@ export default function NotFound() {
           <motion.div
             key={i}
             initial={{
-              x: particle.initialX,
               y: -20,
               opacity: 0
             }}
