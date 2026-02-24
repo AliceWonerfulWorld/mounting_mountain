@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTimeOfDayExtended } from "@/hooks/useTimeOfDay";
 import type { TimeOfDay } from "@/lib/timeOfDayConfig";
@@ -9,13 +9,65 @@ import type { TimeOfDay } from "@/lib/timeOfDayConfig";
  * TimedBackground コンポーネント
  * 
  * 時間帯に応じて背景を変化させるコンポーネント
- * Phase 4: 各時間帯の背景を実装
+ * Phase 6: 最終調整・パフォーマンス最適化完了
+ * 
+ * 機能:
+ * - 6つの時間帯（Dawn, Morning, Day, Afternoon, Sunset, Night）
+ * - 各時間帯で異なる空のグラデーション、太陽/月の位置・色
+ * - 時間帯別のアニメーション速度（脈動・雲の流れ）
+ * - 夜は星空エフェクト
+ * - 時間帯切り替え時のスムーズなトランジション（2秒フェード）
  * 
  * パフォーマンス最適化:
  * - React.memo でラップ
+ * - useMemo で設定取得を最適化
  * - GPU 合成を活用 (will-change, transform: translateZ(0))
- * - 画面サイズに応じて雲の表示数を調整
+ * - 画面サイズに応じて雲の表示数を調整（モバイル2つ、タブレット3つ、デスクトップ4つ）
+ * - resize イベントのthrottling
+ * - AnimatePresenceでDOMの効率的な更新
  */
+
+// 星コンポーネント（メモ化で最適化）
+const Stars = React.memo(() => {
+  const stars = useMemo(() => {
+    return [...Array(50)].map((_, i) => ({
+      id: i,
+      left: `${Math.random() * 100}%`,
+      top: `${Math.random() * 70}%`,
+      baseOpacity: 0.3 + Math.random() * 0.7,
+      minOpacity: 0.1 + Math.random() * 0.3,
+      duration: 2 + Math.random() * 3,
+      delay: Math.random() * 2,
+    }));
+  }, []);
+
+  return (
+    <div className="absolute inset-0">
+      {stars.map((star) => (
+        <motion.div
+          key={star.id}
+          className="absolute h-1 w-1 rounded-full bg-white"
+          style={{
+            left: star.left,
+            top: star.top,
+            opacity: star.baseOpacity,
+          }}
+          animate={{
+            opacity: [star.baseOpacity, star.minOpacity, star.baseOpacity],
+          }}
+          transition={{
+            duration: star.duration,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: star.delay,
+          }}
+        />
+      ))}
+    </div>
+  );
+});
+
+Stars.displayName = "Stars";
 
 // 時間帯ごとの背景設定
 interface TimeConfig {
@@ -174,8 +226,9 @@ const TimedBackgroundComponent: React.FC<TimedBackgroundProps> = ({ debugTimeOfD
   const { timeOfDay: currentTimeOfDay } = useTimeOfDayExtended();
   const timeOfDay = debugTimeOfDay || currentTimeOfDay;
   
-  // 時間帯に応じた設定を取得
-  const config = TIME_CONFIGS[timeOfDay];
+  // 時間帯に応じた設定を取得（useMemoで最適化）
+  const config = useMemo(() => TIME_CONFIGS[timeOfDay], [timeOfDay]);
+  
   // 画面幅に応じて雲の数を調整（パフォーマンス最適化）
   // SSR時は4つ、クライアント側で画面サイズに応じて調整
   const [cloudCount, setCloudCount] = useState(4);
@@ -183,6 +236,8 @@ const TimedBackgroundComponent: React.FC<TimedBackgroundProps> = ({ debugTimeOfD
 
   useEffect(() => {
     // クライアント側でのみ実行
+    let timeoutId: NodeJS.Timeout;
+    
     const updateCloudCount = () => {
       const width = window.innerWidth;
       setScreenWidth(width);
@@ -196,9 +251,18 @@ const TimedBackgroundComponent: React.FC<TimedBackgroundProps> = ({ debugTimeOfD
       }
     };
 
+    // Throttling: resize イベントを200msごとに制限
+    const throttledResize = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(updateCloudCount, 200);
+    };
+
     updateCloudCount();
-    window.addEventListener('resize', updateCloudCount);
-    return () => window.removeEventListener('resize', updateCloudCount);
+    window.addEventListener('resize', throttledResize);
+    return () => {
+      clearTimeout(timeoutId);
+      window.removeEventListener('resize', throttledResize);
+    };
   }, []);
 
   return (
@@ -216,37 +280,10 @@ const TimedBackgroundComponent: React.FC<TimedBackgroundProps> = ({ debugTimeOfD
 
         {/* 太陽と雲のレイヤー */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        {/* 星（夜のみ表示） */}
-        {config.stars && (
-          <div className="absolute inset-0">
-            {[...Array(50)].map((_, i) => (
-              <motion.div
-                key={i}
-                className="absolute h-1 w-1 rounded-full bg-white"
-                style={{
-                  left: `${Math.random() * 100}%`,
-                  top: `${Math.random() * 70}%`,
-                  opacity: 0.3 + Math.random() * 0.7,
-                }}
-                animate={{
-                  opacity: [
-                    0.3 + Math.random() * 0.7,
-                    0.1 + Math.random() * 0.3,
-                    0.3 + Math.random() * 0.7,
-                  ],
-                }}
-                transition={{
-                  duration: 2 + Math.random() * 3,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                  delay: Math.random() * 2,
-                }}
-              />
-            ))}
-          </div>
-        )}
+          {/* 星（夜のみ表示） */}
+          {config.stars && <Stars />}
 
-        {/* Sun/Moon with realistic gradient */}
+          {/* Sun/Moon with realistic gradient */}
         <motion.div
           animate={{ 
             scale: config.sun.pulseScale,
