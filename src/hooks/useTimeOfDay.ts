@@ -78,9 +78,9 @@ export function useTimeOfDayExtended(): TimeOfDayInfo {
     }
   }, []);
 
-  // デバッグモード対応
+  // デバッグモード対応（SSR対応）
   const debugTimeOfDay =
-    process.env.NODE_ENV === "development"
+    process.env.NODE_ENV === "development" && typeof window !== 'undefined'
       ? ((window as any).__DEBUG_TIME_OF_DAY as NewTimeOfDay | undefined)
       : undefined;
 

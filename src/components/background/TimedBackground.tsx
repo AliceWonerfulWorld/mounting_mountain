@@ -2,12 +2,14 @@
 
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { useTimeOfDayExtended } from "@/hooks/useTimeOfDay";
+import type { TimeOfDay } from "@/lib/timeOfDayConfig";
 
 /**
  * TimedBackground コンポーネント
  * 
  * 時間帯に応じて背景を変化させるコンポーネント
- * Phase 2: 現在は昼の背景のみを完全再現（時間帯切り替えは Phase 4 で実装）
+ * Phase 4: 各時間帯の背景を実装
  * 
  * パフォーマンス最適化:
  * - React.memo でラップ
@@ -15,12 +17,142 @@ import { motion } from "framer-motion";
  * - 画面サイズに応じて雲の表示数を調整
  */
 
-interface TimedBackgroundProps {
-  /** デバッグ用: 時間帯を強制指定（Phase 4で使用） */
-  timeOfDay?: string;
+// 時間帯ごとの背景設定
+interface TimeConfig {
+  skyGradient: string;
+  sun: {
+    position: string;
+    size: string;
+    coreGradient: string;
+    glowGradient1: string;
+    glowGradient2: string;
+    shadowColor: string;
+  };
+  clouds: {
+    fill: string;
+    fillAlt1: string;
+    fillAlt2: string;
+    opacity: number;
+  };
 }
 
-const TimedBackgroundComponent: React.FC<TimedBackgroundProps> = ({ timeOfDay = 'day' }) => {
+const TIME_CONFIGS: Record<TimeOfDay, TimeConfig> = {
+  dawn: {
+    skyGradient: "from-orange-300 via-pink-300 to-purple-400",
+    sun: {
+      position: "right-[15%] bottom-[15%]", // 地平線近く
+      size: "h-32 w-32",
+      coreGradient: "radial-gradient(circle, #fed7aa 0%, #fdba74 30%, #fb923c 60%, #f97316 100%)",
+      glowGradient1: "radial-gradient(circle, rgba(251, 146, 60, 0.5) 0%, rgba(249, 115, 22, 0.25) 50%, transparent 100%)",
+      glowGradient2: "radial-gradient(circle, rgba(251, 146, 60, 0.3) 0%, rgba(249, 115, 22, 0.15) 40%, transparent 100%)",
+      shadowColor: "rgba(251, 146, 60, 0.4)",
+    },
+    clouds: {
+      fill: "#fecaca", // ピンク系
+      fillAlt1: "#fde68a", // 薄いオレンジ
+      fillAlt2: "#fed7aa", // 薄いピーチ
+      opacity: 0.85,
+    },
+  },
+  morning: {
+    skyGradient: "from-sky-300 via-blue-200 to-green-100",
+    sun: {
+      position: "right-[12%] top-[20%]",
+      size: "h-36 w-36",
+      coreGradient: "radial-gradient(circle, #fef9c3 0%, #fef08a 30%, #fde047 60%, #facc15 100%)",
+      glowGradient1: "radial-gradient(circle, rgba(254, 249, 195, 0.6) 0%, rgba(254, 240, 138, 0.3) 50%, transparent 100%)",
+      glowGradient2: "radial-gradient(circle, rgba(254, 249, 195, 0.4) 0%, rgba(254, 240, 138, 0.2) 40%, transparent 100%)",
+      shadowColor: "rgba(254, 240, 138, 0.4)",
+    },
+    clouds: {
+      fill: "white",
+      fillAlt1: "#f8fafc",
+      fillAlt2: "#f1f5f9",
+      opacity: 0.95,
+    },
+  },
+  day: {
+    skyGradient: "from-sky-400 via-blue-300 to-green-200",
+    sun: {
+      position: "right-[12%] top-[8%]",
+      size: "h-40 w-40",
+      coreGradient: "radial-gradient(circle, #fef9c3 0%, #fef08a 30%, #fde047 60%, #facc15 100%)",
+      glowGradient1: "radial-gradient(circle, rgba(254, 249, 195, 0.6) 0%, rgba(254, 240, 138, 0.3) 50%, transparent 100%)",
+      glowGradient2: "radial-gradient(circle, rgba(254, 249, 195, 0.4) 0%, rgba(254, 240, 138, 0.2) 40%, transparent 100%)",
+      shadowColor: "rgba(254, 240, 138, 0.4)",
+    },
+    clouds: {
+      fill: "white",
+      fillAlt1: "#f8fafc",
+      fillAlt2: "#f1f5f9",
+      opacity: 0.95,
+    },
+  },
+  afternoon: {
+    skyGradient: "from-sky-400 via-blue-300 to-green-200",
+    sun: {
+      position: "right-[12%] top-[8%]",
+      size: "h-40 w-40",
+      coreGradient: "radial-gradient(circle, #fef9c3 0%, #fef08a 30%, #fde047 60%, #facc15 100%)",
+      glowGradient1: "radial-gradient(circle, rgba(254, 249, 195, 0.6) 0%, rgba(254, 240, 138, 0.3) 50%, transparent 100%)",
+      glowGradient2: "radial-gradient(circle, rgba(254, 249, 195, 0.4) 0%, rgba(254, 240, 138, 0.2) 40%, transparent 100%)",
+      shadowColor: "rgba(254, 240, 138, 0.4)",
+    },
+    clouds: {
+      fill: "white",
+      fillAlt1: "#f8fafc",
+      fillAlt2: "#f1f5f9",
+      opacity: 0.95,
+    },
+  },
+  sunset: {
+    skyGradient: "from-sky-400 via-blue-300 to-green-200",
+    sun: {
+      position: "right-[12%] top-[8%]",
+      size: "h-40 w-40",
+      coreGradient: "radial-gradient(circle, #fef9c3 0%, #fef08a 30%, #fde047 60%, #facc15 100%)",
+      glowGradient1: "radial-gradient(circle, rgba(254, 249, 195, 0.6) 0%, rgba(254, 240, 138, 0.3) 50%, transparent 100%)",
+      glowGradient2: "radial-gradient(circle, rgba(254, 249, 195, 0.4) 0%, rgba(254, 240, 138, 0.2) 40%, transparent 100%)",
+      shadowColor: "rgba(254, 240, 138, 0.4)",
+    },
+    clouds: {
+      fill: "white",
+      fillAlt1: "#f8fafc",
+      fillAlt2: "#f1f5f9",
+      opacity: 0.95,
+    },
+  },
+  night: {
+    skyGradient: "from-sky-400 via-blue-300 to-green-200",
+    sun: {
+      position: "right-[12%] top-[8%]",
+      size: "h-40 w-40",
+      coreGradient: "radial-gradient(circle, #fef9c3 0%, #fef08a 30%, #fde047 60%, #facc15 100%)",
+      glowGradient1: "radial-gradient(circle, rgba(254, 249, 195, 0.6) 0%, rgba(254, 240, 138, 0.3) 50%, transparent 100%)",
+      glowGradient2: "radial-gradient(circle, rgba(254, 249, 195, 0.4) 0%, rgba(254, 240, 138, 0.2) 40%, transparent 100%)",
+      shadowColor: "rgba(254, 240, 138, 0.4)",
+    },
+    clouds: {
+      fill: "white",
+      fillAlt1: "#f8fafc",
+      fillAlt2: "#f1f5f9",
+      opacity: 0.95,
+    },
+  },
+};
+
+interface TimedBackgroundProps {
+  /** デバッグ用: 時間帯を強制指定 */
+  debugTimeOfDay?: TimeOfDay;
+}
+
+const TimedBackgroundComponent: React.FC<TimedBackgroundProps> = ({ debugTimeOfDay }) => {
+  // 現在の時間帯を取得
+  const { timeOfDay: currentTimeOfDay } = useTimeOfDayExtended();
+  const timeOfDay = debugTimeOfDay || currentTimeOfDay;
+  
+  // 時間帯に応じた設定を取得
+  const config = TIME_CONFIGS[timeOfDay];
   // 画面幅に応じて雲の数を調整（パフォーマンス最適化）
   // SSR時は4つ、クライアント側で画面サイズに応じて調整
   const [cloudCount, setCloudCount] = useState(4);
@@ -49,7 +181,7 @@ const TimedBackgroundComponent: React.FC<TimedBackgroundProps> = ({ timeOfDay = 
   return (
     <>
       {/* 背景グラデーション */}
-      <div className="absolute inset-0 bg-gradient-to-b from-sky-400 via-blue-300 to-green-200" />
+      <div className={`absolute inset-0 bg-gradient-to-b ${config.skyGradient}`} />
 
       {/* 太陽と雲のレイヤー */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -63,7 +195,7 @@ const TimedBackgroundComponent: React.FC<TimedBackgroundProps> = ({ timeOfDay = 
             repeat: Infinity, 
             ease: "easeInOut" 
           }}
-          className="absolute right-[12%] top-[8%] h-40 w-40"
+          className={`absolute ${config.sun.position} ${config.sun.size}`}
           style={{
             willChange: 'transform',
             transform: 'translateZ(0)', // GPU合成
@@ -74,23 +206,28 @@ const TimedBackgroundComponent: React.FC<TimedBackgroundProps> = ({ timeOfDay = 
             <div 
               className="absolute inset-0 rounded-full"
               style={{
-                background: 'radial-gradient(circle, #fef9c3 0%, #fef08a 30%, #fde047 60%, #facc15 100%)'
+                background: config.sun.coreGradient
               }}
             />
             {/* Outer glow layers */}
             <div 
               className="absolute -inset-2 rounded-full"
               style={{
-                background: 'radial-gradient(circle, rgba(254, 249, 195, 0.6) 0%, rgba(254, 240, 138, 0.3) 50%, transparent 100%)'
+                background: config.sun.glowGradient1
               }}
             />
             <div 
               className="absolute -inset-4 rounded-full"
               style={{
-                background: 'radial-gradient(circle, rgba(254, 249, 195, 0.4) 0%, rgba(254, 240, 138, 0.2) 40%, transparent 100%)'
+                background: config.sun.glowGradient2
               }}
             />
-            <div className="absolute inset-0 rounded-full shadow-[0_0_100px_40px_rgba(254,240,138,0.4)]" />
+            <div 
+              className="absolute inset-0 rounded-full" 
+              style={{
+                boxShadow: `0 0 100px 40px ${config.sun.shadowColor}`
+              }}
+            />
           </div>
         </motion.div>
 
@@ -106,12 +243,12 @@ const TimedBackgroundComponent: React.FC<TimedBackgroundProps> = ({ timeOfDay = 
             }}
           >
             <svg width="220" height="80" viewBox="0 0 220 80" className="drop-shadow-lg">
-              <ellipse cx="50" cy="50" rx="35" ry="28" fill="white" opacity="0.95" />
-              <ellipse cx="85" cy="45" rx="40" ry="32" fill="white" opacity="0.95" />
-              <ellipse cx="120" cy="50" rx="38" ry="30" fill="white" opacity="0.95" />
-              <ellipse cx="155" cy="48" rx="35" ry="28" fill="white" opacity="0.95" />
-              <ellipse cx="90" cy="55" rx="45" ry="28" fill="#f8fafc" opacity="0.9" />
-              <ellipse cx="125" cy="58" rx="42" ry="26" fill="#f1f5f9" opacity="0.85" />
+              <ellipse cx="50" cy="50" rx="35" ry="28" fill={config.clouds.fill} opacity={config.clouds.opacity} />
+              <ellipse cx="85" cy="45" rx="40" ry="32" fill={config.clouds.fill} opacity={config.clouds.opacity} />
+              <ellipse cx="120" cy="50" rx="38" ry="30" fill={config.clouds.fill} opacity={config.clouds.opacity} />
+              <ellipse cx="155" cy="48" rx="35" ry="28" fill={config.clouds.fill} opacity={config.clouds.opacity} />
+              <ellipse cx="90" cy="55" rx="45" ry="28" fill={config.clouds.fillAlt1} opacity={config.clouds.opacity - 0.05} />
+              <ellipse cx="125" cy="58" rx="42" ry="26" fill={config.clouds.fillAlt2} opacity={config.clouds.opacity - 0.1} />
             </svg>
           </motion.div>
         )}
@@ -127,12 +264,12 @@ const TimedBackgroundComponent: React.FC<TimedBackgroundProps> = ({ timeOfDay = 
             }}
           >
             <svg width="280" height="100" viewBox="0 0 280 100" className="drop-shadow-lg">
-              <ellipse cx="60" cy="60" rx="45" ry="35" fill="white" opacity="0.92" />
-              <ellipse cx="110" cy="55" rx="50" ry="40" fill="white" opacity="0.92" />
-              <ellipse cx="160" cy="60" rx="48" ry="38" fill="white" opacity="0.92" />
-              <ellipse cx="210" cy="58" rx="45" ry="36" fill="white" opacity="0.92" />
-              <ellipse cx="115" cy="68" rx="55" ry="35" fill="#f8fafc" opacity="0.88" />
-              <ellipse cx="165" cy="70" rx="52" ry="32" fill="#f1f5f9" opacity="0.83" />
+              <ellipse cx="60" cy="60" rx="45" ry="35" fill={config.clouds.fill} opacity={config.clouds.opacity - 0.03} />
+              <ellipse cx="110" cy="55" rx="50" ry="40" fill={config.clouds.fill} opacity={config.clouds.opacity - 0.03} />
+              <ellipse cx="160" cy="60" rx="48" ry="38" fill={config.clouds.fill} opacity={config.clouds.opacity - 0.03} />
+              <ellipse cx="210" cy="58" rx="45" ry="36" fill={config.clouds.fill} opacity={config.clouds.opacity - 0.03} />
+              <ellipse cx="115" cy="68" rx="55" ry="35" fill={config.clouds.fillAlt1} opacity={config.clouds.opacity - 0.07} />
+              <ellipse cx="165" cy="70" rx="52" ry="32" fill={config.clouds.fillAlt2} opacity={config.clouds.opacity - 0.12} />
             </svg>
           </motion.div>
         )}
@@ -148,12 +285,12 @@ const TimedBackgroundComponent: React.FC<TimedBackgroundProps> = ({ timeOfDay = 
             }}
           >
             <svg width="200" height="70" viewBox="0 0 200 70" className="drop-shadow-lg">
-              <ellipse cx="45" cy="45" rx="32" ry="25" fill="white" opacity="0.94" />
-              <ellipse cx="75" cy="42" rx="36" ry="28" fill="white" opacity="0.94" />
-              <ellipse cx="110" cy="45" rx="35" ry="27" fill="white" opacity="0.94" />
-              <ellipse cx="140" cy="43" rx="32" ry="25" fill="white" opacity="0.94" />
-              <ellipse cx="80" cy="50" rx="40" ry="25" fill="#f8fafc" opacity="0.9" />
-              <ellipse cx="115" cy="52" rx="38" ry="23" fill="#f1f5f9" opacity="0.86" />
+              <ellipse cx="45" cy="45" rx="32" ry="25" fill={config.clouds.fill} opacity={config.clouds.opacity - 0.01} />
+              <ellipse cx="75" cy="42" rx="36" ry="28" fill={config.clouds.fill} opacity={config.clouds.opacity - 0.01} />
+              <ellipse cx="110" cy="45" rx="35" ry="27" fill={config.clouds.fill} opacity={config.clouds.opacity - 0.01} />
+              <ellipse cx="140" cy="43" rx="32" ry="25" fill={config.clouds.fill} opacity={config.clouds.opacity - 0.01} />
+              <ellipse cx="80" cy="50" rx="40" ry="25" fill={config.clouds.fillAlt1} opacity={config.clouds.opacity - 0.05} />
+              <ellipse cx="115" cy="52" rx="38" ry="23" fill={config.clouds.fillAlt2} opacity={config.clouds.opacity - 0.09} />
             </svg>
           </motion.div>
         )}
@@ -169,12 +306,12 @@ const TimedBackgroundComponent: React.FC<TimedBackgroundProps> = ({ timeOfDay = 
             }}
           >
             <svg width="180" height="65" viewBox="0 0 180 65" className="drop-shadow-md">
-              <ellipse cx="40" cy="42" rx="30" ry="23" fill="white" opacity="0.93" />
-              <ellipse cx="68" cy="39" rx="33" ry="26" fill="white" opacity="0.93" />
-              <ellipse cx="100" cy="42" rx="32" ry="25" fill="white" opacity="0.93" />
-              <ellipse cx="128" cy="40" rx="30" ry="23" fill="white" opacity="0.93" />
-              <ellipse cx="72" cy="47" rx="37" ry="23" fill="#f8fafc" opacity="0.89" />
-              <ellipse cx="105" cy="49" rx="35" ry="21" fill="#f1f5f9" opacity="0.85" />
+              <ellipse cx="40" cy="42" rx="30" ry="23" fill={config.clouds.fill} opacity={config.clouds.opacity - 0.02} />
+              <ellipse cx="68" cy="39" rx="33" ry="26" fill={config.clouds.fill} opacity={config.clouds.opacity - 0.02} />
+              <ellipse cx="100" cy="42" rx="32" ry="25" fill={config.clouds.fill} opacity={config.clouds.opacity - 0.02} />
+              <ellipse cx="128" cy="40" rx="30" ry="23" fill={config.clouds.fill} opacity={config.clouds.opacity - 0.02} />
+              <ellipse cx="72" cy="47" rx="37" ry="23" fill={config.clouds.fillAlt1} opacity={config.clouds.opacity - 0.06} />
+              <ellipse cx="105" cy="49" rx="35" ry="21" fill={config.clouds.fillAlt2} opacity={config.clouds.opacity - 0.1} />
             </svg>
           </motion.div>
         )}
