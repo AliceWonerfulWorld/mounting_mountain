@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useTimeOfDayExtended } from "@/hooks/useTimeOfDay";
 import type { TimeOfDay } from "@/lib/timeOfDayConfig";
 
@@ -27,13 +27,17 @@ interface TimeConfig {
     glowGradient1: string;
     glowGradient2: string;
     shadowColor: string;
+    pulseSpeed: number; // 脈動の速度（秒）
+    pulseScale: [number, number, number]; // 脈動のスケール値
   };
   clouds: {
     fill: string;
     fillAlt1: string;
     fillAlt2: string;
     opacity: number;
+    baseSpeed: number; // 基本速度の倍率
   };
+  stars?: boolean; // 星を表示するか
 }
 
 const TIME_CONFIGS: Record<TimeOfDay, TimeConfig> = {
@@ -46,12 +50,15 @@ const TIME_CONFIGS: Record<TimeOfDay, TimeConfig> = {
       glowGradient1: "radial-gradient(circle, rgba(251, 146, 60, 0.5) 0%, rgba(249, 115, 22, 0.25) 50%, transparent 100%)",
       glowGradient2: "radial-gradient(circle, rgba(251, 146, 60, 0.3) 0%, rgba(249, 115, 22, 0.15) 40%, transparent 100%)",
       shadowColor: "rgba(251, 146, 60, 0.4)",
+      pulseSpeed: 8,
+      pulseScale: [1, 1.03, 1],
     },
     clouds: {
       fill: "#fecaca", // ピンク系
       fillAlt1: "#fde68a", // 薄いオレンジ
       fillAlt2: "#fed7aa", // 薄いピーチ
       opacity: 0.85,
+      baseSpeed: 0.8,
     },
   },
   morning: {
@@ -63,12 +70,15 @@ const TIME_CONFIGS: Record<TimeOfDay, TimeConfig> = {
       glowGradient1: "radial-gradient(circle, rgba(254, 249, 195, 0.6) 0%, rgba(254, 240, 138, 0.3) 50%, transparent 100%)",
       glowGradient2: "radial-gradient(circle, rgba(254, 249, 195, 0.4) 0%, rgba(254, 240, 138, 0.2) 40%, transparent 100%)",
       shadowColor: "rgba(254, 240, 138, 0.4)",
+      pulseSpeed: 7,
+      pulseScale: [1, 1.025, 1],
     },
     clouds: {
       fill: "white",
       fillAlt1: "#f8fafc",
       fillAlt2: "#f1f5f9",
       opacity: 0.95,
+      baseSpeed: 1.1,
     },
   },
   day: {
@@ -80,12 +90,15 @@ const TIME_CONFIGS: Record<TimeOfDay, TimeConfig> = {
       glowGradient1: "radial-gradient(circle, rgba(254, 249, 195, 0.6) 0%, rgba(254, 240, 138, 0.3) 50%, transparent 100%)",
       glowGradient2: "radial-gradient(circle, rgba(254, 249, 195, 0.4) 0%, rgba(254, 240, 138, 0.2) 40%, transparent 100%)",
       shadowColor: "rgba(254, 240, 138, 0.4)",
+      pulseSpeed: 6,
+      pulseScale: [1, 1.02, 1],
     },
     clouds: {
       fill: "white",
       fillAlt1: "#f8fafc",
       fillAlt2: "#f1f5f9",
       opacity: 0.95,
+      baseSpeed: 1.0,
     },
   },
   afternoon: {
@@ -97,12 +110,15 @@ const TIME_CONFIGS: Record<TimeOfDay, TimeConfig> = {
       glowGradient1: "radial-gradient(circle, rgba(253, 230, 138, 0.6) 0%, rgba(251, 191, 36, 0.3) 50%, transparent 100%)",
       glowGradient2: "radial-gradient(circle, rgba(253, 230, 138, 0.4) 0%, rgba(251, 191, 36, 0.2) 40%, transparent 100%)",
       shadowColor: "rgba(251, 191, 36, 0.4)",
+      pulseSpeed: 7,
+      pulseScale: [1, 1.02, 1],
     },
     clouds: {
       fill: "white",
       fillAlt1: "#fef9c3",
       fillAlt2: "#fef3c7",
       opacity: 0.92,
+      baseSpeed: 0.9,
     },
   },
   sunset: {
@@ -114,12 +130,15 @@ const TIME_CONFIGS: Record<TimeOfDay, TimeConfig> = {
       glowGradient1: "radial-gradient(circle, rgba(251, 146, 60, 0.7) 0%, rgba(249, 115, 22, 0.4) 50%, transparent 100%)",
       glowGradient2: "radial-gradient(circle, rgba(251, 146, 60, 0.5) 0%, rgba(249, 115, 22, 0.25) 40%, transparent 100%)",
       shadowColor: "rgba(249, 115, 22, 0.5)",
+      pulseSpeed: 9,
+      pulseScale: [1, 1.035, 1],
     },
     clouds: {
       fill: "#fca5a5",
       fillAlt1: "#fbbf24",
       fillAlt2: "#f97316",
       opacity: 0.88,
+      baseSpeed: 0.7,
     },
   },
   night: {
@@ -131,13 +150,17 @@ const TIME_CONFIGS: Record<TimeOfDay, TimeConfig> = {
       glowGradient1: "radial-gradient(circle, rgba(248, 250, 252, 0.4) 0%, rgba(203, 213, 225, 0.2) 50%, transparent 100%)",
       glowGradient2: "radial-gradient(circle, rgba(248, 250, 252, 0.3) 0%, rgba(203, 213, 225, 0.15) 40%, transparent 100%)",
       shadowColor: "rgba(203, 213, 225, 0.3)",
+      pulseSpeed: 10,
+      pulseScale: [1, 1.015, 1],
     },
     clouds: {
       fill: "#475569",
       fillAlt1: "#334155",
       fillAlt2: "#1e293b",
       opacity: 0.7,
+      baseSpeed: 0.6,
     },
+    stars: true,
   },
 };
 
@@ -179,19 +202,57 @@ const TimedBackgroundComponent: React.FC<TimedBackgroundProps> = ({ debugTimeOfD
   }, []);
 
   return (
-    <>
-      {/* 背景グラデーション */}
-      <div className={`absolute inset-0 bg-gradient-to-b ${config.skyGradient}`} />
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={timeOfDay}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 2, ease: "easeInOut" }}
+        className="absolute inset-0"
+      >
+        {/* 背景グラデーション */}
+        <div className={`absolute inset-0 bg-gradient-to-b ${config.skyGradient}`} />
 
-      {/* 太陽と雲のレイヤー */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        {/* Sun with realistic gradient */}
+        {/* 太陽と雲のレイヤー */}
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        {/* 星（夜のみ表示） */}
+        {config.stars && (
+          <div className="absolute inset-0">
+            {[...Array(50)].map((_, i) => (
+              <motion.div
+                key={i}
+                className="absolute h-1 w-1 rounded-full bg-white"
+                style={{
+                  left: `${Math.random() * 100}%`,
+                  top: `${Math.random() * 70}%`,
+                  opacity: 0.3 + Math.random() * 0.7,
+                }}
+                animate={{
+                  opacity: [
+                    0.3 + Math.random() * 0.7,
+                    0.1 + Math.random() * 0.3,
+                    0.3 + Math.random() * 0.7,
+                  ],
+                }}
+                transition={{
+                  duration: 2 + Math.random() * 3,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: Math.random() * 2,
+                }}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Sun/Moon with realistic gradient */}
         <motion.div
           animate={{ 
-            scale: [1, 1.02, 1],
+            scale: config.sun.pulseScale,
           }}
           transition={{ 
-            duration: 6, 
+            duration: config.sun.pulseSpeed, 
             repeat: Infinity, 
             ease: "easeInOut" 
           }}
@@ -235,7 +296,7 @@ const TimedBackgroundComponent: React.FC<TimedBackgroundProps> = ({ debugTimeOfD
         {cloudCount >= 1 && (
           <motion.div
             animate={{ x: [-200, screenWidth + 200] }}
-            transition={{ duration: 50, repeat: Infinity, ease: "linear" }}
+            transition={{ duration: 50 / config.clouds.baseSpeed, repeat: Infinity, ease: "linear" }}
             className="absolute left-0 top-[12%]"
             style={{
               willChange: 'transform',
@@ -256,7 +317,7 @@ const TimedBackgroundComponent: React.FC<TimedBackgroundProps> = ({ debugTimeOfD
         {cloudCount >= 2 && (
           <motion.div
             animate={{ x: [-250, screenWidth + 250] }}
-            transition={{ duration: 70, repeat: Infinity, ease: "linear", delay: 15 }}
+            transition={{ duration: 70 / config.clouds.baseSpeed, repeat: Infinity, ease: "linear", delay: 15 }}
             className="absolute left-0 top-[28%]"
             style={{
               willChange: 'transform',
@@ -277,7 +338,7 @@ const TimedBackgroundComponent: React.FC<TimedBackgroundProps> = ({ debugTimeOfD
         {cloudCount >= 3 && (
           <motion.div
             animate={{ x: [-180, screenWidth + 180] }}
-            transition={{ duration: 55, repeat: Infinity, ease: "linear", delay: 30 }}
+            transition={{ duration: 55 / config.clouds.baseSpeed, repeat: Infinity, ease: "linear", delay: 30 }}
             className="absolute left-0 top-[48%]"
             style={{
               willChange: 'transform',
@@ -298,7 +359,7 @@ const TimedBackgroundComponent: React.FC<TimedBackgroundProps> = ({ debugTimeOfD
         {cloudCount >= 4 && (
           <motion.div
             animate={{ x: [-150, screenWidth + 150] }}
-            transition={{ duration: 60, repeat: Infinity, ease: "linear", delay: 8 }}
+            transition={{ duration: 60 / config.clouds.baseSpeed, repeat: Infinity, ease: "linear", delay: 8 }}
             className="absolute left-0 top-[68%]"
             style={{
               willChange: 'transform',
@@ -316,7 +377,8 @@ const TimedBackgroundComponent: React.FC<TimedBackgroundProps> = ({ debugTimeOfD
           </motion.div>
         )}
       </div>
-    </>
+      </motion.div>
+    </AnimatePresence>
   );
 };
 

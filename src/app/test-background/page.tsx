@@ -177,7 +177,18 @@ export default function TestBackgroundPage() {
               </ul>
             </div>
           )}
-
+          <div className="mb-6 rounded-lg bg-gradient-to-r from-purple-50 to-blue-50 p-4 border-2 border-purple-200">
+            <h2 className="mb-2 font-bold text-purple-900">✨ Phase 5: 各時間帯の差別化</h2>
+            <ul className="list-inside list-disc space-y-1 text-sm text-purple-800">
+              <li><strong>太陽/月の脈動速度:</strong> 朝は速め、夜はゆっくり</li>
+              <li><strong>雲の移動速度:</strong> 朝=1.1倍速、昼=通常、夜=0.6倍速</li>
+              <li><strong>トランジション:</strong> 時間帯切り替え時に2秒フェード</li>
+              <li><strong>星空エフェクト:</strong> 夜のみ50個の輝く星を表示</li>
+            </ul>
+            <p className="mt-2 text-xs text-purple-700 italic">
+              💡 時間帯を切り替えて、各時間帯の個性を比較してみてください
+            </p>
+          </div>
           <div className="flex gap-4">
             <Link
               href="/"
