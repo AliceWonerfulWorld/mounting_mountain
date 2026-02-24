@@ -141,6 +141,43 @@ export default function TestBackgroundPage() {
             </div>
           )}
 
+          {debugTime === 'afternoon' && (
+            <div className="mb-6 rounded-lg bg-amber-50 p-4">
+              <h2 className="mb-2 font-bold text-amber-900">🌤️ Afternoon（午後）確認ポイント</h2>
+              <ul className="list-inside list-disc space-y-1 text-sm text-amber-800">
+                <li>背景: やや暖かみのある青空（amber-100のアクセント）</li>
+                <li>太陽: やや西寄り（右20%）、昼より少し低め（15%）</li>
+                <li>太陽の色: やや暖色（アンバー系）</li>
+                <li>雲: 白〜薄い黄色</li>
+                <li>全体的に柔らかく暖かい午後の印象</li>
+              </ul>
+            </div>
+          )}
+
+          {debugTime === 'sunset' && (
+            <div className="mb-6 rounded-lg bg-rose-50 p-4">
+              <h2 className="mb-2 font-bold text-rose-900">🌇 Sunset（夕焼け）確認ポイント</h2>
+              <ul className="list-inside list-disc space-y-1 text-sm text-rose-800">
+                <li>背景: 鮮やかな夕焼け（オレンジ→ピンク→紫）</li>
+                <li>太陽: 地平線近く（左下）、オレンジ〜赤色</li>
+                <li>雲: 赤、オレンジ、黄色に鮮やかに染まる</li>
+                <li>全体的にドラマチックで情熱的な印象</li>
+              </ul>
+            </div>
+          )}
+
+          {debugTime === 'night' && (
+            <div className="mb-6 rounded-lg bg-slate-100 p-4 border-2 border-slate-300">
+              <h2 className="mb-2 font-bold text-slate-900">🌙 Night（夜）確認ポイント</h2>
+              <ul className="list-inside list-disc space-y-1 text-sm text-slate-700">
+                <li>背景: 濃い青〜紫〜灰色（indigo-950→purple-900→slate-800）</li>
+                <li>月: 左上、銀白色の優しい光</li>
+                <li>雲: 暗い灰色、控えめな存在感</li>
+                <li>全体的に静かで落ち着いた夜の印象</li>
+              </ul>
+            </div>
+          )}
+
           <div className="flex gap-4">
             <Link
               href="/"
