@@ -110,82 +110,97 @@ export default function Home() {
           『マウント』を"標高"で可視化するAIゲーム
         </p>
 
-        {/* Main Actions Container */}
-        <div className="flex flex-col items-center gap-6 w-full max-w-4xl">
+        {/* Card Dashboard Container */}
+        <div className="flex flex-col items-center gap-10 w-full max-w-6xl px-4">
 
-          {/* Row 1: Solo and Versus */}
-          <div className="flex flex-col md:flex-row items-stretch justify-center gap-4 w-full">
-            {/* Solo Mode Button - Primary */}
-            <Link
-              href="/solo"
-              className="group relative overflow-hidden rounded-2xl bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 px-8 py-6 text-xl font-black uppercase tracking-wider text-white shadow-2xl shadow-red-500/50 transition-all duration-300 hover:scale-105 hover:shadow-red-500/80 md:flex-1 md:text-2xl flex items-center justify-center text-center"
-            >
-              <span className="relative z-10 flex items-center gap-3">
-                <Zap className="h-7 w-7 animate-pulse" />
-                ソロモード
-                <Mountain className="h-7 w-7" />
-              </span>
-              <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-              {/* Shine Effect */}
-              <div className="absolute inset-0 -translate-x-full transform bg-gradient-to-r from-transparent via-white/30 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
-            </Link>
+          {/* Section 1: ゲームモード */}
+          <section className="w-full">
+            <div className="mb-4 flex items-center justify-center gap-2">
+              <div className="h-1 w-8 rounded-full bg-gradient-to-r from-transparent via-white/60 to-white/60" />
+              <h2 className="text-2xl font-black text-white drop-shadow-lg flex items-center gap-2">
+                🎮 <span>ゲームモード</span>
+              </h2>
+              <div className="h-1 w-8 rounded-full bg-gradient-to-r from-white/60 via-white/60 to-transparent" />
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+              {/* Solo Mode Button - Primary */}
+              <Link
+                href="/solo"
+                className="group relative overflow-hidden rounded-2xl bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 px-8 py-8 text-xl font-black uppercase tracking-wider text-white shadow-2xl shadow-red-500/50 transition-all duration-300 hover:scale-105 hover:shadow-red-500/80 md:text-2xl flex items-center justify-center text-center"
+              >
+                <span className="relative z-10 flex items-center gap-3">
+                  <Zap className="h-8 w-8 animate-pulse" />
+                  ソロモード
+                  <Mountain className="h-8 w-8" />
+                </span>
+                <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                <div className="absolute inset-0 -translate-x-full transform bg-gradient-to-r from-transparent via-white/30 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+              </Link>
 
-            {/* Versus Mode Button - Secondary (Now Styled Like Solo) */}
-            <Link
-              href="/versus/local"
-              className="group relative overflow-hidden rounded-2xl bg-gradient-to-r from-purple-600 via-violet-600 to-indigo-600 px-8 py-6 text-xl font-black tracking-wider text-white shadow-2xl shadow-purple-500/50 transition-all duration-300 hover:scale-105 hover:shadow-purple-500/80 md:flex-1 md:text-2xl flex items-center justify-center text-center"
-            >
-              <span className="relative z-10 flex items-center gap-3">
-                <Target className="h-7 w-7" />
-                対戦モード (Beta)
-              </span>
-              <div className="absolute inset-0 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-              {/* Shine Effect */}
-              <div className="absolute inset-0 -translate-x-full transform bg-gradient-to-r from-transparent via-white/30 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
-            </Link>
-          </div>
+              {/* Versus Mode Button */}
+              <Link
+                href="/versus/local"
+                className="group relative overflow-hidden rounded-2xl bg-gradient-to-r from-purple-600 via-violet-600 to-indigo-600 px-8 py-8 text-xl font-black tracking-wider text-white shadow-2xl shadow-purple-500/50 transition-all duration-300 hover:scale-105 hover:shadow-purple-500/80 md:text-2xl flex items-center justify-center text-center"
+              >
+                <span className="relative z-10 flex items-center gap-3">
+                  <Target className="h-8 w-8" />
+                  対戦モード
+                  <span className="text-sm font-semibold bg-white/20 px-2 py-1 rounded-md">Beta</span>
+                </span>
+                <div className="absolute inset-0 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                <div className="absolute inset-0 -translate-x-full transform bg-gradient-to-r from-transparent via-white/30 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+              </Link>
+            </div>
+          </section>
 
-          {/* Row 2: Achievements, Ranking and HowTo */}
-          <div className="flex flex-col md:flex-row items-center justify-center gap-4 w-full">
-            <Link
-              href="/achievements"
-              className="group relative overflow-hidden rounded-xl bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-600 px-8 py-4 text-lg font-bold text-white shadow-xl shadow-blue-500/40 transition-all duration-300 hover:scale-105 hover:shadow-blue-500/80 w-full md:flex-1 flex items-center justify-center gap-2"
-            >
-              <span className="relative z-10 flex items-center gap-2">
-                <Trophy className="h-5 w-5" />
-                実績一覧
-              </span>
-              <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 via-blue-500 to-teal-500 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-              {/* Shine Effect */}
-              <div className="absolute inset-0 -translate-x-full transform bg-gradient-to-r from-transparent via-white/30 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
-            </Link>
+          {/* Section 2: コミュニティ */}
+          <section className="w-full">
+            <div className="mb-4 flex items-center justify-center gap-2">
+              <div className="h-1 w-8 rounded-full bg-gradient-to-r from-transparent via-white/60 to-white/60" />
+              <h2 className="text-xl font-black text-white drop-shadow-lg flex items-center gap-2">
+                📊 <span>コミュニティ</span>
+              </h2>
+              <div className="h-1 w-8 rounded-full bg-gradient-to-r from-white/60 via-white/60 to-transparent" />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <Link
+                href="/achievements"
+                className="group relative overflow-hidden rounded-xl bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-600 px-6 py-6 text-lg font-bold text-white shadow-xl shadow-blue-500/40 transition-all duration-300 hover:scale-105 hover:shadow-blue-500/80 flex items-center justify-center gap-3"
+              >
+                <span className="relative z-10 flex items-center gap-3">
+                  <Trophy className="h-6 w-6" />
+                  実績一覧
+                </span>
+                <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 via-blue-500 to-teal-500 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                <div className="absolute inset-0 -translate-x-full transform bg-gradient-to-r from-transparent via-white/30 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+              </Link>
 
-            <Link
-              href="/ranking"
-              className="group relative overflow-hidden rounded-xl bg-gradient-to-r from-yellow-600 via-amber-600 to-orange-600 px-8 py-4 text-lg font-bold text-white shadow-xl shadow-yellow-500/40 transition-all duration-300 hover:scale-105 hover:shadow-yellow-500/80 w-full md:flex-1 flex items-center justify-center gap-2"
-            >
-              <span className="relative z-10 flex items-center gap-2">
-                <Trophy className="h-5 w-5" />
-                ランキング
-              </span>
-              <div className="absolute inset-0 bg-gradient-to-r from-amber-400 via-yellow-500 to-orange-500 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-              {/* Shine Effect */}
-              <div className="absolute inset-0 -translate-x-full transform bg-gradient-to-r from-transparent via-white/30 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
-            </Link>
+              <Link
+                href="/ranking"
+                className="group relative overflow-hidden rounded-xl bg-gradient-to-r from-yellow-600 via-amber-600 to-orange-600 px-6 py-6 text-lg font-bold text-white shadow-xl shadow-yellow-500/40 transition-all duration-300 hover:scale-105 hover:shadow-yellow-500/80 flex items-center justify-center gap-3"
+              >
+                <span className="relative z-10 flex items-center gap-3">
+                  <Trophy className="h-6 w-6" />
+                  ランキング
+                </span>
+                <div className="absolute inset-0 bg-gradient-to-r from-amber-400 via-yellow-500 to-orange-500 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                <div className="absolute inset-0 -translate-x-full transform bg-gradient-to-r from-transparent via-white/30 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+              </Link>
 
-            <Link
-              href="/howto"
-              className="group relative overflow-hidden rounded-xl bg-gradient-to-r from-slate-600 via-zinc-600 to-neutral-600 px-8 py-4 text-lg font-bold text-white shadow-xl shadow-slate-500/40 transition-all duration-300 hover:scale-105 hover:shadow-slate-500/80 w-full md:flex-1 flex items-center justify-center gap-2"
-            >
-              <span className="relative z-10 flex items-center gap-2">
-                <BookOpen className="h-5 w-5" />
-                遊び方
-              </span>
-              <div className="absolute inset-0 bg-gradient-to-r from-zinc-500 via-slate-500 to-neutral-500 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-              {/* Shine Effect */}
-              <div className="absolute inset-0 -translate-x-full transform bg-gradient-to-r from-transparent via-white/30 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
-            </Link>
-          </div>
+              <Link
+                href="/howto"
+                className="group relative overflow-hidden rounded-xl bg-gradient-to-r from-slate-600 via-zinc-600 to-neutral-600 px-6 py-6 text-lg font-bold text-white shadow-xl shadow-slate-500/40 transition-all duration-300 hover:scale-105 hover:shadow-slate-500/80 flex items-center justify-center gap-3 sm:col-span-2 lg:col-span-1"
+              >
+                <span className="relative z-10 flex items-center gap-3">
+                  <BookOpen className="h-6 w-6" />
+                  遊び方
+                </span>
+                <div className="absolute inset-0 bg-gradient-to-r from-zinc-500 via-slate-500 to-neutral-500 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                <div className="absolute inset-0 -translate-x-full transform bg-gradient-to-r from-transparent via-white/30 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+              </Link>
+            </div>
+          </section>
+
         </div>
       </section>
 
