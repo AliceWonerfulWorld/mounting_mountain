@@ -170,13 +170,36 @@ export default function RankingPage() {
         {data.entries.length === 0 ? (
           <div className="text-center py-16">
             <Trophy className="h-16 w-16 text-gray-600 mx-auto mb-4" />
-            <p className="text-xl text-gray-400">まだランキングデータがありません</p>
-            <Link
-              href="/solo"
-              className="inline-block mt-6 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold py-3 px-8 rounded-lg hover:from-blue-700 hover:to-cyan-700 transition-all duration-300 shadow-lg"
-            >
-              ソロモードをプレイ
-            </Link>
+            <p className="text-xl text-gray-400 mb-2">まだランキングデータがありません</p>
+            {!user ? (
+              <>
+                <p className="text-base text-gray-500 mb-6">
+                  最初のランキング参加者になりませんか？
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <Link
+                    href="/auth/signup"
+                    className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold py-3 px-8 rounded-lg hover:from-amber-600 hover:to-orange-600 transition-all duration-300 shadow-lg shadow-orange-500/30"
+                  >
+                    <Trophy className="h-5 w-5" />
+                    無料登録してプレイ
+                  </Link>
+                  <Link
+                    href="/solo"
+                    className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold py-3 px-8 rounded-lg hover:from-blue-700 hover:to-cyan-700 transition-all duration-300 shadow-lg"
+                  >
+                    ゲストでプレイ
+                  </Link>
+                </div>
+              </>
+            ) : (
+              <Link
+                href="/solo"
+                className="inline-block mt-6 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold py-3 px-8 rounded-lg hover:from-blue-700 hover:to-cyan-700 transition-all duration-300 shadow-lg"
+              >
+                ソロモードをプレイ
+              </Link>
+            )}
           </div>
         ) : (
           <div className="space-y-3">
@@ -253,9 +276,34 @@ export default function RankingPage() {
 
         {/* フッター */}
         {data.entries.length > 0 && (
-          <div className="mt-12 text-center text-gray-400 text-sm">
-            <p>総合ランキングは完走したゲームの最高スコアで決まります</p>
-            <p className="mt-2">ランキングは1分ごとに更新されます</p>
+          <div className="mt-12 space-y-6">
+            {/* 未登録ユーザー向けメッセージ */}
+            {!user && (
+              <div className="rounded-xl border border-yellow-400/30 bg-gradient-to-r from-yellow-600/10 to-orange-600/10 p-6 text-center backdrop-blur-sm">
+                <div className="mb-2 flex items-center justify-center gap-2">
+                  <Trophy className="h-5 w-5 text-yellow-400" />
+                  <span className="text-lg font-bold text-yellow-200">
+                    このランキングに参加するには
+                  </span>
+                </div>
+                <p className="mb-4 text-sm text-gray-300">
+                  無料のアカウント登録が必要です。今すぐ登録して、あなたのスコアをランキングに掲載しましょう！
+                </p>
+                <Link
+                  href="/auth/signup"
+                  className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 px-6 py-3 font-bold text-white shadow-lg shadow-orange-500/30 transition-all hover:from-amber-600 hover:to-orange-600 hover:shadow-orange-500/50"
+                >
+                  <Trophy className="h-4 w-4" />
+                  無料登録してランキングに参加
+                </Link>
+              </div>
+            )}
+
+            {/* 一般情報 */}
+            <div className="text-center text-gray-400 text-sm">
+              <p>総合ランキングは完走したゲームの最高スコアで決まります</p>
+              <p className="mt-2">ランキングは1分ごとに更新されます</p>
+            </div>
           </div>
         )}
       </div>

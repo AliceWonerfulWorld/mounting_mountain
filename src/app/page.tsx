@@ -17,33 +17,33 @@ export default function Home() {
   };
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-gradient-to-b from-zinc-900 to-black text-white">
+    <main className="relative min-h-screen overflow-hidden bg-gradient-to-b from-sky-400 via-blue-300 to-green-200 text-gray-900">
       {/* Header - Auth Status */}
       <header className="relative z-20 flex items-center justify-end px-6 py-4 gap-4">
         {loading ? (
-          <div className="text-sm text-blue-300">読み込み中...</div>
+          <div className="text-sm text-blue-700 font-semibold">読み込み中...</div>
         ) : user ? (
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 rounded-full border border-blue-400/30 bg-blue-900/30 px-4 py-2 backdrop-blur-sm">
-              <User className="h-4 w-4 text-blue-300" />
-              <span className="text-sm font-semibold text-blue-100">{user.email}</span>
+            <div className="flex items-center gap-2 rounded-full border border-blue-500/50 bg-white/90 px-4 py-2 backdrop-blur-sm shadow-md">
+              <User className="h-4 w-4 text-blue-600" />
+              <span className="text-sm font-semibold text-blue-800">{user.email}</span>
             </div>
             <Link
               href="/history"
-              className="flex items-center gap-2 rounded-lg border border-green-400/50 bg-green-900/30 px-4 py-2 text-sm font-semibold text-green-100 backdrop-blur-sm transition-all hover:bg-green-800/50 hover:shadow-lg hover:shadow-green-500/20"
+              className="flex items-center gap-2 rounded-lg border border-green-500/50 bg-white/90 px-4 py-2 text-sm font-semibold text-green-700 backdrop-blur-sm shadow-md transition-all hover:bg-green-50 hover:shadow-lg hover:border-green-600"
             >
               <History className="h-4 w-4" />
               履歴
             </Link>
             <Link
               href="/profile"
-              className="rounded-lg border border-purple-400/50 bg-purple-900/30 px-4 py-2 text-sm font-semibold text-purple-100 backdrop-blur-sm transition-all hover:bg-purple-800/50 hover:shadow-lg hover:shadow-purple-500/20"
+              className="rounded-lg border border-purple-500/50 bg-white/90 px-4 py-2 text-sm font-semibold text-purple-700 backdrop-blur-sm shadow-md transition-all hover:bg-purple-50 hover:shadow-lg hover:border-purple-600"
             >
               プロフィール
             </Link>
             <button
               onClick={() => setShowLogoutModal(true)}
-              className="flex items-center gap-2 rounded-lg border border-red-400/50 bg-red-900/30 px-4 py-2 text-sm font-semibold text-red-100 backdrop-blur-sm transition-all hover:bg-red-800/50 hover:shadow-lg hover:shadow-red-500/20"
+              className="flex items-center gap-2 rounded-lg border border-red-500/50 bg-white/90 px-4 py-2 text-sm font-semibold text-red-700 backdrop-blur-sm shadow-md transition-all hover:bg-red-50 hover:shadow-lg hover:border-red-600"
             >
               <LogOut className="h-4 w-4" />
               ログアウト
@@ -53,7 +53,7 @@ export default function Home() {
           <div className="flex items-center gap-3">
             <Link
               href="/auth/login"
-              className="flex items-center gap-2 rounded-lg border border-blue-400/50 bg-blue-900/30 px-4 py-2 text-sm font-semibold text-blue-100 backdrop-blur-sm transition-all hover:bg-blue-800/50 hover:shadow-lg hover:shadow-blue-500/20"
+              className="flex items-center gap-2 rounded-lg border border-blue-500/50 bg-white/90 px-4 py-2 text-sm font-semibold text-blue-700 backdrop-blur-sm shadow-md transition-all hover:bg-blue-50 hover:shadow-lg hover:border-blue-600"
             >
               <LogIn className="h-4 w-4" />
               ログイン
@@ -69,9 +69,105 @@ export default function Home() {
         )}
       </header>
 
-      {/* Background Elements (Stars) */}
+      {/* Background Elements - Sky, Sun and Clouds */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-zinc-800/20 via-transparent to-transparent" />
+        {/* Sun with realistic gradient */}
+        <motion.div
+          animate={{ 
+            scale: [1, 1.02, 1],
+          }}
+          transition={{ 
+            duration: 6, 
+            repeat: Infinity, 
+            ease: "easeInOut" 
+          }}
+          className="absolute right-[12%] top-[8%] h-40 w-40"
+        >
+          <div className="relative h-full w-full">
+            {/* Sun core with radial gradient */}
+            <div 
+              className="absolute inset-0 rounded-full"
+              style={{
+                background: 'radial-gradient(circle, #fef9c3 0%, #fef08a 30%, #fde047 60%, #facc15 100%)'
+              }}
+            />
+            {/* Outer glow layers */}
+            <div 
+              className="absolute -inset-2 rounded-full"
+              style={{
+                background: 'radial-gradient(circle, rgba(254, 249, 195, 0.6) 0%, rgba(254, 240, 138, 0.3) 50%, transparent 100%)'
+              }}
+            />
+            <div 
+              className="absolute -inset-4 rounded-full"
+              style={{
+                background: 'radial-gradient(circle, rgba(254, 249, 195, 0.4) 0%, rgba(254, 240, 138, 0.2) 40%, transparent 100%)'
+              }}
+            />
+            <div className="absolute inset-0 rounded-full shadow-[0_0_100px_40px_rgba(254,240,138,0.4)]" />
+          </div>
+        </motion.div>
+
+        {/* Realistic SVG Clouds */}
+        <motion.div
+          animate={{ x: [-200, typeof window !== 'undefined' ? window.innerWidth + 200 : 2000] }}
+          transition={{ duration: 50, repeat: Infinity, ease: "linear" }}
+          className="absolute left-0 top-[12%]"
+        >
+          <svg width="220" height="80" viewBox="0 0 220 80" className="drop-shadow-lg">
+            <ellipse cx="50" cy="50" rx="35" ry="28" fill="white" opacity="0.95" />
+            <ellipse cx="85" cy="45" rx="40" ry="32" fill="white" opacity="0.95" />
+            <ellipse cx="120" cy="50" rx="38" ry="30" fill="white" opacity="0.95" />
+            <ellipse cx="155" cy="48" rx="35" ry="28" fill="white" opacity="0.95" />
+            <ellipse cx="90" cy="55" rx="45" ry="28" fill="#f8fafc" opacity="0.9" />
+            <ellipse cx="125" cy="58" rx="42" ry="26" fill="#f1f5f9" opacity="0.85" />
+          </svg>
+        </motion.div>
+
+        <motion.div
+          animate={{ x: [-250, typeof window !== 'undefined' ? window.innerWidth + 250 : 2000] }}
+          transition={{ duration: 70, repeat: Infinity, ease: "linear", delay: 15 }}
+          className="absolute left-0 top-[28%]"
+        >
+          <svg width="280" height="100" viewBox="0 0 280 100" className="drop-shadow-lg">
+            <ellipse cx="60" cy="60" rx="45" ry="35" fill="white" opacity="0.92" />
+            <ellipse cx="110" cy="55" rx="50" ry="40" fill="white" opacity="0.92" />
+            <ellipse cx="160" cy="60" rx="48" ry="38" fill="white" opacity="0.92" />
+            <ellipse cx="210" cy="58" rx="45" ry="36" fill="white" opacity="0.92" />
+            <ellipse cx="115" cy="68" rx="55" ry="35" fill="#f8fafc" opacity="0.88" />
+            <ellipse cx="165" cy="70" rx="52" ry="32" fill="#f1f5f9" opacity="0.83" />
+          </svg>
+        </motion.div>
+
+        <motion.div
+          animate={{ x: [-180, typeof window !== 'undefined' ? window.innerWidth + 180 : 2000] }}
+          transition={{ duration: 55, repeat: Infinity, ease: "linear", delay: 30 }}
+          className="absolute left-0 top-[48%]"
+        >
+          <svg width="200" height="70" viewBox="0 0 200 70" className="drop-shadow-lg">
+            <ellipse cx="45" cy="45" rx="32" ry="25" fill="white" opacity="0.94" />
+            <ellipse cx="75" cy="42" rx="36" ry="28" fill="white" opacity="0.94" />
+            <ellipse cx="110" cy="45" rx="35" ry="27" fill="white" opacity="0.94" />
+            <ellipse cx="140" cy="43" rx="32" ry="25" fill="white" opacity="0.94" />
+            <ellipse cx="80" cy="50" rx="40" ry="25" fill="#f8fafc" opacity="0.9" />
+            <ellipse cx="115" cy="52" rx="38" ry="23" fill="#f1f5f9" opacity="0.86" />
+          </svg>
+        </motion.div>
+
+        <motion.div
+          animate={{ x: [-150, typeof window !== 'undefined' ? window.innerWidth + 150 : 2000] }}
+          transition={{ duration: 60, repeat: Infinity, ease: "linear", delay: 8 }}
+          className="absolute left-0 top-[68%]"
+        >
+          <svg width="180" height="65" viewBox="0 0 180 65" className="drop-shadow-md">
+            <ellipse cx="40" cy="42" rx="30" ry="23" fill="white" opacity="0.93" />
+            <ellipse cx="68" cy="39" rx="33" ry="26" fill="white" opacity="0.93" />
+            <ellipse cx="100" cy="42" rx="32" ry="25" fill="white" opacity="0.93" />
+            <ellipse cx="128" cy="40" rx="30" ry="23" fill="white" opacity="0.93" />
+            <ellipse cx="72" cy="47" rx="37" ry="23" fill="#f8fafc" opacity="0.89" />
+            <ellipse cx="105" cy="49" rx="35" ry="21" fill="#f1f5f9" opacity="0.85" />
+          </svg>
+        </motion.div>
       </div>
 
       {/* Hero Section */}
@@ -88,40 +184,28 @@ export default function Home() {
             alt="Mountain Background"
             width={1920}
             height={1080}
-            className="w-full h-auto object-contain object-bottom opacity-90 drop-shadow-2xl"
+            className="w-full h-auto object-contain object-bottom opacity-70 drop-shadow-2xl"
             priority
           />
           {/* Overlay to blend with background/footer */}
-          <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-green-200/60 via-transparent to-transparent" />
         </motion.div>
 
-        {/* Floating Icons */}
-        {/*<div className="mb-6 flex items-center gap-4">
-          <div className="animate-bounce">
-            <Mountain className="h-20 w-20 text-blue-400 drop-shadow-[0_0_15px_rgba(96,165,250,0.5)]" />
-          </div>
-          <div className="animate-pulse">
-            <Sparkles className="h-10 w-10 text-yellow-300 drop-shadow-[0_0_10px_rgba(253,224,71,0.6)]" />
-          </div>
-        </div>
-        */}
-
-
-        {/* Title with Glow Effect */}
-        <h1 className="mb-4 bg-gradient-to-r from-blue-200 via-white to-blue-200 bg-clip-text text-6xl font-black leading-tight tracking-tight text-transparent drop-shadow-[0_5px_5px_rgba(0,0,0,0.8)] md:text-7xl lg:text-8xl">
+        {/* Title with natural color */}
+        <h1 className="mb-4 text-6xl font-black leading-tight tracking-tight text-white drop-shadow-[0_4px_12px_rgba(0,0,0,0.25)] md:text-7xl lg:text-8xl">
           マウンティング
           <br />
           マウンテン
         </h1>
 
         {/* Altitude Badge */}
-        <div className="mb-6 flex items-center gap-2 rounded-full border-2 border-yellow-400/50 bg-yellow-400/10 px-6 py-2 backdrop-blur-md shadow-lg shadow-black/40">
-          <Trophy className="h-5 w-5 text-yellow-400 drop-shadow-md" />
-          <span className="text-sm font-bold text-yellow-300 drop-shadow-md">標高で競え！マウント度測定ゲーム</span>
+        <div className="mb-6 flex items-center gap-2 rounded-full border-2 border-white/80 bg-white/90 px-6 py-2 backdrop-blur-md shadow-lg">
+          <Trophy className="h-5 w-5 text-amber-600" />
+          <span className="text-sm font-bold text-gray-800">標高で競え！マウント度測定ゲーム</span>
         </div>
 
-        <p className="mb-12 max-w-2xl text-xl font-semibold text-blue-100 drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] md:text-2xl">
-          『マウント』を“標高”で可視化するAIゲーム
+        <p className="mb-12 max-w-2xl text-xl font-semibold text-gray-700 drop-shadow-[0_2px_4px_rgba(255,255,255,0.8)] md:text-2xl">
+          『マウント』を"標高"で可視化するAIゲーム
         </p>
 
         {/* Main Actions Container */}
