@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { Mountain, Trophy, BookOpen, Zap, Target, User, LogOut, LogIn, UserPlus, History, AlertTriangle, X } from "lucide-react";
+import { Mountain, Trophy, BookOpen, Zap, Target, User, LogOut, LogIn, UserPlus, History, X } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { TimedBackground } from "@/components/background/TimedBackground";
 
@@ -214,7 +214,7 @@ export default function Home() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setShowLogoutModal(false)}
-              className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm"
+              className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm"
             />
 
             {/* Modal */}
@@ -226,48 +226,72 @@ export default function Home() {
               className="fixed inset-0 z-50 flex items-center justify-center p-4"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="relative w-full max-w-md rounded-2xl border border-red-400/50 bg-gradient-to-br from-slate-800/95 to-zinc-900/95 p-8 shadow-2xl backdrop-blur-md">
-                {/* Close button */}
-                <button
-                  onClick={() => setShowLogoutModal(false)}
-                  className="absolute right-4 top-4 rounded-lg p-1 text-gray-400 transition-colors hover:bg-white/10 hover:text-white"
-                >
-                  <X className="h-5 w-5" />
-                </button>
-
-                {/* Icon */}
-                <div className="mb-4 flex justify-center">
-                  <div className="rounded-full bg-red-500/20 p-3">
-                    <AlertTriangle className="h-12 w-12 text-red-400" />
-                  </div>
-                </div>
-
-                {/* Title */}
-                <h2 className="mb-2 text-center text-2xl font-black text-white">
-                  ログアウトしますか？
-                </h2>
-
-                {/* Message */}
-                <p className="mb-8 text-center text-sm text-gray-300">
-                  ログアウトすると、再度ログインするまで
-                  <br />
-                  履歴の閲覧やゲームの保存ができなくなります。
-                </p>
-
-                {/* Buttons */}
-                <div className="flex gap-3">
+              <div className="relative w-full max-w-md overflow-hidden rounded-3xl border border-blue-200/50 bg-gradient-to-br from-white via-sky-50/80 to-blue-50/90 shadow-2xl backdrop-blur-xl">
+                {/* Gradient accent line */}
+                <div className="h-1.5 w-full bg-gradient-to-r from-blue-500 via-sky-400 to-cyan-500" />
+                
+                <div className="p-8">
+                  {/* Close button */}
                   <button
                     onClick={() => setShowLogoutModal(false)}
-                    className="flex-1 rounded-lg border border-gray-600 bg-gray-700/50 px-6 py-3 font-bold text-white transition-all hover:bg-gray-600/50"
+                    className="absolute right-4 top-5 rounded-full p-1.5 text-gray-500 transition-all hover:bg-gray-100 hover:text-gray-700 hover:rotate-90"
                   >
-                    キャンセル
+                    <X className="h-5 w-5" />
                   </button>
-                  <button
-                    onClick={handleLogout}
-                    className="flex-1 rounded-lg bg-gradient-to-r from-red-600 to-rose-600 px-6 py-3 font-bold text-white shadow-lg transition-all hover:from-red-700 hover:to-rose-700 hover:shadow-red-500/50"
-                  >
-                    ログアウト
-                  </button>
+
+                  {/* Icon with animated rings */}
+                  <div className="mb-6 flex justify-center">
+                    <div className="relative">
+                      {/* Outer ring */}
+                      <div className="absolute inset-0 animate-ping rounded-full bg-gradient-to-r from-orange-400/30 to-red-400/30" />
+                      {/* Middle ring */}
+                      <div className="absolute -inset-2 rounded-full bg-gradient-to-r from-orange-400/20 to-red-400/20 blur-xl" />
+                      {/* Icon container */}
+                      <div className="relative rounded-full bg-gradient-to-br from-orange-100 via-red-50 to-rose-100 p-4 shadow-inner">
+                        <div className="rounded-full bg-gradient-to-br from-orange-500 to-red-500 p-3 shadow-lg">
+                          <LogOut className="h-10 w-10 text-white" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Title */}
+                  <h2 className="mb-3 text-center text-2xl font-black tracking-tight text-gray-800">
+                    ログアウトしますか？
+                  </h2>
+
+                  {/* Message */}
+                  <div className="mb-8 rounded-xl bg-gradient-to-br from-blue-50/80 to-sky-50/80 p-4 shadow-inner">
+                    <p className="text-center text-sm leading-relaxed text-gray-700">
+                      ログアウトすると、再度ログインするまで
+                      <br />
+                      <span className="font-bold text-orange-600">履歴の閲覧</span>や
+                      <span className="font-bold text-orange-600">ゲームの保存</span>が
+                      <br />
+                      できなくなります。
+                    </p>
+                  </div>
+
+                  {/* Buttons */}
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => setShowLogoutModal(false)}
+                      className="group flex-1 rounded-xl border-2 border-gray-300 bg-gradient-to-b from-white to-gray-50 px-6 py-3.5 font-bold text-gray-700 shadow-md transition-all hover:scale-105 hover:border-gray-400 hover:shadow-lg active:scale-95"
+                    >
+                      <span className="flex items-center justify-center gap-2">
+                        キャンセル
+                      </span>
+                    </button>
+                    <button
+                      onClick={handleLogout}
+                      className="group flex-1 rounded-xl bg-gradient-to-r from-orange-500 via-red-500 to-rose-500 px-6 py-3.5 font-bold text-white shadow-lg transition-all hover:scale-105 hover:from-orange-600 hover:via-red-600 hover:to-rose-600 hover:shadow-xl hover:shadow-red-300/50 active:scale-95"
+                    >
+                      <span className="flex items-center justify-center gap-2">
+                        <LogOut className="h-4 w-4" />
+                        ログアウト
+                      </span>
+                    </button>
+                  </div>
                 </div>
               </div>
             </motion.div>
