@@ -6,6 +6,7 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mountain, Trophy, BookOpen, Zap, Target, User, LogOut, LogIn, UserPlus, History, AlertTriangle, X } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { TimedBackground } from "@/components/background/TimedBackground";
 
 export default function Home() {
   const { user, loading, signOut } = useAuth();
@@ -17,7 +18,9 @@ export default function Home() {
   };
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-gradient-to-b from-sky-400 via-blue-300 to-green-200 text-gray-900">
+    <main className="relative min-h-screen overflow-hidden text-gray-900">
+      {/* Time-based Background */}
+      <TimedBackground />
       {/* Header - Auth Status */}
       <header className="relative z-20 flex items-center justify-end px-6 py-4 gap-4">
         {loading ? (
@@ -68,107 +71,6 @@ export default function Home() {
           </div>
         )}
       </header>
-
-      {/* Background Elements - Sky, Sun and Clouds */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        {/* Sun with realistic gradient */}
-        <motion.div
-          animate={{ 
-            scale: [1, 1.02, 1],
-          }}
-          transition={{ 
-            duration: 6, 
-            repeat: Infinity, 
-            ease: "easeInOut" 
-          }}
-          className="absolute right-[12%] top-[8%] h-40 w-40"
-        >
-          <div className="relative h-full w-full">
-            {/* Sun core with radial gradient */}
-            <div 
-              className="absolute inset-0 rounded-full"
-              style={{
-                background: 'radial-gradient(circle, #fef9c3 0%, #fef08a 30%, #fde047 60%, #facc15 100%)'
-              }}
-            />
-            {/* Outer glow layers */}
-            <div 
-              className="absolute -inset-2 rounded-full"
-              style={{
-                background: 'radial-gradient(circle, rgba(254, 249, 195, 0.6) 0%, rgba(254, 240, 138, 0.3) 50%, transparent 100%)'
-              }}
-            />
-            <div 
-              className="absolute -inset-4 rounded-full"
-              style={{
-                background: 'radial-gradient(circle, rgba(254, 249, 195, 0.4) 0%, rgba(254, 240, 138, 0.2) 40%, transparent 100%)'
-              }}
-            />
-            <div className="absolute inset-0 rounded-full shadow-[0_0_100px_40px_rgba(254,240,138,0.4)]" />
-          </div>
-        </motion.div>
-
-        {/* Realistic SVG Clouds */}
-        <motion.div
-          animate={{ x: [-200, typeof window !== 'undefined' ? window.innerWidth + 200 : 2000] }}
-          transition={{ duration: 50, repeat: Infinity, ease: "linear" }}
-          className="absolute left-0 top-[12%]"
-        >
-          <svg width="220" height="80" viewBox="0 0 220 80" className="drop-shadow-lg">
-            <ellipse cx="50" cy="50" rx="35" ry="28" fill="white" opacity="0.95" />
-            <ellipse cx="85" cy="45" rx="40" ry="32" fill="white" opacity="0.95" />
-            <ellipse cx="120" cy="50" rx="38" ry="30" fill="white" opacity="0.95" />
-            <ellipse cx="155" cy="48" rx="35" ry="28" fill="white" opacity="0.95" />
-            <ellipse cx="90" cy="55" rx="45" ry="28" fill="#f8fafc" opacity="0.9" />
-            <ellipse cx="125" cy="58" rx="42" ry="26" fill="#f1f5f9" opacity="0.85" />
-          </svg>
-        </motion.div>
-
-        <motion.div
-          animate={{ x: [-250, typeof window !== 'undefined' ? window.innerWidth + 250 : 2000] }}
-          transition={{ duration: 70, repeat: Infinity, ease: "linear", delay: 15 }}
-          className="absolute left-0 top-[28%]"
-        >
-          <svg width="280" height="100" viewBox="0 0 280 100" className="drop-shadow-lg">
-            <ellipse cx="60" cy="60" rx="45" ry="35" fill="white" opacity="0.92" />
-            <ellipse cx="110" cy="55" rx="50" ry="40" fill="white" opacity="0.92" />
-            <ellipse cx="160" cy="60" rx="48" ry="38" fill="white" opacity="0.92" />
-            <ellipse cx="210" cy="58" rx="45" ry="36" fill="white" opacity="0.92" />
-            <ellipse cx="115" cy="68" rx="55" ry="35" fill="#f8fafc" opacity="0.88" />
-            <ellipse cx="165" cy="70" rx="52" ry="32" fill="#f1f5f9" opacity="0.83" />
-          </svg>
-        </motion.div>
-
-        <motion.div
-          animate={{ x: [-180, typeof window !== 'undefined' ? window.innerWidth + 180 : 2000] }}
-          transition={{ duration: 55, repeat: Infinity, ease: "linear", delay: 30 }}
-          className="absolute left-0 top-[48%]"
-        >
-          <svg width="200" height="70" viewBox="0 0 200 70" className="drop-shadow-lg">
-            <ellipse cx="45" cy="45" rx="32" ry="25" fill="white" opacity="0.94" />
-            <ellipse cx="75" cy="42" rx="36" ry="28" fill="white" opacity="0.94" />
-            <ellipse cx="110" cy="45" rx="35" ry="27" fill="white" opacity="0.94" />
-            <ellipse cx="140" cy="43" rx="32" ry="25" fill="white" opacity="0.94" />
-            <ellipse cx="80" cy="50" rx="40" ry="25" fill="#f8fafc" opacity="0.9" />
-            <ellipse cx="115" cy="52" rx="38" ry="23" fill="#f1f5f9" opacity="0.86" />
-          </svg>
-        </motion.div>
-
-        <motion.div
-          animate={{ x: [-150, typeof window !== 'undefined' ? window.innerWidth + 150 : 2000] }}
-          transition={{ duration: 60, repeat: Infinity, ease: "linear", delay: 8 }}
-          className="absolute left-0 top-[68%]"
-        >
-          <svg width="180" height="65" viewBox="0 0 180 65" className="drop-shadow-md">
-            <ellipse cx="40" cy="42" rx="30" ry="23" fill="white" opacity="0.93" />
-            <ellipse cx="68" cy="39" rx="33" ry="26" fill="white" opacity="0.93" />
-            <ellipse cx="100" cy="42" rx="32" ry="25" fill="white" opacity="0.93" />
-            <ellipse cx="128" cy="40" rx="30" ry="23" fill="white" opacity="0.93" />
-            <ellipse cx="72" cy="47" rx="37" ry="23" fill="#f8fafc" opacity="0.89" />
-            <ellipse cx="105" cy="49" rx="35" ry="21" fill="#f1f5f9" opacity="0.85" />
-          </svg>
-        </motion.div>
-      </div>
 
       {/* Hero Section */}
       <section className="relative z-10 flex min-h-screen flex-col items-center justify-center overflow-hidden px-6 py-16 text-center">
