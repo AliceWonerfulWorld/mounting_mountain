@@ -1,13 +1,20 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { motion } from "framer-motion";
-import { Mountain, Trophy, BookOpen, Zap, Target, User, LogOut, LogIn, UserPlus, History } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Mountain, Trophy, BookOpen, Zap, Target, User, LogOut, LogIn, UserPlus, History, AlertTriangle, X } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function Home() {
   const { user, loading, signOut } = useAuth();
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+
+  const handleLogout = async () => {
+    await signOut();
+    setShowLogoutModal(false);
+  };
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-gradient-to-b from-zinc-900 to-black text-white">
@@ -35,7 +42,7 @@ export default function Home() {
               プロフィール
             </Link>
             <button
-              onClick={() => signOut()}
+              onClick={() => setShowLogoutModal(true)}
               className="flex items-center gap-2 rounded-lg border border-red-400/50 bg-red-900/30 px-4 py-2 text-sm font-semibold text-red-100 backdrop-blur-sm transition-all hover:bg-red-800/50 hover:shadow-lg hover:shadow-red-500/20"
             >
               <LogOut className="h-4 w-4" />
@@ -195,6 +202,77 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Logout Confirmation Modal */}
+      <AnimatePresence>
+        {showLogoutModal && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowLogoutModal(false)}
+              className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm"
+            />
+
+            {/* Modal */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              transition={{ type: "spring", duration: 0.3 }}
+              className="fixed inset-0 z-50 flex items-center justify-center p-4"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="relative w-full max-w-md rounded-2xl border border-red-400/50 bg-gradient-to-br from-slate-800/95 to-zinc-900/95 p-8 shadow-2xl backdrop-blur-md">
+                {/* Close button */}
+                <button
+                  onClick={() => setShowLogoutModal(false)}
+                  className="absolute right-4 top-4 rounded-lg p-1 text-gray-400 transition-colors hover:bg-white/10 hover:text-white"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+
+                {/* Icon */}
+                <div className="mb-4 flex justify-center">
+                  <div className="rounded-full bg-red-500/20 p-3">
+                    <AlertTriangle className="h-12 w-12 text-red-400" />
+                  </div>
+                </div>
+
+                {/* Title */}
+                <h2 className="mb-2 text-center text-2xl font-black text-white">
+                  ログアウトしますか？
+                </h2>
+
+                {/* Message */}
+                <p className="mb-8 text-center text-sm text-gray-300">
+                  ログアウトすると、再度ログインするまで
+                  <br />
+                  履歴の閲覧やゲームの保存ができなくなります。
+                </p>
+
+                {/* Buttons */}
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setShowLogoutModal(false)}
+                    className="flex-1 rounded-lg border border-gray-600 bg-gray-700/50 px-6 py-3 font-bold text-white transition-all hover:bg-gray-600/50"
+                  >
+                    キャンセル
+                  </button>
+                  <button
+                    onClick={handleLogout}
+                    className="flex-1 rounded-lg bg-gradient-to-r from-red-600 to-rose-600 px-6 py-3 font-bold text-white shadow-lg transition-all hover:from-red-700 hover:to-rose-700 hover:shadow-red-500/50"
+                  >
+                    ログアウト
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </main>
   );
 }
