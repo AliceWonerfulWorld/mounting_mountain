@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Trophy, Medal, Crown, TrendingUp, User, ArrowLeft, Mountain } from "lucide-react";
 import { motion } from "framer-motion";
@@ -20,7 +19,6 @@ interface RankingData {
 
 export default function RankingPage() {
   const { user, loading: authLoading } = useAuth();
-  const router = useRouter();
   const [data, setData] = useState<RankingData>({ entries: [], myRank: null, myEntry: null });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");

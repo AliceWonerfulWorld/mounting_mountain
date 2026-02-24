@@ -59,7 +59,7 @@ export function useTimeOfDayExtended(): TimeOfDayInfo {
     // デバッグモード対応（開発環境のみ）
     if (process.env.NODE_ENV === "development") {
       const checkDebugMode = () => {
-        const debugTimeOfDay = (window as any).__DEBUG_TIME_OF_DAY as NewTimeOfDay | undefined;
+        const debugTimeOfDay = (window as Window & { __DEBUG_TIME_OF_DAY?: NewTimeOfDay }).__DEBUG_TIME_OF_DAY;
         if (debugTimeOfDay) {
           // デバッグモードの場合は更新しない
           return;
@@ -81,7 +81,7 @@ export function useTimeOfDayExtended(): TimeOfDayInfo {
   // デバッグモード対応（SSR対応）
   const debugTimeOfDay =
     process.env.NODE_ENV === "development" && typeof window !== 'undefined'
-      ? ((window as any).__DEBUG_TIME_OF_DAY as NewTimeOfDay | undefined)
+      ? ((window as Window & { __DEBUG_TIME_OF_DAY?: NewTimeOfDay }).__DEBUG_TIME_OF_DAY as NewTimeOfDay | undefined)
       : undefined;
 
   // useMemoでメモ化してパフォーマンス最適化

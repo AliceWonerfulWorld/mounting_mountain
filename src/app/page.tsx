@@ -107,7 +107,7 @@ export default function Home() {
         </div>
 
         <p className="mb-12 max-w-2xl text-xl font-semibold text-gray-700 drop-shadow-[0_2px_4px_rgba(255,255,255,0.8)] md:text-2xl">
-          『マウント』を"標高"で可視化するAIゲーム
+          『マウント』を&quot;標高&quot;で可視化するAIゲーム
         </p>
 
         {/* Card Dashboard Container */}

@@ -27,19 +27,22 @@ import type { TimeOfDay } from "@/lib/timeOfDayConfig";
  * - AnimatePresenceでDOMの効率的な更新
  */
 
+// 星の位置を事前生成（pure関数として初期化時のみ実行）
+const generateStars = () => {
+  return [...Array(50)].map((_, i) => ({
+    id: i,
+    left: `${Math.random() * 100}%`,
+    top: `${Math.random() * 70}%`,
+    baseOpacity: 0.3 + Math.random() * 0.7,
+    minOpacity: 0.1 + Math.random() * 0.3,
+    duration: 2 + Math.random() * 3,
+    delay: Math.random() * 2,
+  }));
+};
+
 // 星コンポーネント（メモ化で最適化）
 const Stars = React.memo(() => {
-  const stars = useMemo(() => {
-    return [...Array(50)].map((_, i) => ({
-      id: i,
-      left: `${Math.random() * 100}%`,
-      top: `${Math.random() * 70}%`,
-      baseOpacity: 0.3 + Math.random() * 0.7,
-      minOpacity: 0.1 + Math.random() * 0.3,
-      duration: 2 + Math.random() * 3,
-      delay: Math.random() * 2,
-    }));
-  }, []);
+  const [stars] = useState(() => generateStars());
 
   return (
     <div className="absolute inset-0">
