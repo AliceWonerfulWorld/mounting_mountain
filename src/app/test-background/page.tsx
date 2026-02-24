@@ -96,14 +96,50 @@ export default function TestBackgroundPage() {
             <p>✅ パフォーマンス最適化: GPU合成、React.memo</p>
           </div>
 
-          <div className="mb-6 rounded-lg bg-blue-50 p-4">
-            <h2 className="mb-2 font-bold text-blue-900">Phase 4.1: Dawn（朝焼け）確認ポイント</h2>
-            <ul className="list-inside list-disc space-y-1 text-sm text-blue-800">
-              <li>背景: オレンジ→ピンク→紫のグラデーション</li>
-              <li>太陽: 地平線近く（右下）、オレンジ色</li>
-              <li>雲: ピンク〜オレンジに染まる</li>
-            </ul>
-          </div>
+          {/* 現在の時間帯に応じた確認ポイント */}
+          {!debugTime && (
+            <div className="mb-6 rounded-lg bg-green-50 p-4">
+              <h2 className="mb-2 font-bold text-green-900">💡 ヒント</h2>
+              <p className="text-sm text-green-800">
+                上のボタンで時間帯を切り替えて、それぞれの背景を確認してください
+              </p>
+            </div>
+          )}
+
+          {debugTime === 'dawn' && (
+            <div className="mb-6 rounded-lg bg-orange-50 p-4">
+              <h2 className="mb-2 font-bold text-orange-900">🌅 Dawn（朝焼け）確認ポイント</h2>
+              <ul className="list-inside list-disc space-y-1 text-sm text-orange-800">
+                <li>背景: オレンジ→ピンク→紫のグラデーション</li>
+                <li>太陽: 地平線近く（右下）、オレンジ色</li>
+                <li>雲: ピンク〜オレンジに染まる</li>
+              </ul>
+            </div>
+          )}
+
+          {debugTime === 'morning' && (
+            <div className="mb-6 rounded-lg bg-blue-50 p-4">
+              <h2 className="mb-2 font-bold text-blue-900">☀️ Morning（朝）確認ポイント</h2>
+              <ul className="list-inside list-disc space-y-1 text-sm text-blue-800">
+                <li>背景: 爽やかな青空グラデーション（sky-300→blue-200→green-100）</li>
+                <li>太陽: 右上やや低め（20%）、明るい黄色</li>
+                <li>雲: 白く爽やか</li>
+                <li>全体的に柔らかく優しい印象</li>
+              </ul>
+            </div>
+          )}
+
+          {debugTime === 'day' && (
+            <div className="mb-6 rounded-lg bg-sky-50 p-4">
+              <h2 className="mb-2 font-bold text-sky-900">🌞 Day（昼）確認ポイント</h2>
+              <ul className="list-inside list-disc space-y-1 text-sm text-sky-800">
+                <li>背景: 鮮やかな青空（sky-400→blue-300→green-200）</li>
+                <li>太陽: 右上高め（8%）、最も明るい</li>
+                <li>雲: 白く明瞭</li>
+                <li>全体的に明るく活発な印象</li>
+              </ul>
+            </div>
+          )}
 
           <div className="flex gap-4">
             <Link
