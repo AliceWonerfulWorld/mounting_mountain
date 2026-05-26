@@ -1,105 +1,34 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect, memo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import type { GameState, Round } from "@/types/game";
-import { PROMPTS } from "@/lib/prompts";
 import { DetailedMountain } from "@/components/DetailedMountain";
-import { pickN } from "@/lib/random";
-import { createRounds } from "@/lib/game";
 import { cn } from "@/lib/utils";
-import { updateStats } from "@/lib/achievementStore";
-import { ROUTES, getRoute, type RouteId } from "@/lib/solo/routes";
-import { computeFinalAltitude } from "@/lib/solo/score";
+import { ROUTES, getRoute } from "@/lib/solo/routes";
 import { RotateCcw, TrendingUp, AlertTriangle, Mountain } from "lucide-react";
-import { RoundCutin } from "@/components/RoundCutin";
-import { TurnCutin } from "@/components/TurnCutin";
-import { BattleCutin } from "@/components/BattleCutin";
-
-// ルート選択カードコンポーネント（メモ化して再レンダリングを防ぐ）
-const RouteCard = memo(({ routeId, isSelected, onSelect }: { 
-    routeId: RouteId; 
-    isSelected: boolean; 
-    onSelect: (routeId: RouteId) => void;
-}) => {
-    const route = getRoute(routeId);
-    const colorClass = routeId === "SAFE" ? "text-blue-500" : routeId === "RISKY" ? "text-red-500" : "text-amber-600";
-
-    return (
-        <button
-            onClick={() => onSelect(routeId)}
-            className={cn(
-                "relative flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all duration-200",
-                isSelected
-                    ? "border-blue-500 bg-blue-50/50 dark:bg-blue-900/20 shadow-md transform scale-[1.02]"
-                    : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 bg-white/50 dark:bg-slate-800/50"
-            )}
-        >
-            {isSelected && (
-                <motion.div
-                    initial={{ scale: 0, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                    className="absolute -top-2 -right-2 w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center shadow-sm"
-                >
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                    </svg>
-                </motion.div>
-            )}
-
-            <div className="text-3xl mb-2">{route.emoji}</div>
-            <div className="text-sm font-bold text-slate-700 dark:text-slate-200">{route.label}</div>
-            <div className={cn("text-xs font-bold mt-1", colorClass)}>
-                x{route.multiplier}
-            </div>
-        </button>
-    );
-});
-
-RouteCard.displayName = 'RouteCard';
-
-type VersusState = GameState & {
-    currentPlayerIndex: 0 | 1; // 0: Player 1, 1: Player 2
-    phase: "input" | "result" | "finished" | "round_start" | "turn_change" | "both_results" | "battle_cutin";
-    lastResult: Round | undefined; // 直近の判定結果表示用
-    roundWinner?: 0 | 1 | null; // 0: P1, 1: P2, null: 引き分け
-    selectedRoute: RouteId; // 現在のプレイヤーが選択したルート
-};
+import { useVersusLocalGame, VERSUS_ROUND_COUNT } from "@/hooks/useVersusLocalGame";
+import { RouteCard } from "@/components/versus/RouteCard";
+import { VersusBackground } from "@/components/versus/VersusBackground";
+import { VersusCutins } from "@/components/versus/VersusCutins";
+import { VersusHud } from "@/components/versus/VersusHud";
 
 export default function VersusLocalPage() {
-    const ROUND_COUNT = 3;
-
-    const [game, setGame] = useState<VersusState | null>(null);
-    const [text, setText] = useState("");
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const [isHistoryOpen, setIsHistoryOpen] = useState(false);
-
-    // 初期化
-    useEffect(() => {
-        const selectedPrompts = pickN(PROMPTS, ROUND_COUNT).map((p) => p.text);
-        const roundsP1 = createRounds(selectedPrompts, ROUND_COUNT);
-        const roundsP2 = createRounds(selectedPrompts, ROUND_COUNT);
-
-        setGame({
-            mode: "versus_local",
-            status: "playing",
-            roundIndex: 0,
-            prompts: selectedPrompts,
-            currentPlayerIndex: 0,
-            phase: "round_start",
-            insurance: 0,
-            players: [
-                { id: "p1", name: "Player 1", totalScore: 0, rounds: roundsP1 },
-                { id: "p2", name: "Player 2", totalScore: 0, rounds: roundsP2 },
-            ],
-            lastResult: undefined,
-            roundWinner: undefined,
-            selectedRoute: "NORMAL",
-        });
-    }, []);
+    const {
+        game,
+        text,
+        setText,
+        loading,
+        error,
+        isHistoryOpen,
+        setIsHistoryOpen,
+        submitRound,
+        nextTurn,
+        resetGame,
+        completeRoundCutin,
+        completeTurnCutin,
+        completeBattleCutin,
+        selectRoute,
+    } = useVersusLocalGame();
 
     if (!game) return <div className="min-h-screen flex items-center justify-center text-gray-500">Loading Mount...</div>;
 
@@ -108,261 +37,25 @@ export default function VersusLocalPage() {
     const isP1 = game.currentPlayerIndex === 0;
     const isFinished = game.status === "finished";
 
-    // --- Actions ---
-
-    async function submitRound() {
-        if (!text.trim() || loading || isFinished) return;
-
-        setLoading(true);
-        setError(null);
-
-        try {
-            const res = await fetch("/api/analyze", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    text: text.trim(),
-                    route: game!.selectedRoute, // 選択されたルートを使用
-                    mode: "versus" // 辛辣モードを有効化
-                }),
-            });
-
-            if (!res.ok) throw new Error("API Error");
-            const result = await res.json();
-
-            setGame((prev) => {
-                if (!prev) return null;
-                const next = structuredClone(prev);
-                const player = next.players[next.currentPlayerIndex];
-                const round = player.rounds[next.roundIndex];
-
-                const route = getRoute(next.selectedRoute);
-
-                const scoreResult = computeFinalAltitude({
-                    baseAltitude: result.altitude,
-                    routeId: next.selectedRoute,
-                    routeMultiplier: route.multiplier,
-                    bonusAltitude: 0,
-                    // 対戦モードでは現状天気・保険なし（必要なら追加）
-                });
-
-                round.inputText = text.trim();
-                round.result = {
-                    ...result,
-                    routeId: next.selectedRoute,
-                    routeMultiplier: route.multiplier,
-                    finalAltitude: scoreResult.finalAltitude,
-                    didFall: scoreResult.didFall,
-                    fallReason: scoreResult.fallReason,
-                };
-
-                player.totalScore += scoreResult.finalAltitude;
-
-                // 称号更新
-                updateStats({
-                    highestAltitude: scoreResult.finalAltitude,
-                    snowCount: scoreResult.finalAltitude >= 6000 ? 1 : 0,
-                    everestCount: scoreResult.finalAltitude >= 8000 ? 1 : 0,
-                });
-
-                // P1終了時は交代へ、P2終了時は両結果表示へ
-                if (next.currentPlayerIndex === 0) {
-                    next.currentPlayerIndex = 1; // Player2に切り替え
-                    next.selectedRoute = "NORMAL"; // P2のデフォルトルート
-                    next.phase = "turn_change"; // Player2のTurnCutinを表示
-                } else {
-                    // P2終了時にラウンド勝者判定
-                    const p1Res = next.players[0].rounds[next.roundIndex].result;
-                    const p2Res = next.players[1].rounds[next.roundIndex].result;
-                    const p1Alt = p1Res?.finalAltitude ?? 0;
-                    const p2Alt = p2Res?.finalAltitude ?? 0;
-
-                    if (p1Alt > p2Alt) next.roundWinner = 0;
-                    else if (p2Alt > p1Alt) next.roundWinner = 1;
-                    else next.roundWinner = null;
-
-                    next.phase = "battle_cutin"; // BattleCutinを表示
-                }
-
-                return next;
-            });
-            setText("");
-        } catch {
-            setError("判定に失敗しました。もう一度お試しください。");
-        } finally {
-            setLoading(false);
-        }
-    }
-
-    function nextTurn() {
-        setGame((prev) => {
-            if (!prev) return null;
-            const next = structuredClone(prev);
-
-            // both_results から次のラウンドまたは終了へ
-            // ボーナス加算
-            if (next.roundWinner === 0) next.players[0].totalScore += 1000;
-            else if (next.roundWinner === 1) next.players[1].totalScore += 1000;
-
-            if (next.roundIndex + 1 >= ROUND_COUNT) {
-                next.status = "finished";
-                next.phase = "finished";
-                // 終了時称号
-                const p1Win = next.players[0].totalScore > next.players[1].totalScore;
-                updateStats({ versusPlays: 1, versusWinsP1: p1Win ? 1 : 0 });
-            } else {
-                next.roundIndex += 1;
-                next.currentPlayerIndex = 0;
-                next.phase = "round_start";
-                next.lastResult = undefined;
-                next.roundWinner = undefined;
-                next.selectedRoute = "NORMAL";
-            }
-            return next;
-        });
-        setText("");
-    }
-
-    function resetGame() {
-        const selectedPrompts = pickN(PROMPTS, ROUND_COUNT).map((p) => p.text);
-        const roundsP1 = createRounds(selectedPrompts, ROUND_COUNT);
-        const roundsP2 = createRounds(selectedPrompts, ROUND_COUNT);
-
-        setGame({
-            mode: "versus_local",
-            status: "playing",
-            roundIndex: 0,
-            prompts: selectedPrompts,
-            currentPlayerIndex: 0,
-            phase: "round_start",
-            insurance: 0,
-            players: [
-                { id: "p1", name: "Player 1", totalScore: 0, rounds: roundsP1 },
-                { id: "p2", name: "Player 2", totalScore: 0, rounds: roundsP2 },
-            ],
-            lastResult: undefined,
-            roundWinner: undefined,
-            selectedRoute: "NORMAL",
-        });
-        setText("");
-        setIsHistoryOpen(false);
-    }
-
-    // Cut-in Handlers
-    function handleRoundCutinComplete() {
-        setGame((prev) => {
-            if (!prev) return null;
-            return {
-                ...prev,
-                phase: "turn_change" // Round Start -> P1 Turn Cutin
-            };
-        });
-    }
-
-    function handleTurnCutinComplete() {
-        setGame((prev) => {
-            if (!prev) return null;
-            return {
-                ...prev,
-                phase: "input" // TurnCutin完了 -> 入力画面へ
-            };
-        });
-    }
-
-    function handleBattleCutinComplete() {
-        setGame((prev) => {
-            if (!prev) return null;
-            return {
-                ...prev,
-                phase: "both_results" // BattleCutin完了 -> 両結果表示
-            };
-        });
-    }
-
-    // ルート選択ハンドラ
-    const handleRouteSelect = (routeId: RouteId) => {
-        setGame(prev => prev ? { ...prev, selectedRoute: routeId } : null);
-    };
-
     return (
         <main className="min-h-screen relative overflow-x-hidden text-slate-800 dark:text-slate-200 font-sans selection:bg-blue-100 selection:text-blue-900">
-            {/* --- 背景レイヤー (Soloモードから移植・簡略化) --- */}
-            <div className="fixed inset-0 bg-gradient-to-b from-sky-300 via-blue-100 to-white dark:from-slate-900 dark:via-slate-950 dark:to-black transition-colors duration-1000 -z-30" />
-
-            {/* 遠景の山 */}
-            <div className="fixed bottom-0 left-0 right-0 -z-20 pointer-events-none opacity-40">
-                <svg viewBox="0 0 1200 400" className="w-full h-auto text-slate-400 dark:text-slate-800 fill-current">
-                    <path d="M0,400 L0,200 L200,100 L400,180 L600,80 L800,160 L1000,120 L1200,200 L1200,400 Z" />
-                </svg>
-            </div>
-
-            {/* 中景の山 */}
-            <div className="fixed bottom-0 left-0 right-0 -z-10 pointer-events-none opacity-60">
-                <svg viewBox="0 0 1200 300" className="w-full h-auto text-slate-300 dark:text-slate-700 fill-current">
-                    <path d="M0,300 L150,150 L300,220 L450,100 L600,180 L750,120 L900,200 L1050,140 L1200,250 L1200,300 Z" />
-                </svg>
-            </div>
+            <VersusBackground />
 
             {/* コンテンツコンテナ */}
             <div className="relative z-10 max-w-4xl mx-auto px-4 py-6 pb-24 min-h-screen flex flex-col">
 
                 {/* --- HUD / Header --- */}
                 {!isFinished && (
-                    <header className="mb-6">
-                        <div className="flex items-center justify-between gap-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md p-4 rounded-2xl shadow-lg border border-white/20">
-                            {/* Player 1 Badge */}
-                            <div className={cn(
-                                "flex flex-col items-center p-3 rounded-xl transition-all duration-300 w-28",
-                                isP1 ? "bg-red-500 text-white shadow-red-200 dark:shadow-red-900/30 shadow-lg scale-105" : "bg-slate-100 dark:bg-slate-800 text-slate-500 scale-95 opacity-70"
-                            )}>
-                                <span className="text-xs font-bold uppercase tracking-wider">Player 1</span>
-                                <span className="text-xl font-black">{game.players[0].totalScore.toLocaleString()}m</span>
-                            </div>
-
-                            {/* Round Info */}
-                            <div className="flex flex-col items-center">
-                                <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Round</div>
-                                <div className="text-2xl font-black text-slate-700 dark:text-slate-200">
-                                    {game.roundIndex + 1} <span className="text-slate-400 text-lg">/ {ROUND_COUNT}</span>
-                                </div>
-                            </div>
-
-                            {/* Player 2 Badge */}
-                            <div className={cn(
-                                "flex flex-col items-center p-3 rounded-xl transition-all duration-300 w-28",
-                                !isP1 ? "bg-blue-500 text-white shadow-blue-200 dark:shadow-blue-900/30 shadow-lg scale-105" : "bg-slate-100 dark:bg-slate-800 text-slate-500 scale-95 opacity-70"
-                            )}>
-                                <span className="text-xs font-bold uppercase tracking-wider">Player 2</span>
-                                <span className="text-xl font-black">{game.players[1].totalScore.toLocaleString()}m</span>
-                            </div>
-                        </div>
-                    </header>
+                    <VersusHud game={game} roundCount={VERSUS_ROUND_COUNT} />
                 )}
 
                 {/* Cut-in Overlays (Full Screen) */}
-                <AnimatePresence>
-                    {game.phase === "round_start" && (
-                        <RoundCutin
-                            key="round-cutin"
-                            roundNumber={game.roundIndex + 1}
-                            onComplete={handleRoundCutinComplete}
-                        />
-                    )}
-                    {game.phase === "turn_change" && (
-                        <TurnCutin
-                            key="turn-cutin"
-                            playerIndex={game.currentPlayerIndex}
-                            playerName={game.players[game.currentPlayerIndex].name}
-                            onComplete={handleTurnCutinComplete}
-                        />
-                    )}
-                    {game.phase === "battle_cutin" && (
-                        <BattleCutin
-                            key="battle-cutin"
-                            onComplete={handleBattleCutinComplete}
-                        />
-                    )}
-                </AnimatePresence>
+                <VersusCutins
+                    game={game}
+                    onRoundComplete={completeRoundCutin}
+                    onTurnComplete={completeTurnCutin}
+                    onBattleComplete={completeBattleCutin}
+                />
 
                 {/* --- Main Game Card --- */}
                 {(game.phase === "input" || game.phase === "result" || game.phase === "both_results" || game.phase === "finished") && (
@@ -803,7 +496,7 @@ export default function VersusLocalPage() {
                                         className="w-full py-4 bg-slate-900 text-white hover:bg-slate-800 rounded-xl font-bold text-lg shadow-lg flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
                                     >
                                         <span>
-                                            {game.roundIndex + 1 >= ROUND_COUNT ? "最終結果を見る" : "次のラウンドへ"}
+                                            {game.roundIndex + 1 >= VERSUS_ROUND_COUNT ? "最終結果を見る" : "次のラウンドへ"}
                                         </span>
                                         <TrendingUp className="w-5 h-5" />
                                     </button>
@@ -816,7 +509,7 @@ export default function VersusLocalPage() {
                                 <div>
                                     <div className="text-xs font-bold text-slate-400 mb-2 flex items-center gap-2">
                                         <div className={cn("w-2 h-2 rounded-full", isP1 ? "bg-red-500" : "bg-blue-500")} />
-                                        <span>ROUND {game.roundIndex + 1} / {ROUND_COUNT}</span>
+                                        <span>ROUND {game.roundIndex + 1} / {VERSUS_ROUND_COUNT}</span>
                                     </div>
                                     <h2 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-slate-100 leading-tight">
                                         Q. <span className="text-transparent bg-clip-text bg-gradient-to-r from-slate-800 to-slate-600 dark:from-white dark:to-slate-300">{currentRound.prompt}</span>
@@ -842,7 +535,7 @@ export default function VersusLocalPage() {
                                                 key={route.id} 
                                                 routeId={route.id} 
                                                 isSelected={game.selectedRoute === route.id}
-                                                onSelect={handleRouteSelect}
+                                                onSelect={selectRoute}
                                             />
                                         ))}
                                     </div>
