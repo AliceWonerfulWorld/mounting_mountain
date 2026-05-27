@@ -43,6 +43,7 @@ export function SoloFinalResults({ game, summary, onReset }: SoloFinalResultsPro
                 bonusAltitude={Math.max(0, totalScore - summary.score.max)}
                 className="h-full min-h-[460px] rounded-[1.5rem] border-0 shadow-none"
                 size="large"
+                showHud={false}
               />
               <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-950/58 via-transparent to-slate-950/12" />
               <div className="absolute inset-x-4 top-4 flex flex-wrap items-start justify-between gap-3 text-white">

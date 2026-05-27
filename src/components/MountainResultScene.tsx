@@ -20,6 +20,7 @@ type MountainResultSceneProps = {
   bonusAltitude?: number;
   className?: string;
   size?: "compact" | "large";
+  showHud?: boolean;
 };
 
 type Palette = {
@@ -151,6 +152,7 @@ export const MountainResultScene = memo(function MountainResultScene({
   bonusAltitude = 0,
   className,
   size = "large",
+  showHud = true,
 }: MountainResultSceneProps) {
   const ratio = Math.min(Math.max(altitude / maxAltitude, 0), 1);
   const palette = buildPalette(color, weather, timeOfDay, ratio);
@@ -220,46 +222,50 @@ export const MountainResultScene = memo(function MountainResultScene({
         {didFall && <FallScar palette={palette} />}
       </Canvas>
 
-      <div className="pointer-events-none absolute inset-x-4 top-4 flex items-start justify-between gap-3">
-        <div>
-          <div className="text-[10px] font-black uppercase tracking-[0.26em]" style={{ color: palette.label }}>
-            {mode === "versus" ? "Judged Peak" : "Current Peak"}
+      {showHud && (
+        <div className="pointer-events-none absolute inset-x-4 top-4 flex items-start justify-between gap-3">
+          <div>
+            <div className="text-[10px] font-black uppercase tracking-[0.26em]" style={{ color: palette.label }}>
+              {mode === "versus" ? "Judged Peak" : "Current Peak"}
+            </div>
+            <div className="mt-1 text-sm font-bold sm:text-base" style={{ color: palette.label }}>{tier}</div>
           </div>
-          <div className="mt-1 text-sm font-bold sm:text-base" style={{ color: palette.label }}>{tier}</div>
+          <div className="rounded-full bg-white/72 px-3 py-1 text-xs font-black text-slate-800 shadow-sm backdrop-blur-md">
+            {Math.round(ratio * 100)}%
+          </div>
         </div>
-        <div className="rounded-full bg-white/72 px-3 py-1 text-xs font-black text-slate-800 shadow-sm backdrop-blur-md">
-          {Math.round(ratio * 100)}%
-        </div>
-      </div>
+      )}
 
-      <div className="pointer-events-none absolute inset-x-4 bottom-4 flex items-end justify-between gap-3">
-        <div>
-          <div className="text-[10px] font-black uppercase tracking-[0.22em] text-white/70">
-            Altitude
+      {showHud && (
+        <div className="pointer-events-none absolute inset-x-4 bottom-4 flex items-end justify-between gap-3">
+          <div>
+            <div className="text-[10px] font-black uppercase tracking-[0.22em] text-white/70">
+              Altitude
+            </div>
+            <div className="mt-1 font-mono text-4xl font-black leading-none tracking-tight text-white drop-shadow-[0_3px_10px_rgba(0,0,0,0.45)] sm:text-5xl">
+              {altitude.toLocaleString()}
+              <span className="ml-1 text-base text-white/75 sm:text-xl">m</span>
+            </div>
           </div>
-          <div className="mt-1 font-mono text-4xl font-black leading-none tracking-tight text-white drop-shadow-[0_3px_10px_rgba(0,0,0,0.45)] sm:text-5xl">
-            {altitude.toLocaleString()}
-            <span className="ml-1 text-base text-white/75 sm:text-xl">m</span>
+          <div className="flex flex-col items-end gap-2 text-right">
+            {bonusAltitude > 0 && (
+              <div className="rounded-full bg-amber-300/92 px-3 py-1 text-xs font-black text-amber-950 shadow-lg">
+                +{bonusAltitude.toLocaleString()}m
+              </div>
+            )}
+            {didFall && (
+              <div className="rounded-full bg-red-500/92 px-3 py-1 text-xs font-black text-white shadow-lg">
+                滑落
+              </div>
+            )}
+            {isWinner && (
+              <div className="rounded-full bg-white/90 px-3 py-1 text-xs font-black text-slate-900 shadow-lg">
+                WINNER
+              </div>
+            )}
           </div>
         </div>
-        <div className="flex flex-col items-end gap-2 text-right">
-          {bonusAltitude > 0 && (
-            <div className="rounded-full bg-amber-300/92 px-3 py-1 text-xs font-black text-amber-950 shadow-lg">
-              +{bonusAltitude.toLocaleString()}m
-            </div>
-          )}
-          {didFall && (
-            <div className="rounded-full bg-red-500/92 px-3 py-1 text-xs font-black text-white shadow-lg">
-              滑落
-            </div>
-          )}
-          {isWinner && (
-            <div className="rounded-full bg-white/90 px-3 py-1 text-xs font-black text-slate-900 shadow-lg">
-              WINNER
-            </div>
-          )}
-        </div>
-      </div>
+      )}
     </div>
   );
 });
