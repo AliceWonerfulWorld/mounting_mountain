@@ -22,48 +22,48 @@ export default function Home() {
       {/* Time-based Background */}
       <TimedBackground />
       {/* Header - Auth Status */}
-      <header className="relative z-20 flex items-center justify-end px-6 py-4 gap-4">
+      <header className="relative z-20 flex w-full items-center justify-center px-3 py-3 sm:justify-end sm:px-6 sm:py-4">
         {loading ? (
           <div className="text-sm text-blue-700 font-semibold">読み込み中...</div>
         ) : user ? (
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 rounded-full border border-blue-500/50 bg-white/90 px-4 py-2 backdrop-blur-sm shadow-md">
-              <User className="h-4 w-4 text-blue-600" />
-              <span className="text-sm font-semibold text-blue-800">{user.email}</span>
+          <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap sm:items-center sm:justify-end sm:gap-3">
+            <div className="col-span-2 flex min-w-0 items-center justify-center gap-2 rounded-full border border-blue-500/50 bg-white/90 px-3 py-2 backdrop-blur-sm shadow-md sm:max-w-[260px] sm:justify-start sm:px-4">
+              <User className="h-4 w-4 shrink-0 text-blue-600" />
+              <span className="truncate text-xs font-semibold text-blue-800 sm:text-sm">{user.email}</span>
             </div>
             <Link
               href="/history"
-              className="flex items-center gap-2 rounded-lg border border-green-500/50 bg-white/90 px-4 py-2 text-sm font-semibold text-green-700 backdrop-blur-sm shadow-md transition-all hover:bg-green-50 hover:shadow-lg hover:border-green-600"
+              className="flex min-h-10 items-center justify-center gap-2 rounded-lg border border-green-500/50 bg-white/90 px-3 py-2 text-xs font-semibold text-green-700 backdrop-blur-sm shadow-md transition-all hover:bg-green-50 hover:shadow-lg hover:border-green-600 sm:px-4 sm:text-sm"
             >
               <History className="h-4 w-4" />
               履歴
             </Link>
             <Link
               href="/profile"
-              className="rounded-lg border border-purple-500/50 bg-white/90 px-4 py-2 text-sm font-semibold text-purple-700 backdrop-blur-sm shadow-md transition-all hover:bg-purple-50 hover:shadow-lg hover:border-purple-600"
+              className="flex min-h-10 items-center justify-center rounded-lg border border-purple-500/50 bg-white/90 px-3 py-2 text-xs font-semibold text-purple-700 backdrop-blur-sm shadow-md transition-all hover:bg-purple-50 hover:shadow-lg hover:border-purple-600 sm:px-4 sm:text-sm"
             >
               プロフィール
             </Link>
             <button
               onClick={() => setShowLogoutModal(true)}
-              className="flex items-center gap-2 rounded-lg border border-red-500/50 bg-white/90 px-4 py-2 text-sm font-semibold text-red-700 backdrop-blur-sm shadow-md transition-all hover:bg-red-50 hover:shadow-lg hover:border-red-600"
+              className="col-span-2 flex min-h-10 items-center justify-center gap-2 rounded-lg border border-red-500/50 bg-white/90 px-3 py-2 text-xs font-semibold text-red-700 backdrop-blur-sm shadow-md transition-all hover:bg-red-50 hover:shadow-lg hover:border-red-600 sm:col-span-1 sm:px-4 sm:text-sm"
             >
               <LogOut className="h-4 w-4" />
               ログアウト
             </button>
           </div>
         ) : (
-          <div className="flex items-center gap-3">
+          <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:items-center sm:gap-3">
             <Link
               href="/auth/login"
-              className="flex items-center gap-2 rounded-lg border border-blue-500/50 bg-white/90 px-4 py-2 text-sm font-semibold text-blue-700 backdrop-blur-sm shadow-md transition-all hover:bg-blue-50 hover:shadow-lg hover:border-blue-600"
+              className="flex min-h-10 items-center justify-center gap-2 rounded-lg border border-blue-500/50 bg-white/90 px-3 py-2 text-xs font-semibold text-blue-700 backdrop-blur-sm shadow-md transition-all hover:bg-blue-50 hover:shadow-lg hover:border-blue-600 sm:px-4 sm:text-sm"
             >
               <LogIn className="h-4 w-4" />
               ログイン
             </Link>
             <Link
               href="/auth/signup"
-              className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 px-4 py-2 text-sm font-bold text-white shadow-lg shadow-orange-500/30 transition-all hover:from-amber-600 hover:to-orange-600 hover:shadow-orange-500/50"
+              className="flex min-h-10 items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 px-3 py-2 text-xs font-bold text-white shadow-lg shadow-orange-500/30 transition-all hover:from-amber-600 hover:to-orange-600 hover:shadow-orange-500/50 sm:px-4 sm:text-sm"
             >
               <UserPlus className="h-4 w-4" />
               新規登録
@@ -73,20 +73,20 @@ export default function Home() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative z-10 flex min-h-screen flex-col items-center justify-center overflow-hidden px-6 py-16 text-center">
+      <section className="relative z-10 flex min-h-[calc(100svh-64px)] flex-col items-center justify-center overflow-hidden px-3 pb-10 pt-8 text-center sm:px-6 sm:py-16">
         {/* Mountain Image Animation (Behind Hero Content) */}
         <motion.div
           initial={{ y: "100%", opacity: 0 }}
           animate={{ y: "0%", opacity: 1 }}
           transition={{ duration: 2, ease: [0.22, 1, 0.36, 1] }} // Custom ease for "majestic" feel
-          className="absolute bottom-0 left-0 right-0 -z-10 pointer-events-none"
+          className="absolute bottom-0 left-1/2 right-auto -z-10 w-[180vw] max-w-none -translate-x-1/2 pointer-events-none sm:left-0 sm:right-0 sm:w-full sm:translate-x-0"
         >
           <Image
             src="/mountain.png"
             alt="Mountain Background"
             width={1920}
             height={1080}
-            className="w-full h-auto object-contain object-bottom opacity-70 drop-shadow-2xl"
+            className="h-auto w-full object-contain object-bottom opacity-60 drop-shadow-2xl sm:opacity-70"
             priority
           />
           {/* Overlay to blend with background/footer */}
@@ -94,44 +94,44 @@ export default function Home() {
         </motion.div>
 
         {/* Title with natural color */}
-        <h1 className="mb-4 text-6xl font-black leading-tight tracking-tight text-white drop-shadow-[0_4px_12px_rgba(0,0,0,0.25)] md:text-7xl lg:text-8xl">
+        <h1 className="mb-3 text-[clamp(2.35rem,11.5vw,4.5rem)] font-black leading-[1.02] tracking-tight text-white drop-shadow-[0_4px_12px_rgba(0,0,0,0.35)] sm:mb-4 md:text-7xl lg:text-8xl">
           マウンティング
           <br />
           マウンテン
         </h1>
 
         {/* Altitude Badge */}
-        <div className="mb-6 flex items-center gap-2 rounded-full border-2 border-white/80 bg-white/90 px-6 py-2 backdrop-blur-md shadow-lg">
-          <Trophy className="h-5 w-5 text-amber-600" />
-          <span className="text-sm font-bold text-gray-800">標高で競え！マウント度測定ゲーム</span>
+        <div className="mb-4 flex max-w-full items-center gap-2 rounded-full border-2 border-white/80 bg-white/90 px-4 py-2 backdrop-blur-md shadow-lg sm:mb-6 sm:px-6">
+          <Trophy className="h-5 w-5 shrink-0 text-amber-600" />
+          <span className="text-xs font-bold text-gray-800 sm:text-sm">標高で競え！マウント度測定ゲーム</span>
         </div>
 
-        <p className="mb-12 max-w-2xl text-xl font-semibold text-gray-700 drop-shadow-[0_2px_4px_rgba(255,255,255,0.8)] md:text-2xl">
+        <p className="mb-8 max-w-[22rem] text-base font-semibold leading-relaxed text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.55)] sm:mb-12 sm:max-w-2xl sm:text-xl md:text-2xl">
           『マウント』を&quot;標高&quot;で可視化するAIゲーム
         </p>
 
         {/* Card Dashboard Container */}
-        <div className="flex flex-col items-center gap-10 w-full max-w-6xl px-4">
+        <div className="flex w-full max-w-6xl flex-col items-center gap-7 px-0 sm:gap-10 sm:px-4">
 
           {/* Section 1: ゲームモード */}
           <section className="w-full">
             <div className="mb-4 flex items-center justify-center gap-2">
               <div className="h-1 w-8 rounded-full bg-gradient-to-r from-transparent via-white/60 to-white/60" />
-              <h2 className="text-2xl font-black text-white drop-shadow-lg flex items-center gap-2">
+              <h2 className="flex items-center gap-2 text-xl font-black text-white drop-shadow-lg sm:text-2xl">
                 🎮 <span>ゲームモード</span>
               </h2>
               <div className="h-1 w-8 rounded-full bg-gradient-to-r from-white/60 via-white/60 to-transparent" />
             </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 gap-3 sm:gap-5 lg:grid-cols-2">
               {/* Solo Mode Button - Primary */}
               <Link
                 href="/solo"
-                className="group relative overflow-hidden rounded-2xl bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 px-8 py-8 text-xl font-black uppercase tracking-wider text-white shadow-2xl shadow-red-500/50 transition-all duration-300 hover:scale-105 hover:shadow-red-500/80 md:text-2xl flex items-center justify-center text-center"
+                className="group relative flex min-h-[84px] items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 px-4 py-5 text-center text-lg font-black uppercase tracking-wider text-white shadow-2xl shadow-red-500/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-red-500/80 sm:px-8 sm:py-8 md:text-2xl"
               >
-                <span className="relative z-10 flex items-center gap-3">
-                  <Zap className="h-8 w-8 animate-pulse" />
+                <span className="relative z-10 flex items-center justify-center gap-2 sm:gap-3">
+                  <Zap className="h-7 w-7 shrink-0 animate-pulse sm:h-8 sm:w-8" />
                   ソロモード
-                  <Mountain className="h-8 w-8" />
+                  <Mountain className="h-7 w-7 shrink-0 sm:h-8 sm:w-8" />
                 </span>
                 <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                 <div className="absolute inset-0 -translate-x-full transform bg-gradient-to-r from-transparent via-white/30 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
@@ -140,10 +140,10 @@ export default function Home() {
               {/* Versus Mode Button */}
               <Link
                 href="/versus/local"
-                className="group relative overflow-hidden rounded-2xl bg-gradient-to-r from-purple-600 via-violet-600 to-indigo-600 px-8 py-8 text-xl font-black tracking-wider text-white shadow-2xl shadow-purple-500/50 transition-all duration-300 hover:scale-105 hover:shadow-purple-500/80 md:text-2xl flex items-center justify-center text-center"
+                className="group relative flex min-h-[84px] items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-r from-purple-600 via-violet-600 to-indigo-600 px-4 py-5 text-center text-lg font-black tracking-wider text-white shadow-2xl shadow-purple-500/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-purple-500/80 sm:px-8 sm:py-8 md:text-2xl"
               >
-                <span className="relative z-10 flex items-center gap-3">
-                  <Target className="h-8 w-8" />
+                <span className="relative z-10 flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+                  <Target className="h-7 w-7 shrink-0 sm:h-8 sm:w-8" />
                   対戦モード
                   <span className="text-sm font-semibold bg-white/20 px-2 py-1 rounded-md">Beta</span>
                 </span>
@@ -157,15 +157,15 @@ export default function Home() {
           <section className="w-full">
             <div className="mb-4 flex items-center justify-center gap-2">
               <div className="h-1 w-8 rounded-full bg-gradient-to-r from-transparent via-white/60 to-white/60" />
-              <h2 className="text-xl font-black text-white drop-shadow-lg flex items-center gap-2">
+              <h2 className="flex items-center gap-2 text-lg font-black text-white drop-shadow-lg sm:text-xl">
                 📊 <span>コミュニティ</span>
               </h2>
               <div className="h-1 w-8 rounded-full bg-gradient-to-r from-white/60 via-white/60 to-transparent" />
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
               <Link
                 href="/achievements"
-                className="group relative overflow-hidden rounded-xl bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-600 px-6 py-6 text-lg font-bold text-white shadow-xl shadow-blue-500/40 transition-all duration-300 hover:scale-105 hover:shadow-blue-500/80 flex items-center justify-center gap-3"
+                className="group relative flex min-h-[64px] items-center justify-center gap-3 overflow-hidden rounded-xl bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-600 px-4 py-4 text-base font-bold text-white shadow-xl shadow-blue-500/40 transition-all duration-300 hover:scale-[1.02] hover:shadow-blue-500/80 sm:px-6 sm:py-6 sm:text-lg"
               >
                 <span className="relative z-10 flex items-center gap-3">
                   <Trophy className="h-6 w-6" />
@@ -177,7 +177,7 @@ export default function Home() {
 
               <Link
                 href="/ranking"
-                className="group relative overflow-hidden rounded-xl bg-gradient-to-r from-yellow-600 via-amber-600 to-orange-600 px-6 py-6 text-lg font-bold text-white shadow-xl shadow-yellow-500/40 transition-all duration-300 hover:scale-105 hover:shadow-yellow-500/80 flex items-center justify-center gap-3"
+                className="group relative flex min-h-[64px] items-center justify-center gap-3 overflow-hidden rounded-xl bg-gradient-to-r from-yellow-600 via-amber-600 to-orange-600 px-4 py-4 text-base font-bold text-white shadow-xl shadow-yellow-500/40 transition-all duration-300 hover:scale-[1.02] hover:shadow-yellow-500/80 sm:px-6 sm:py-6 sm:text-lg"
               >
                 <span className="relative z-10 flex items-center gap-3">
                   <Trophy className="h-6 w-6" />
@@ -189,7 +189,7 @@ export default function Home() {
 
               <Link
                 href="/howto"
-                className="group relative overflow-hidden rounded-xl bg-gradient-to-r from-slate-600 via-zinc-600 to-neutral-600 px-6 py-6 text-lg font-bold text-white shadow-xl shadow-slate-500/40 transition-all duration-300 hover:scale-105 hover:shadow-slate-500/80 flex items-center justify-center gap-3 sm:col-span-2 lg:col-span-1"
+                className="group relative flex min-h-[64px] items-center justify-center gap-3 overflow-hidden rounded-xl bg-gradient-to-r from-slate-600 via-zinc-600 to-neutral-600 px-4 py-4 text-base font-bold text-white shadow-xl shadow-slate-500/40 transition-all duration-300 hover:scale-[1.02] hover:shadow-slate-500/80 sm:col-span-2 sm:px-6 sm:py-6 sm:text-lg lg:col-span-1"
               >
                 <span className="relative z-10 flex items-center gap-3">
                   <BookOpen className="h-6 w-6" />
