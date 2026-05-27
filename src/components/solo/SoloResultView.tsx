@@ -21,40 +21,45 @@ export function SoloResultView({
   if (!round.result) return null;
 
   return (
-    <section className="bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md rounded-2xl border-4 border-white/50 dark:border-zinc-700/50 shadow-2xl p-6 md:p-8 animate-in slide-in-from-top-4 fade-in duration-500 overflow-hidden relative">
+    <section className="relative overflow-hidden rounded-2xl border-2 border-white/50 bg-white/95 p-4 shadow-2xl backdrop-blur-md animate-in slide-in-from-top-4 fade-in duration-500 dark:border-zinc-700/50 dark:bg-zinc-900/95 sm:p-6 md:border-4 md:p-8">
       {/* 背景の光るエフェクト */}
       <div className="absolute inset-0 bg-gradient-to-b from-blue-50/50 to-transparent dark:from-blue-900/20 pointer-events-none" />
 
       {/* 結果ヘッダー */}
-      <div className="relative z-10 text-center mb-6">
-        <div className="text-3xl md:text-4xl font-black text-gray-800 dark:text-gray-100">
+      <div className="relative z-10 mb-5 text-center sm:mb-6">
+        <div className="text-2xl font-black text-gray-800 dark:text-gray-100 sm:text-3xl md:text-4xl">
           ROUND {roundNumber} 結果
         </div>
       </div>
 
-      <div className="relative z-10 flex flex-col md:flex-row items-center gap-8 mb-8">
+      <div className="relative z-10 mb-6 flex flex-col items-center gap-5 md:mb-8 md:flex-row md:gap-8">
         {/* 左側: マウンテンビュー */}
         <div className="flex-shrink-0 relative group">
           <div className="absolute inset-0 bg-blue-500/20 blur-3xl rounded-full transform scale-75 group-hover:scale-110 transition-transform duration-700"></div>
-          <DetailedMountain altitude={round.result.altitude} size={320} />
+          <div className="md:hidden">
+            <DetailedMountain altitude={round.result.altitude} size={220} />
+          </div>
+          <div className="hidden md:block">
+            <DetailedMountain altitude={round.result.altitude} size={320} />
+          </div>
         </div>
 
         {/* 右側: 情報エリア */}
-        <div className="flex-1 space-y-4 w-full text-center md:text-left">
+        <div className="w-full flex-1 space-y-4 text-center md:text-left">
           {/* メイン標高表示 */}
           <div>
-            <div className="text-base md:text-lg font-bold text-gray-500 uppercase tracking-widest mb-2">Current Altitude</div>
-            <div className="flex items-baseline justify-center md:justify-start gap-3">
-              <span className="text-7xl md:text-8xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-br from-gray-800 to-gray-600 dark:from-white dark:to-gray-400 drop-shadow-sm">
+            <div className="mb-2 text-sm font-bold uppercase tracking-widest text-gray-500 md:text-lg">Current Altitude</div>
+            <div className="flex items-baseline justify-center gap-2 md:justify-start md:gap-3">
+              <span className="bg-gradient-to-br from-gray-800 to-gray-600 bg-clip-text text-5xl font-black tracking-tighter text-transparent drop-shadow-sm dark:from-white dark:to-gray-400 sm:text-7xl md:text-8xl">
                 {round.result.altitude.toLocaleString()}
               </span>
-              <span className="text-2xl md:text-3xl font-bold text-gray-400">m</span>
+              <span className="text-xl font-bold text-gray-400 md:text-3xl">m</span>
             </div>
 
             {/* ボーナス表示 */}
             {(round.result.bonusAltitude ?? 0) > 0 && (
               <div className="flex items-center justify-center md:justify-start gap-3 text-base md:text-lg mt-2">
-                <span className="text-yellow-600 dark:text-yellow-400 font-bold flex items-center gap-2 animate-pulse">
+                <span className="flex items-center gap-2 text-sm font-bold text-yellow-600 animate-pulse dark:text-yellow-400 sm:text-base md:text-lg">
                   <span className="text-xl">✨</span><span>+{round.result.bonusAltitude}m Bonus!</span>
                 </span>
               </div>
@@ -69,14 +74,14 @@ export function SoloResultView({
             {round.result.insuranceUsed && (
               <div className="bg-green-100 dark:bg-green-900/50 border border-green-300 dark:border-green-700 rounded-lg p-3 flex items-center justify-center gap-2 shadow-sm">
                 <span className="text-xl">🛟</span>
-                <span className="text-green-800 dark:text-green-200 font-bold">保険発動!滑落を回避しました</span>
+                <span className="text-sm font-bold text-green-800 dark:text-green-200 sm:text-base">保険発動!滑落を回避しました</span>
               </div>
             )}
 
             {/* 滑落 */}
             {round.result.didFall && (
               <div className="bg-red-50 dark:bg-red-900/30 border-2 border-red-500 rounded-lg p-4 shadow-lg animate-[shake_0.5s_ease-in-out]">
-                <div className="flex items-center justify-center gap-2 text-red-600 dark:text-red-400 font-black text-lg">
+                <div className="flex items-center justify-center gap-2 text-base font-black text-red-600 dark:text-red-400 sm:text-lg">
                   <span>⚠️</span>
                   <span>{round.result.fallReason || "滑落発生!"}</span>
                 </div>
@@ -98,7 +103,7 @@ export function SoloResultView({
 
           {/* ルート情報 */}
           {round.result.routeId && (
-            <div className="flex flex-wrap gap-2 justify-center md:justify-start items-center text-sm">
+            <div className="flex flex-wrap items-center justify-center gap-2 text-sm md:justify-start">
               <span className="text-gray-400 font-bold text-xs uppercase">Route Info:</span>
               <span className="px-2 py-1 rounded bg-gray-100 dark:bg-zinc-800 font-bold border border-gray-200 dark:border-zinc-700">
                 {getRoute(round.result.routeId).emoji} {getRoute(round.result.routeId).label}
@@ -149,13 +154,13 @@ export function SoloResultView({
       <div className="relative z-10">
         <button
           onClick={onNext}
-          className={`w-full py-5 rounded-xl text-white font-bold text-xl md:text-2xl hover:scale-[1.02] transition-transform shadow-lg ${
+          className={`w-full rounded-xl py-4 text-lg font-bold text-white shadow-lg transition-transform hover:scale-[1.02] sm:py-5 sm:text-xl md:text-2xl ${
             isGameFinished
               ? 'bg-gradient-to-r from-yellow-600 to-orange-600'
               : 'bg-gradient-to-r from-green-600 to-emerald-600'
           }`}
         >
-          <div className="flex items-center justify-center gap-3">
+          <div className="flex items-center justify-center gap-2 sm:gap-3">
             {isGameFinished ? (
               <>
                 <span>結果を見る</span>

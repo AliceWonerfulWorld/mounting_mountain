@@ -24,13 +24,13 @@ export const SoloInputArea = memo(function SoloInputArea({
   onRouteSelect,
 }: SoloInputAreaProps) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 sm:space-y-6">
       {/* ルート選択 */}
       <div className="space-y-3">
         <div className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wide">
           📍 Route Selection
         </div>
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-3 gap-2 sm:gap-3">
           {ROUTES.map((route) => {
             const isSelected = selectedRoute === route.id;
             const borderClass = isSelected
@@ -46,11 +46,11 @@ export const SoloInputArea = memo(function SoloInputArea({
                 onClick={() => {
                   onRouteSelect(route.id);
                 }}
-                className={`relative py-4 md:py-5 px-3 rounded-lg border-2 transition-all duration-200 flex flex-col items-center justify-center gap-2 hover:scale-[1.02] ${borderClass} ${activeClass} ${isSelected ? "" : "hover:bg-gray-50 dark:hover:bg-zinc-800"}`}
+                className={`relative flex min-h-[88px] flex-col items-center justify-center gap-1 rounded-lg border-2 px-2 py-3 transition-all duration-200 hover:scale-[1.02] sm:min-h-[112px] sm:gap-2 sm:px-3 md:py-5 ${borderClass} ${activeClass} ${isSelected ? "" : "hover:bg-gray-50 dark:hover:bg-zinc-800"}`}
               >
-                <div className="text-3xl md:text-4xl">{route.emoji}</div>
-                <div className="text-sm md:text-base font-bold">{route.label}</div>
-                <div className="text-xs md:text-sm font-mono">x{route.multiplier}</div>
+                <div className="text-2xl sm:text-3xl md:text-4xl">{route.emoji}</div>
+                <div className="text-xs font-bold leading-tight sm:text-sm md:text-base">{route.label}</div>
+                <div className="text-[11px] font-mono sm:text-xs md:text-sm">x{route.multiplier}</div>
 
                 {isSelected && (
                   <div className="absolute -top-2 -right-2">
@@ -69,24 +69,24 @@ export const SoloInputArea = memo(function SoloInputArea({
       {/* 入力エリア */}
       <div className="space-y-4">
         <textarea
-          className="w-full min-h-40 rounded-xl border-2 border-transparent bg-gray-50/50 dark:bg-black/50 p-5 text-xl md:text-2xl focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-black outline-none transition-all resize-y shadow-inner"
+          className="min-h-36 w-full resize-y rounded-xl border-2 border-transparent bg-gray-50/50 p-4 text-base shadow-inner outline-none transition-all focus:bg-white focus:ring-2 focus:ring-blue-500 dark:bg-black/50 dark:focus:bg-black sm:min-h-40 sm:p-5 sm:text-xl md:text-2xl"
           placeholder="ここにマウント発言を入力... (例: 「まあ、俺なら3秒で終わるけどね」)"
           value={text}
           onChange={onTextChange}
           disabled={disabled || loading}
         />
 
-        <div className="flex gap-6">
+        <div className="flex gap-3 sm:gap-6">
           <button
-            className="flex-1 group relative overflow-hidden rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 p-[2px] focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-transform hover:scale-[1.02]"
+            className="group relative flex-1 overflow-hidden rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 p-[2px] transition-transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
             disabled={!text.trim() || loading || disabled}
             onClick={onSubmit}
           >
-            <div className="relative h-full w-full rounded-[10px] bg-transparent transition-all group-hover:bg-white/10 px-8 py-4">
-              <div className="flex items-center justify-center gap-3 text-white font-bold text-xl md:text-2xl">
+            <div className="relative h-full w-full rounded-[10px] bg-transparent px-4 py-3 transition-all group-hover:bg-white/10 sm:px-8 sm:py-4">
+              <div className="flex items-center justify-center gap-2 text-base font-bold text-white sm:gap-3 sm:text-xl md:text-2xl">
                 {loading ? (
                   <>
-                    <svg className="animate-spin h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <svg className="h-5 w-5 animate-spin text-white sm:h-6 sm:w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
@@ -95,7 +95,7 @@ export const SoloInputArea = memo(function SoloInputArea({
                 ) : (
                   <>
                     <span>マウントを取る!</span>
-                    <span className="text-2xl md:text-3xl">🏔️</span>
+                    <span className="text-xl sm:text-2xl md:text-3xl">🏔️</span>
                   </>
                 )}
               </div>
@@ -103,7 +103,7 @@ export const SoloInputArea = memo(function SoloInputArea({
           </button>
 
           <button
-            className="px-5 rounded-xl border-2 border-gray-200 dark:border-zinc-700 text-gray-500 hover:text-red-500 hover:border-red-200 hover:bg-red-50 hover:scale-[1.02] transition-all text-xl md:text-2xl flex-shrink-0"
+            className="min-w-12 flex-shrink-0 rounded-xl border-2 border-gray-200 px-4 text-xl text-gray-500 transition-all hover:scale-[1.02] hover:border-red-200 hover:bg-red-50 hover:text-red-500 dark:border-zinc-700 md:text-2xl"
             onClick={onReset}
             title="最初からやり直す"
           >

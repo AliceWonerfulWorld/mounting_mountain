@@ -76,7 +76,7 @@ export function MissionBriefingScreen({
         animate={{ opacity: 1 }}
         exit={{ opacity: 0, scale: 1.1 }}
         transition={{ duration: 0.5 }}
-        className={`fixed inset-0 z-50 flex items-center justify-center overflow-hidden ${
+        className={`fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden px-3 py-5 sm:px-6 ${
           missionTheme === 0
             ? "bg-gradient-to-b from-slate-800 via-slate-700 to-slate-900"
             : missionTheme === 1
@@ -132,7 +132,7 @@ export function MissionBriefingScreen({
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 0.6 }}
               transition={{ delay: 0.3, duration: 1.5 }}
-              className="absolute top-20 right-20 w-40 h-40 bg-yellow-300 rounded-full blur-2xl"
+              className="absolute right-6 top-16 h-28 w-28 rounded-full bg-yellow-300 blur-2xl sm:right-20 sm:top-20 sm:h-40 sm:w-40"
             />
 
             {/* 朝焼けの山々 */}
@@ -226,15 +226,15 @@ export function MissionBriefingScreen({
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.3, duration: 0.5 }}
-          className="relative z-10 max-w-3xl px-8 w-full"
+          className="relative z-10 w-full max-w-3xl px-0 sm:px-4 md:px-8"
         >
           {/* ヘッダー */}
-          <div className="text-center mb-8">
+          <div className="mb-5 text-center sm:mb-8">
             <motion.div
               initial={{ y: -20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.5, duration: 0.5 }}
-              className={`text-5xl md:text-6xl font-black mb-4 tracking-tight ${
+              className={`mb-2 text-3xl font-black tracking-tight sm:mb-4 sm:text-5xl md:text-6xl ${
                 missionTheme === 2 ? 'text-slate-800' : 'text-white'
               }`}
             >
@@ -244,7 +244,7 @@ export function MissionBriefingScreen({
               initial={{ y: -10, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.6, duration: 0.5 }}
-              className={missionTheme === 2 ? 'text-xl text-slate-600' : 'text-xl text-slate-300'}
+              className={missionTheme === 2 ? 'text-base text-slate-600 sm:text-xl' : 'text-base text-slate-300 sm:text-xl'}
             >
               今回の挑戦
             </motion.div>
@@ -255,7 +255,7 @@ export function MissionBriefingScreen({
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.7, duration: 0.5 }}
-            className={`bg-white/95 dark:bg-zinc-900/95 rounded-3xl p-8 md:p-12 shadow-2xl backdrop-blur-sm border-4 ${
+            className={`rounded-2xl border-2 bg-white/95 p-4 shadow-2xl backdrop-blur-sm dark:bg-zinc-900/95 sm:rounded-3xl sm:border-4 sm:p-8 md:p-12 ${
               missionTheme === 0
                 ? 'border-amber-500/50'
                 : missionTheme === 1
@@ -264,37 +264,37 @@ export function MissionBriefingScreen({
             }`}
           >
             {/* ミッションアイコンとタイトル */}
-            <div className="text-center mb-6">
+            <div className="mb-4 text-center sm:mb-6">
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.9, type: "spring", stiffness: 200 }}
-                className="text-7xl mb-4"
+                className="mb-2 text-5xl sm:mb-4 sm:text-7xl"
               >
                 🎯
               </motion.div>
-              <div className="text-3xl md:text-4xl font-black text-gray-800 dark:text-gray-100">
+              <div className="text-2xl font-black leading-tight text-gray-800 dark:text-gray-100 sm:text-3xl md:text-4xl">
                 {mission?.title || 'ミッション'}
               </div>
             </div>
 
             {/* ミッション説明 */}
-            <div className="bg-blue-50 dark:bg-blue-950/50 rounded-2xl p-6 mb-6 border border-blue-200 dark:border-blue-800">
+            <div className="mb-4 rounded-xl border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-950/50 sm:mb-6 sm:rounded-2xl sm:p-6">
               <div className="text-sm font-bold text-blue-600 dark:text-blue-400 mb-2 uppercase tracking-wide">
                 Mission Description
               </div>
-              <div className="text-lg text-gray-800 dark:text-gray-100 leading-relaxed">
+              <div className="text-base leading-relaxed text-gray-800 dark:text-gray-100 sm:text-lg">
                 {mission?.description || ''}
               </div>
             </div>
 
             {/* 達成条件 */}
-            <div className="bg-amber-50 dark:bg-amber-950/50 rounded-2xl p-6 mb-8 border border-amber-200 dark:border-amber-800">
+            <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-950/50 sm:mb-8 sm:rounded-2xl sm:p-6">
               <div className="text-sm font-bold text-amber-600 dark:text-amber-400 mb-3 uppercase tracking-wide flex items-center gap-2">
                 <span>🎯</span>
                 <span>Clear Condition</span>
               </div>
-              <div className="text-2xl md:text-3xl font-black text-amber-800 dark:text-amber-100">
+              <div className="text-xl font-black leading-tight text-amber-800 dark:text-amber-100 sm:text-2xl md:text-3xl">
                 {getMissionConditionText(mission)}
               </div>
             </div>
@@ -304,7 +304,7 @@ export function MissionBriefingScreen({
               onClick={onStart}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className={`w-full py-6 rounded-xl text-white font-bold text-2xl transition-transform shadow-lg hover:shadow-xl ${
+              className={`w-full rounded-xl py-4 text-xl font-bold text-white shadow-lg transition-transform hover:shadow-xl sm:py-6 sm:text-2xl ${
                 missionTheme === 0
                   ? 'bg-gradient-to-r from-blue-600 to-indigo-600'
                   : missionTheme === 1
@@ -312,9 +312,9 @@ export function MissionBriefingScreen({
                   : 'bg-gradient-to-r from-cyan-600 to-blue-600'
               }`}
             >
-              <div className="flex items-center justify-center gap-3">
+              <div className="flex items-center justify-center gap-2 sm:gap-3">
                 <span>挑戦を開始する</span>
-                <span className="text-3xl">🏔️</span>
+                <span className="text-2xl sm:text-3xl">🏔️</span>
               </div>
             </motion.button>
           </motion.div>
