@@ -1,7 +1,7 @@
 "use client";
 
 import type { Round } from "@/types/game";
-import { DetailedMountain } from "@/components/DetailedMountain";
+import { MountainResultScene } from "@/components/MountainResultScene";
 import { getLabelJa } from "@/lib/labels";
 import { getRoute } from "@/lib/solo/routes";
 
@@ -34,14 +34,13 @@ export function SoloResultView({
 
       <div className="relative z-10 mb-6 flex flex-col items-center gap-5 md:mb-8 md:flex-row md:gap-8">
         {/* 左側: マウンテンビュー */}
-        <div className="flex-shrink-0 relative group">
-          <div className="absolute inset-0 bg-blue-500/20 blur-3xl rounded-full transform scale-75 group-hover:scale-110 transition-transform duration-700"></div>
-          <div className="md:hidden">
-            <DetailedMountain altitude={round.result.altitude} size={220} />
-          </div>
-          <div className="hidden md:block">
-            <DetailedMountain altitude={round.result.altitude} size={320} />
-          </div>
+        <div className="w-full flex-shrink-0 md:w-[360px] lg:w-[420px]">
+          <MountainResultScene
+            altitude={round.result.altitude}
+            didFall={round.result.didFall}
+            bonusAltitude={round.result.bonusAltitude}
+            size="large"
+          />
         </div>
 
         {/* 右側: 情報エリア */}

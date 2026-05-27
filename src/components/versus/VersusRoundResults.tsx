@@ -3,7 +3,7 @@
 import { TrendingUp, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getRoute } from "@/lib/solo/routes";
-import { DetailedMountain } from "@/components/DetailedMountain";
+import { MountainResultScene } from "@/components/MountainResultScene";
 import type { VersusState } from "@/hooks/useVersusLocalGame";
 import type { Round } from "@/types/game";
 
@@ -18,14 +18,14 @@ export function VersusRoundResults({ game, roundCount, onNext }: VersusRoundResu
     const p2Round = game.players[1].rounds[game.roundIndex];
 
     return (
-        <div className="flex flex-col h-full animate-in zoom-in duration-300">
-            <div className="flex-1 space-y-6">
-                <div className="text-center mb-4">
-                    <h2 className="text-2xl font-black text-slate-800 dark:text-white mb-1">ROUND {game.roundIndex + 1} 結果</h2>
-                    <div className="text-sm text-slate-500">Q. {game.prompts[game.roundIndex]}</div>
+        <div className="flex h-full flex-col animate-in zoom-in duration-300">
+            <div className="flex-1 space-y-5 sm:space-y-6">
+                <div className="mb-4 text-center">
+                    <h2 className="mb-1 text-2xl font-black text-slate-800 dark:text-white">ROUND {game.roundIndex + 1} 結果</h2>
+                    <div className="text-sm leading-relaxed text-slate-500">Q. {game.prompts[game.roundIndex]}</div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
                     <RoundPlayerResult
                         playerName="Player 1"
                         color="red"
@@ -89,7 +89,7 @@ function RoundPlayerResult({
         };
 
     return (
-        <div className={cn("border-2 rounded-2xl p-4 space-y-3", colorStyles.panel)}>
+        <div className={cn("space-y-3 rounded-2xl border-2 p-3 sm:p-4", colorStyles.panel)}>
             <div className="text-center">
                 <ResultBadge state={resultState} />
 
@@ -99,13 +99,14 @@ function RoundPlayerResult({
                     <span>{route.label}</span>
                 </div>
 
-                <div className="flex justify-center my-4 -mx-2">
-                    <DetailedMountain
+                <div className="my-4">
+                    <MountainResultScene
                         altitude={result?.altitude || 0}
-                        size={280}
                         color={color}
+                        mode="versus"
                         isWinner={resultState === "win"}
-                        animate={true}
+                        didFall={result?.didFall}
+                        size="compact"
                     />
                 </div>
 
