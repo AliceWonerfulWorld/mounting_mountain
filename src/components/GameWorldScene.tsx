@@ -1,7 +1,7 @@
 "use client";
 
 import { memo, useMemo, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Float, Sparkles } from "@react-three/drei";
 import * as THREE from "three";
 import type { WeatherId } from "@/lib/solo/weather";
@@ -93,6 +93,13 @@ const WIND_STREAKS = Array.from({ length: 28 }, (_, i) => ({
   scale: 0.35 + ((i * 17) % 30) / 100,
 }));
 
+const STAR_POINTS = Array.from({ length: 58 }, (_, i) => ({
+  x: ((i * 43) % 140) / 10 - 7,
+  y: ((i * 61) % 42) / 10 + 0.6,
+  z: -((i * 47) % 90) / 10 - 3.5,
+  size: 0.012 + ((i * 11) % 9) / 1000,
+}));
+
 export const GameWorldScene = memo(function GameWorldScene({
   weather,
   variant = "solo",
@@ -115,11 +122,13 @@ export const GameWorldScene = memo(function GameWorldScene({
         gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
         className="absolute inset-0"
       >
+        <CameraDrift variant={variant} />
         <ambientLight intensity={1.35} />
-        <directionalLight position={[4, 7, 4]} intensity={2.2} color="#ffffff" />
+        <AnimatedKeyLight color="#ffffff" accent={palette.accent} />
         <directionalLight position={[-5, 2, -4]} intensity={0.7} color={palette.accent} />
         <fog attach="fog" args={[palette.fog, 7.2, 17]} />
 
+        <SkySignals palette={palette} weather={weather} />
         <WorldMountains palette={palette} />
         <CloudBank palette={palette} weather={weather} />
         <Atmosphere
@@ -131,10 +140,89 @@ export const GameWorldScene = memo(function GameWorldScene({
           <Sparkles count={42} scale={[10, 3.2, 5]} position={[0, 1.2, -4]} size={1.4} speed={0.18} color={palette.accent} opacity={0.32} />
         )}
       </Canvas>
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(255,255,255,0.5),transparent_28%),linear-gradient(180deg,transparent_55%,rgba(15,23,42,0.10)_100%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(255,255,255,0.48),transparent_28%),linear-gradient(180deg,transparent_55%,rgba(15,23,42,0.10)_100%)]" />
+      <div className="absolute inset-0 opacity-45 mix-blend-screen [background:linear-gradient(105deg,transparent_0%,rgba(255,255,255,0.18)_18%,transparent_36%)] animate-[world-sheen_8s_ease-in-out_infinite]" />
     </div>
   );
 });
+
+function CameraDrift({ variant }: { variant: "solo" | "versus" }) {
+  const { camera } = useThree();
+  const baseZ = variant === "versus" ? 7.45 : 7.2;
+
+  useFrame(({ clock, pointer }) => {
+    const time = clock.elapsedTime;
+    const targetX = Math.sin(time * 0.12) * 0.28 + pointer.x * 0.16;
+    const targetY = 2.42 + Math.sin(time * 0.18) * 0.08 + pointer.y * 0.08;
+    const targetZ = baseZ + Math.cos(time * 0.1) * 0.12;
+
+    camera.position.lerp(new THREE.Vector3(targetX, targetY, targetZ), 0.025);
+    camera.lookAt(Math.sin(time * 0.08) * 0.22, -0.08, -4.6);
+  });
+
+  return null;
+}
+
+function AnimatedKeyLight({ color, accent }: { color: string; accent: string }) {
+  const lightRef = useRef<THREE.DirectionalLight>(null);
+  const accentRef = useRef<THREE.PointLight>(null);
+
+  useFrame(({ clock }) => {
+    const time = clock.elapsedTime;
+    if (lightRef.current) {
+      lightRef.current.position.x = 4 + Math.sin(time * 0.22) * 0.7;
+      lightRef.current.position.y = 7 + Math.cos(time * 0.18) * 0.3;
+      lightRef.current.intensity = 2.05 + Math.sin(time * 0.7) * 0.18;
+    }
+    if (accentRef.current) {
+      accentRef.current.position.x = Math.sin(time * 0.26) * 3.2;
+      accentRef.current.intensity = 0.8 + Math.sin(time * 0.9) * 0.22;
+    }
+  });
+
+  return (
+    <>
+      <directionalLight ref={lightRef} position={[4, 7, 4]} intensity={2.2} color={color} />
+      <pointLight ref={accentRef} position={[0, 2.5, -3.5]} intensity={0.8} color={accent} distance={9} />
+    </>
+  );
+}
+
+function SkySignals({ palette, weather }: { palette: WorldPalette; weather?: WeatherId }) {
+  const ringRef = useRef<THREE.Group>(null);
+  const showStars = weather === "BLIZZARD" || weather === "WINDY";
+
+  useFrame(({ clock }) => {
+    if (!ringRef.current) return;
+    ringRef.current.rotation.z = clock.elapsedTime * 0.025;
+    ringRef.current.position.x = Math.sin(clock.elapsedTime * 0.12) * 0.24;
+  });
+
+  return (
+    <group position={[0, 2.4, -7.5]}>
+      <group ref={ringRef}>
+        <mesh>
+          <torusGeometry args={[1.85, 0.008, 8, 96]} />
+          <meshBasicMaterial color={palette.accent} transparent opacity={weather === "SUNNY" ? 0.18 : 0.1} />
+        </mesh>
+        <mesh rotation={[0, 0, Math.PI / 4]}>
+          <torusGeometry args={[2.35, 0.006, 8, 96]} />
+          <meshBasicMaterial color={palette.horizon} transparent opacity={0.12} />
+        </mesh>
+      </group>
+      {showStars && (
+        <group>
+          {STAR_POINTS.map((point, index) => (
+            <mesh key={index} position={[point.x, point.y, point.z]}>
+              <sphereGeometry args={[point.size, 6, 6]} />
+              <meshBasicMaterial color={palette.snow} transparent opacity={0.42 + (index % 4) * 0.08} />
+            </mesh>
+          ))}
+        </group>
+      )}
+    </group>
+  );
+}
 
 function WorldMountains({ palette }: { palette: WorldPalette }) {
   const farMaterial = useMemo(() => mountainMaterial(palette.far, 0.62), [palette.far]);
@@ -145,8 +233,9 @@ function WorldMountains({ palette }: { palette: WorldPalette }) {
 
   useFrame(({ clock }) => {
     if (!groupRef.current) return;
-    groupRef.current.position.x = Math.sin(clock.elapsedTime * 0.08) * 0.08;
-    groupRef.current.rotation.y = Math.sin(clock.elapsedTime * 0.05) * 0.018;
+    groupRef.current.position.x = Math.sin(clock.elapsedTime * 0.08) * 0.16;
+    groupRef.current.position.z = Math.cos(clock.elapsedTime * 0.06) * 0.08;
+    groupRef.current.rotation.y = Math.sin(clock.elapsedTime * 0.05) * 0.024;
   });
 
   return (
@@ -177,6 +266,7 @@ function WorldMountains({ palette }: { palette: WorldPalette }) {
 
 function CloudBank({ palette, weather }: { palette: WorldPalette; weather?: WeatherId }) {
   const opacity = weather === "SUNNY" ? 0.18 : weather === "BLIZZARD" ? 0.55 : 0.34;
+  const groupRef = useRef<THREE.Group>(null);
   const material = useMemo(
     () =>
       new THREE.MeshBasicMaterial({
@@ -188,8 +278,15 @@ function CloudBank({ palette, weather }: { palette: WorldPalette; weather?: Weat
     [opacity, palette.horizon],
   );
 
+  useFrame(({ clock }) => {
+    if (!groupRef.current) return;
+    const speed = weather === "WINDY" ? 0.42 : 0.14;
+    groupRef.current.position.x = Math.sin(clock.elapsedTime * speed) * 1.5;
+    groupRef.current.position.y = 1.4 + Math.sin(clock.elapsedTime * 0.24) * 0.08;
+  });
+
   return (
-    <group position={[0, 1.4, -6.5]}>
+    <group ref={groupRef} position={[0, 1.4, -6.5]}>
       <Float speed={0.45} rotationIntensity={0.04} floatIntensity={0.18}>
         <VolumetricCloud position={[-3.6, 0.15, 0]} scale={[1.05, 0.34, 0.24]} material={material} />
         <VolumetricCloud position={[2.5, -0.05, -0.6]} scale={[1.2, 0.38, 0.26]} material={material} />
@@ -238,11 +335,13 @@ function Atmosphere({
 
   useFrame(({ clock }) => {
     if (snowRef.current) {
-      snowRef.current.position.y = -((clock.elapsedTime * 0.52) % 2.5);
-      snowRef.current.position.x = Math.sin(clock.elapsedTime * 0.65) * 0.18;
+      snowRef.current.position.y = -((clock.elapsedTime * 0.72) % 2.5);
+      snowRef.current.position.x = Math.sin(clock.elapsedTime * 0.65) * 0.32;
+      snowRef.current.rotation.z = Math.sin(clock.elapsedTime * 0.2) * 0.08;
     }
     if (windRef.current) {
-      windRef.current.position.x = ((clock.elapsedTime * 2.1) % 4) - 2;
+      windRef.current.position.x = ((clock.elapsedTime * 3.4) % 5) - 2.5;
+      windRef.current.position.y = Math.sin(clock.elapsedTime * 1.2) * 0.18;
     }
   });
 

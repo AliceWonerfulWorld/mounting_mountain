@@ -188,6 +188,7 @@ export default function SoloPage() {
                     round={gameHook.lastResult}
                     isGameFinished={gameHook.game.roundIndex + 1 >= gameHook.game.players[0].rounds.length}
                     roundNumber={gameHook.game.roundIndex + 1}
+                    weather={gameHook.game.weather}
                     onNext={handleNext}
                   />
 

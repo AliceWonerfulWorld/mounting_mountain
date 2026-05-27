@@ -5,12 +5,16 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { Float, Html, Sparkles } from "@react-three/drei";
 import * as THREE from "three";
 import clsx from "clsx";
+import type { WeatherId } from "@/lib/solo/weather";
+import type { TimeOfDay } from "@/lib/timeOfDayConfig";
 
 type MountainResultSceneProps = {
   altitude: number;
   maxAltitude?: number;
   mode?: "solo" | "versus";
   color?: "red" | "blue" | "neutral";
+  weather?: WeatherId;
+  timeOfDay?: TimeOfDay;
   isWinner?: boolean;
   didFall?: boolean;
   bonusAltitude?: number;
@@ -27,6 +31,7 @@ type Palette = {
   snow: string;
   accent: string;
   glow: string;
+  label: string;
 };
 
 const PALETTES: Record<NonNullable<MountainResultSceneProps["color"]>, Palette> = {
@@ -39,6 +44,7 @@ const PALETTES: Record<NonNullable<MountainResultSceneProps["color"]>, Palette> 
     snow: "#f8fafc",
     accent: "#f59e0b",
     glow: "rgba(245, 158, 11, 0.38)",
+    label: "#334155",
   },
   red: {
     sky: "#fee2e2",
@@ -49,6 +55,7 @@ const PALETTES: Record<NonNullable<MountainResultSceneProps["color"]>, Palette> 
     snow: "#fff1f2",
     accent: "#ef4444",
     glow: "rgba(239, 68, 68, 0.38)",
+    label: "#7f1d1d",
   },
   blue: {
     sky: "#dbeafe",
@@ -59,6 +66,76 @@ const PALETTES: Record<NonNullable<MountainResultSceneProps["color"]>, Palette> 
     snow: "#f0f9ff",
     accent: "#3b82f6",
     glow: "rgba(59, 130, 246, 0.38)",
+    label: "#172554",
+  },
+};
+
+const WEATHER_TINTS: Record<WeatherId, Partial<Palette>> = {
+  SUNNY: {
+    sky: "#bae6fd",
+    horizon: "#fef9c3",
+    ridge: "#86efac",
+    snow: "#fff7ed",
+    glow: "rgba(251, 191, 36, 0.34)",
+  },
+  WINDY: {
+    sky: "#cbd5e1",
+    horizon: "#e2e8f0",
+    ridge: "#94a3b8",
+    rock: "#64748b",
+    shadow: "#334155",
+    glow: "rgba(226, 232, 240, 0.26)",
+  },
+  BLIZZARD: {
+    sky: "#dbeafe",
+    horizon: "#f8fafc",
+    ridge: "#cbd5e1",
+    rock: "#94a3b8",
+    shadow: "#475569",
+    snow: "#ffffff",
+    glow: "rgba(255, 255, 255, 0.42)",
+  },
+};
+
+const TIME_TINTS: Record<TimeOfDay, Partial<Palette>> = {
+  dawn: {
+    sky: "#c7d2fe",
+    horizon: "#fed7aa",
+    accent: "#fb923c",
+    glow: "rgba(251, 146, 60, 0.36)",
+  },
+  morning: {
+    sky: "#bae6fd",
+    horizon: "#fef3c7",
+    accent: "#f59e0b",
+  },
+  day: {
+    sky: "#bfdbfe",
+    horizon: "#f8fafc",
+  },
+  afternoon: {
+    sky: "#93c5fd",
+    horizon: "#fde68a",
+    accent: "#f97316",
+  },
+  sunset: {
+    sky: "#fda4af",
+    horizon: "#fed7aa",
+    ridge: "#c084fc",
+    accent: "#fb7185",
+    glow: "rgba(251, 113, 133, 0.4)",
+    label: "#4c1d95",
+  },
+  night: {
+    sky: "#0f172a",
+    horizon: "#1e293b",
+    ridge: "#334155",
+    rock: "#475569",
+    shadow: "#020617",
+    snow: "#dbeafe",
+    accent: "#93c5fd",
+    glow: "rgba(147, 197, 253, 0.28)",
+    label: "#dbeafe",
   },
 };
 
@@ -67,6 +144,8 @@ export const MountainResultScene = memo(function MountainResultScene({
   maxAltitude = 8848,
   mode = "solo",
   color = "neutral",
+  weather,
+  timeOfDay = "day",
   isWinner = false,
   didFall = false,
   bonusAltitude = 0,
@@ -74,9 +153,10 @@ export const MountainResultScene = memo(function MountainResultScene({
   size = "large",
 }: MountainResultSceneProps) {
   const ratio = Math.min(Math.max(altitude / maxAltitude, 0), 1);
-  const palette = PALETTES[color];
+  const palette = buildPalette(color, weather, timeOfDay, ratio);
   const tier = getAltitudeTier(altitude);
   const isCompact = size === "compact";
+  const sceneScale = 0.72 + ratio * 0.42;
 
   return (
     <div
@@ -114,17 +194,19 @@ export const MountainResultScene = memo(function MountainResultScene({
         gl={{ antialias: true, alpha: true }}
         className="absolute inset-0"
       >
-        <ambientLight intensity={1.35} />
-        <directionalLight position={[3.2, 4.5, 2.6]} intensity={2.4} color="#ffffff" />
+        <ambientLight intensity={timeOfDay === "night" ? 0.92 : 1.35} />
+        <directionalLight position={[3.2, 4.5, 2.6]} intensity={timeOfDay === "night" ? 1.45 : 2.4} color={timeOfDay === "sunset" ? "#fed7aa" : "#ffffff"} />
         <directionalLight position={[-4, 1.6, -2]} intensity={0.9} color={palette.ridge} />
         <fog attach="fog" args={[palette.horizon, 7, 13]} />
+
+        <ResultAtmosphere palette={palette} weather={weather} timeOfDay={timeOfDay} />
 
         <Float speed={1.2} rotationIntensity={0.12} floatIntensity={isCompact ? 0.12 : 0.22}>
           <MountainMesh altitudeRatio={ratio} palette={palette} didFall={didFall} />
         </Float>
 
-        <RidgeLine z={-1.45} y={-1.14} color={palette.ridge} opacity={0.42} scale={1.22} />
-        <RidgeLine z={-2.05} y={-1.03} color={palette.shadow} opacity={0.18} scale={1.46} />
+        <RidgeLine z={-1.45} y={-1.14} color={palette.ridge} opacity={0.18 + ratio * 0.22} scale={sceneScale} />
+        <RidgeLine z={-2.05} y={-1.03} color={palette.shadow} opacity={0.12 + ratio * 0.12} scale={sceneScale + 0.28} />
         {(isWinner || altitude >= 8000) && (
           <Sparkles
             count={isCompact ? 34 : 56}
@@ -140,10 +222,10 @@ export const MountainResultScene = memo(function MountainResultScene({
 
       <div className="pointer-events-none absolute inset-x-4 top-4 flex items-start justify-between gap-3">
         <div>
-          <div className="text-[10px] font-black uppercase tracking-[0.26em] text-slate-700/80">
+          <div className="text-[10px] font-black uppercase tracking-[0.26em]" style={{ color: palette.label }}>
             {mode === "versus" ? "Judged Peak" : "Current Peak"}
           </div>
-          <div className="mt-1 text-sm font-bold text-slate-900/85 sm:text-base">{tier}</div>
+          <div className="mt-1 text-sm font-bold sm:text-base" style={{ color: palette.label }}>{tier}</div>
         </div>
         <div className="rounded-full bg-white/72 px-3 py-1 text-xs font-black text-slate-800 shadow-sm backdrop-blur-md">
           {Math.round(ratio * 100)}%
@@ -192,14 +274,17 @@ function MountainMesh({
   didFall: boolean;
 }) {
   const groupRef = useRef<THREE.Group>(null);
-  const height = 1.75 + altitudeRatio * 2.65;
-  const radius = 1.48 - altitudeRatio * 0.28;
+  const height = 0.48 + Math.pow(altitudeRatio, 0.82) * 4.35;
+  const radius = 1.1 + altitudeRatio * 0.32;
+  const sideHeight = Math.max(0.32, height * (0.42 + altitudeRatio * 0.24));
+  const baseY = -1.36;
   const snowHeight = altitudeRatio > 0.55 ? Math.max(0.22, height * 0.26) : 0;
+  const foothillHeight = Math.max(0.22, height * 0.36);
 
   useFrame(({ clock }) => {
     if (!groupRef.current) return;
     groupRef.current.rotation.y = Math.sin(clock.elapsedTime * 0.38) * 0.08;
-    groupRef.current.position.y = -1.12 + Math.sin(clock.elapsedTime * 0.72) * 0.025;
+    groupRef.current.position.y = Math.sin(clock.elapsedTime * 0.72) * 0.025;
   });
 
   const rockMaterial = useMemo(
@@ -235,23 +320,28 @@ function MountainMesh({
 
   return (
     <group ref={groupRef}>
-      <mesh position={[0, height / 2 - 1.1, 0]} rotation={[0, Math.PI / 4, 0]} material={rockMaterial}>
+      <mesh position={[0, baseY + height / 2, 0]} rotation={[0, Math.PI / 4, 0]} material={rockMaterial}>
         <coneGeometry args={[radius, height, 7, 5]} />
       </mesh>
-      <mesh position={[-0.58, height * 0.34 - 1.05, 0.2]} rotation={[0, -0.35, 0.18]} material={shadowMaterial}>
-        <coneGeometry args={[radius * 0.62, height * 0.82, 5, 4]} />
+      <mesh position={[-0.58, baseY + sideHeight / 2 + height * 0.02, 0.2]} rotation={[0, -0.35, 0.18]} material={shadowMaterial}>
+        <coneGeometry args={[radius * 0.56, sideHeight, 5, 4]} />
       </mesh>
-      <mesh position={[0.52, height * 0.32 - 1.04, 0.1]} rotation={[0, 0.42, -0.12]} material={rockMaterial}>
-        <coneGeometry args={[radius * 0.52, height * 0.76, 5, 4]} />
+      <mesh position={[0.52, baseY + sideHeight / 2, 0.1]} rotation={[0, 0.42, -0.12]} material={rockMaterial}>
+        <coneGeometry args={[radius * 0.5, sideHeight * 0.9, 5, 4]} />
       </mesh>
+      {altitudeRatio < 0.22 && (
+        <mesh position={[0, baseY + foothillHeight / 2 - 0.05, -0.1]} rotation={[0, 0.2, 0]} material={rockMaterial}>
+          <coneGeometry args={[radius * 1.26, foothillHeight, 8, 2]} />
+        </mesh>
+      )}
       {snowHeight > 0 && (
-        <mesh position={[0, height - snowHeight / 2 - 1.08, 0]} rotation={[0, Math.PI / 4, 0]} material={snowMaterial}>
+        <mesh position={[0, baseY + height - snowHeight / 2 + 0.02, 0]} rotation={[0, Math.PI / 4, 0]} material={snowMaterial}>
           <coneGeometry args={[radius * (snowHeight / height) * 1.22, snowHeight, 7, 2]} />
         </mesh>
       )}
-      {altitudeRatio >= 0.9 && <SummitFlag color={palette.accent} height={height} />}
+      {altitudeRatio >= 0.9 && <SummitFlag color={palette.accent} height={height} baseY={baseY} />}
       {didFall && (
-        <Html position={[0.52, height * 0.42 - 1.05, 0.95]} transform>
+        <Html position={[0.52, baseY + height * 0.42, 0.95]} transform>
           <div className="h-16 w-1 rotate-[22deg] rounded-full bg-red-500 shadow-[0_0_18px_rgba(239,68,68,0.95)]" />
         </Html>
       )}
@@ -259,9 +349,9 @@ function MountainMesh({
   );
 }
 
-function SummitFlag({ color, height }: { color: string; height: number }) {
+function SummitFlag({ color, height, baseY }: { color: string; height: number; baseY: number }) {
   return (
-    <group position={[0, height - 0.86, 0]}>
+    <group position={[0, baseY + height - 0.02, 0]}>
       <mesh position={[0, 0.32, 0]}>
         <cylinderGeometry args={[0.01, 0.01, 0.66, 8]} />
         <meshStandardMaterial color="#f8fafc" roughness={0.42} />
@@ -319,10 +409,103 @@ function FallScar({ palette }: { palette: Palette }) {
   );
 }
 
+function ResultAtmosphere({
+  palette,
+  weather,
+  timeOfDay,
+}: {
+  palette: Palette;
+  weather?: WeatherId;
+  timeOfDay: TimeOfDay;
+}) {
+  const showSnow = weather === "BLIZZARD";
+  const showWind = weather === "WINDY";
+  const showStars = timeOfDay === "night" || timeOfDay === "dawn";
+
+  return (
+    <>
+      {showStars && (
+        <Sparkles
+          count={28}
+          scale={[4.8, 2.3, 1.8]}
+          position={[0, 1.4, -1.2]}
+          size={1.5}
+          speed={0.12}
+          color={palette.snow}
+          opacity={0.42}
+        />
+      )}
+      {showSnow && (
+        <Sparkles
+          count={54}
+          scale={[4.8, 2.8, 2]}
+          position={[0, 0.4, 0]}
+          size={2.2}
+          speed={0.62}
+          color={palette.snow}
+          opacity={0.58}
+        />
+      )}
+      {showWind && <WindRibbons color={palette.accent} />}
+    </>
+  );
+}
+
+function WindRibbons({ color }: { color: string }) {
+  const groupRef = useRef<THREE.Group>(null);
+
+  useFrame(({ clock }) => {
+    if (!groupRef.current) return;
+    groupRef.current.position.x = ((clock.elapsedTime * 1.9) % 3) - 1.5;
+  });
+
+  return (
+    <group ref={groupRef} rotation={[0, 0, -0.08]} position={[0, 0.25, 0.3]}>
+      {[-1.15, -0.45, 0.32, 1.05].map((y, index) => (
+        <mesh key={index} position={[-0.6 + index * 0.34, y, 0]}>
+          <boxGeometry args={[1.3, 0.018, 0.018]} />
+          <meshBasicMaterial color={color} transparent opacity={0.28} />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
 function getAltitudeTier(altitude: number) {
   if (altitude >= 8000) return "Death Zone Summit";
   if (altitude >= 6000) return "Snow Line";
   if (altitude >= 4000) return "Alpine Wall";
   if (altitude >= 2000) return "Rocky Ridge";
   return "Foothills";
+}
+
+function buildPalette(
+  color: NonNullable<MountainResultSceneProps["color"]>,
+  weather: WeatherId | undefined,
+  timeOfDay: TimeOfDay,
+  ratio: number,
+): Palette {
+  const base = PALETTES[color];
+  const weatherTint = weather ? WEATHER_TINTS[weather] : {};
+  const timeTint = TIME_TINTS[timeOfDay];
+  const altitudeTint: Partial<Palette> = ratio < 0.22
+    ? {
+        rock: color === "neutral" ? "#3f7d4d" : base.rock,
+        shadow: color === "neutral" ? "#245135" : base.shadow,
+        ridge: color === "neutral" ? "#86efac" : base.ridge,
+      }
+    : ratio > 0.68
+      ? {
+          rock: color === "neutral" ? "#64748b" : base.rock,
+          shadow: color === "neutral" ? "#334155" : base.shadow,
+          snow: "#f8fafc",
+        }
+      : {};
+
+  return {
+    ...base,
+    ...weatherTint,
+    ...timeTint,
+    ...altitudeTint,
+  };
 }

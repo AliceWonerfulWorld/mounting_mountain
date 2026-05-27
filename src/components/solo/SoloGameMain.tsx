@@ -32,7 +32,9 @@ export function SoloGameMain({
   return (
     <>
       {/* メインゲーム画面 */}
-      <section className="relative overflow-hidden rounded-xl border border-white/20 bg-white/90 p-4 shadow-lg backdrop-blur-sm animate-in slide-in-from-bottom-2 fade-in duration-500 dark:bg-zinc-900/90 sm:p-6">
+      <section className="relative overflow-hidden rounded-2xl border border-white/35 bg-white/82 p-4 shadow-[0_24px_70px_rgba(15,23,42,0.22)] backdrop-blur-xl animate-in slide-in-from-bottom-2 fade-in duration-500 dark:border-white/10 dark:bg-zinc-950/78 sm:p-6">
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/80 to-transparent" />
+          <div className="pointer-events-none absolute -left-32 top-0 h-full w-40 rotate-12 bg-white/15 blur-2xl" />
           {/* 背景装飾 */}
           <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
             <div className="text-8xl">⛰️</div>

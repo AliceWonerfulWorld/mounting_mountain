@@ -4,11 +4,14 @@ import type { Round } from "@/types/game";
 import { MountainResultScene } from "@/components/MountainResultScene";
 import { getLabelJa } from "@/lib/labels";
 import { getRoute } from "@/lib/solo/routes";
+import { useTimeOfDayExtended } from "@/hooks/useTimeOfDay";
+import type { WeatherId } from "@/lib/solo/weather";
 
 interface SoloResultViewProps {
   round: Round;
   isGameFinished: boolean;
   roundNumber: number;
+  weather?: WeatherId;
   onNext: () => void;
 }
 
@@ -16,8 +19,11 @@ export function SoloResultView({
   round,
   isGameFinished,
   roundNumber,
+  weather,
   onNext,
 }: SoloResultViewProps) {
+  const { timeOfDay } = useTimeOfDayExtended();
+
   if (!round.result) return null;
 
   return (
@@ -37,6 +43,8 @@ export function SoloResultView({
         <div className="w-full flex-shrink-0 md:w-[360px] lg:w-[420px]">
           <MountainResultScene
             altitude={round.result.altitude}
+            weather={weather}
+            timeOfDay={timeOfDay}
             didFall={round.result.didFall}
             bonusAltitude={round.result.bonusAltitude}
             size="large"

@@ -113,6 +113,20 @@ body {
   }
 }
 
+@keyframes world-sheen {
+  0%, 100% {
+    transform: translateX(-35%) skewX(-12deg);
+    opacity: 0.18;
+  }
+  45% {
+    opacity: 0.34;
+  }
+  60% {
+    transform: translateX(35%) skewX(-12deg);
+    opacity: 0.08;
+  }
+}
+
 /* Tailwind custom utilities */
 .animate-pulse-slow {
   animation: pulse-slow 3s ease-in-out infinite;

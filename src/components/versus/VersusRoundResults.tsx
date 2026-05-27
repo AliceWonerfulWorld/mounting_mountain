@@ -4,6 +4,7 @@ import { TrendingUp, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getRoute } from "@/lib/solo/routes";
 import { MountainResultScene } from "@/components/MountainResultScene";
+import { useTimeOfDayExtended } from "@/hooks/useTimeOfDay";
 import type { VersusState } from "@/hooks/useVersusLocalGame";
 import type { Round } from "@/types/game";
 
@@ -14,6 +15,7 @@ type VersusRoundResultsProps = {
 };
 
 export function VersusRoundResults({ game, roundCount, onNext }: VersusRoundResultsProps) {
+    const { timeOfDay } = useTimeOfDayExtended();
     const p1Round = game.players[0].rounds[game.roundIndex];
     const p2Round = game.players[1].rounds[game.roundIndex];
 
@@ -30,12 +32,14 @@ export function VersusRoundResults({ game, roundCount, onNext }: VersusRoundResu
                         playerName="Player 1"
                         color="red"
                         round={p1Round}
+                        timeOfDay={timeOfDay}
                         resultState={game.roundWinner === 0 ? "win" : game.roundWinner === 1 ? "lose" : "draw"}
                     />
                     <RoundPlayerResult
                         playerName="Player 2"
                         color="blue"
                         round={p2Round}
+                        timeOfDay={timeOfDay}
                         resultState={game.roundWinner === 1 ? "win" : game.roundWinner === 0 ? "lose" : "draw"}
                     />
                 </div>
@@ -63,11 +67,13 @@ function RoundPlayerResult({
     playerName,
     color,
     round,
+    timeOfDay,
     resultState,
 }: {
     playerName: string;
     color: ResultColor;
     round: Round;
+    timeOfDay: ReturnType<typeof useTimeOfDayExtended>["timeOfDay"];
     resultState: ResultState;
 }) {
     const result = round.result;
@@ -104,6 +110,7 @@ function RoundPlayerResult({
                         altitude={result?.altitude || 0}
                         color={color}
                         mode="versus"
+                        timeOfDay={timeOfDay}
                         isWinner={resultState === "win"}
                         didFall={result?.didFall}
                         size="compact"

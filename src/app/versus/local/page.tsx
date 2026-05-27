@@ -61,8 +61,10 @@ export default function VersusLocalPage() {
                 {(game.phase === "input" || game.phase === "result" || game.phase === "both_results" || game.phase === "finished") && (
                     <motion.div
                         layout
-                        className="flex-1 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 dark:border-slate-800 p-6 md:p-8 relative overflow-hidden flex flex-col"
+                        className="relative flex flex-1 flex-col overflow-hidden rounded-3xl border border-white/45 bg-white/82 p-6 shadow-[0_28px_90px_rgba(15,23,42,0.25)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/80 md:p-8"
                     >
+                        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/80 to-transparent" />
+                        <div className="pointer-events-none absolute -left-32 top-0 h-full w-44 rotate-12 bg-white/10 blur-2xl" />
                         {/* Corner Decorations */}
                         <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
                             <Mountain className="w-24 h-24 text-slate-500" />
